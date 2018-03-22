@@ -1,0 +1,10 @@
+{
+    "typeAcquisition": {
+        "include": [
+            "jquery"
+        ]
+    },
+    "compilerOptions": {
+        "target": "ES6"
+    },
+}
