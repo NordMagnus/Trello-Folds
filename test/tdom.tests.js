@@ -20,7 +20,6 @@ requirejs.config({
     }
 });
 
-
 describe('tdom', function() {
 
     const jsdom = require("jsdom");

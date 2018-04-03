@@ -49,7 +49,7 @@
         "jQuery": false,
         "tdom": true,
         "Chart": false,
-        "tsqd": false,
+        "tfolds": false,
         "describe": true,
         "it": true,
         "before": true,

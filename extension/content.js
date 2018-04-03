@@ -1,4 +1,4 @@
-console.info("Running SQUADIFICATION Chrome extension");
+console.info("Running TRELLO FOLDS Chrome extension");
 
-tsqd.debug = true;
-tsqd.initialize();
+tfolds.debug = true;
+tfolds.initialize();

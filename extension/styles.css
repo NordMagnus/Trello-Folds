@@ -1,136 +1,31 @@
-body {
-    background-color: blueviolet;
-}
-
-.graph-area {
-    display: block;
-    background-color: white;
-    /* border-radius: 2px; */
-    width: 254px;
-    margin-top: 3px;
-}
-
-.list-graph {
-    position: relative;
-}
-
-.big-graph {
-    position: relative;
-    padding: 5px;
-    margin: 5px;
-    background-color: #f0f0f0;
-    float: left;
-}
-
-.list-status {
-    float: left;
-    width: 100%;
-    min-height: 40px;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    color: White;
-    font-size: 8pt;
-    box-sizing: border-box;
-    padding: 2px;
-    padding-left: 5px;
-    overflow: visible;
-    display: flex;
-    flex-shrink: 0;
-    flex: none;
-}
-
-.header-btn.squad-enabled {
-    background-color: #96c623;
-}
-
-.header-btn.squad-enabled:hover {
-    background-color: #76a613;
-}
-
-.header-btn.squad-disabled {
-    background-color: #cc4400;
-}
-
-.header-btn.squad-disabled:hover {
-    background-color: #a94200;
-}
-
-.header-btn.squad-tristate {
-    background-color: #0079bf;
-}
-
-.header-btn.squad-tristate:hover {
-    background-color: #0059af;
-}
-
-.header-btn.button-disabled {
-    background-color: #808080;
-}
-
-.header-btn.button-disabled:hover {
-    background-color: #505050;
-}
-
-.team-count {
-    font-size: 24pt;
-    float: right;
-    position: absolute;
-    top: 5px;
-    right: 0px;
-    height: 30px;
+.section {
+    background: rgba(0,0,0,0.0);
+    border: none;
     font-weight: bold;
-    padding: 5px;
+    font-size: 10pt;
+    padding: 0px;
+    margin: 0px;
 }
 
-.fold-button {
-    font-size: 8pt;
-    float: left;
-    position: absolute;
-    top: 4px;
-    left: 0px;
-    height: 10pt;
-    width: 5pt;
-    background-color: rgba(0,0,0,0.3);
-    font-weight: bold;
-    padding: 1px;
-}
-
-div#modal-overlay {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(20,20,20,0.4);
-}
-
-.group-stats {
+.list-collapsed {
+    transform: rotate(270deg);
+    transform-origin: 100% 0%;
+    position: relative;
+    top: 0px;
+    left: -270px;
     display: none;
-    position: absolute;
-    width: 80vw;
-    height: 80vh;
-    top: 5vw;
-    left: 10vw;
-    background-color: White;
-    z-index: 100;
-    border-radius: 4px;
-    box-shadow: 0px 5px 25px #202020;
-    padding: 10px;
+    height: 40px;
+    width: 270px;
 }
 
-.group-stats-heading {
-    width: 100%;
-    height: 50px;
-    display: block;
-    font-size: 18pt;
-    font-weight: bold;
-    text-align: center;
-    padding-top: 10px;
-}
-
-a#close-group-stats {
-    float: right;
+.list-collapsed > span {
+    font-weight: 700;
+    padding: 0px;
+    vertical-align: middle;
+    font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
     font-size: 14px;
-}
-
-div#group-stats-content {
-    overflow: auto;
-    height: 75vh;
+    position: relative;
+    top: 10px;
+    height: 100%;
+    padding-left: 10px;
 }

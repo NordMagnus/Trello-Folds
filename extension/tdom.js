@@ -1,4 +1,3 @@
-
 // eslint-disable-next-line no-unused-vars
 const tdom = (function (factory) {
     'use strict';
@@ -65,7 +64,7 @@ const tdom = (function (factory) {
          * @returns {jQuery} jQuery object with card DOM elements or <code>null</code> if no cards found
          * @throws {TypeError} when missing parameter
          */
-        getCardsByName(name) {
+        getCardsByName(name, exactMatch = false) {
             if (!name) {
                 throw new TypeError();
             }
@@ -76,11 +75,14 @@ const tdom = (function (factory) {
                     .remove() //remove all the children
                     .end() //again go back to selected element
                     .text();
-                return title === name;
+                if (exactMatch) {
+                    return title === name;
+                }
+                return title.indexOf(name) !== -1;
             });
-            if (jCards.length === 0) {
-                return null;
-            }
+            // if (jCards.length === 0) {
+            //     return null;
+            // }
             return jCards;
         },
 
@@ -239,7 +241,7 @@ const tdom = (function (factory) {
          */
         getCardsByLabels(title, filter) {
             throw 'Not implemented'; // TODO Implement
-            // This could be used by tsqd.countTeamMembers()
+            // This could be used by tfolds.countTeamMembers()
         },
 
     };

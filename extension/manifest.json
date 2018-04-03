@@ -17,7 +17,7 @@
     "description": "Trello restructured",
     "content_scripts": [{
         "css": ["styles.css"],
-        "js": ["lib/jquery.js", "lib/Chart.js", "tdom.js", "trello-folds.js", "content.js"],
+        "js": ["lib/jquery.js", "tdom.js", "trello-folds.js", "content.js"],
         "matches": ["https://trello.com/*"]
     }]
 }
