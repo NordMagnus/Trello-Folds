@@ -9,7 +9,277 @@ const tdom = (function (factory) {
 }(function ($) {
     'use strict';
 
+    class EventHandler {
+
+        constructor() {
+            this.listeners = new Map();
+        }
+
+        addListener(label, callback) {
+            this.listeners.has(label) || this.listeners.set(label, []);
+            this.listeners.get(label).push(callback);
+        }
+
+        removeListener(label, callback) {
+            let listeners = this.listeners.get(label);
+
+            if (listeners && listeners.length) {
+                let index = listeners.reduce((i, listener, index) => {
+                    return ((typeof listener == "function") && listener === callback) ? index : i;
+                }, -1);
+
+                if (index > -1) {
+                    listeners.splice(index, 1);
+                    this.listeners.set(label, listeners);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        emit(label, ...args) {
+            let listeners = this.listeners.get(label);
+            if (listeners && listeners.length) {
+                listeners.forEach((listener) => {
+                    listener(...args);
+                });
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    EventHandler.BOARD_CHANGED = Symbol("board_changed");
+    EventHandler.CARD_ADDED = Symbol("card_added");
+    EventHandler.CARD_REMOVED = Symbol("card_removed");
+    EventHandler.CARD_MODIFIED = Symbol("card_modified");
+    EventHandler.LIST_ADDED = Symbol("list_added"); // TODO
+    EventHandler.LIST_MODIFIED = Symbol("list_modified");
+    EventHandler.LIST_TITLE_MODIFIED = Symbol("list_title_modified"); // TODO
+
+    Object.freeze(EventHandler);
+
+    //#region PRIVATE MEMBERS
+
+    let handler = new EventHandler();
+    let boardObserver;
+    let currentBoardId;
+    let debug = false;
+
+    //#endregion PRIVATE MEMBERS
+
     const self = {
+
+        get debug() {
+            return debug;
+        },
+
+        set debug(d) {
+            debug = d;
+        },
+
+        get boardId() {
+            return currentBoardId;
+        },
+
+        /**
+         *
+         */
+        initialize() {
+            let $content = $("DIV#content");
+
+            if (!$content.length) {
+                throw ReferenceError("DIV#content not found");
+            }
+
+            let boardObserver = new MutationObserver(function (mutations) {
+                if (debug) {
+                    console.log("Board observer invoked");
+                }
+
+                if (mutations.length !== 0 && $(mutations[mutations.length - 1].addedNodes)) {
+                    const boardId = self.getBoardIdFromUrl();
+                    console.info(`NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
+                    if (currentBoardId !== boardId) {
+                        console.log("Calling onBoardChanged()");
+                        self.boardChanged(boardId);
+                    }
+                }
+            });
+
+            let conf = {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree: false,
+            };
+
+            self.boardChanged(self.getBoardIdFromUrl());
+
+            /*
+             * Give the page a chance to catch its breath before continuing.
+             */
+            // self.delay(200).then(() => {
+            //     boardObserver.observe($content[0], conf);
+            // })
+            setTimeout(() => {
+                boardObserver.observe($content[0], conf);
+            }, 200);
+        },
+
+        /**
+         *
+         */
+        boardChanged(boardId) {
+            if (debug) {
+                console.info(`INITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
+            }
+            self.connectObservers();
+            const oldBoardId = currentBoardId;
+            currentBoardId = boardId;
+            handler.emit(EventHandler.BOARD_CHANGED, oldBoardId, currentBoardId);
+        },
+
+        // /**
+        //  * https://stackoverflow.com/questions/34255351/is-there-a-version-of-settimeout-that-returns-an-es6-promise
+        //  */
+        // delay(ms) {
+        //     let ctr;
+        //     let rej;
+        //     let p = new Promise(function(resolve, reject) {
+        //         ctr = setTimeout(resolve, ms);
+        //         rej = reject;
+        //     });
+        //     p.cancel = function() {
+        //         clearTimeout(ctr);
+        //         rej(Error("Cancelled"));
+        //     };
+        //     return p;
+        // },
+
+        //#region EVENT MANAGEMENT
+
+        /**
+         *
+         */
+        connectObservers() {
+            self.connectListObserver();
+            self.connectCardObserver();
+        },
+
+        /**
+         *
+         */
+        connectListObserver() {
+            let $lists = $("div.list");
+
+            if ($lists.length === 0) {
+                return;
+            }
+
+            let listObserver = new MutationObserver(function (mutations) {
+                mutations.forEach((m) => {
+                    // console.log("LIST OBSERVER MUTATION", m);
+                    if (m.addedNodes.length > 0 &&
+                        m.addedNodes[0].localName === "a" &&
+                        $(m.addedNodes[0]).hasClass("list-card")) {
+                        handler.emit(EventHandler.CARD_ADDED, m.addedNodes[0]);
+                        handler.emit(EventHandler.LIST_MODIFIED, $(m.target).parent()[0]);
+                    } else if (m.removedNodes.length > 0 &&
+                        m.removedNodes[0].localName === "a" &&
+                        $(m.removedNodes[0]).hasClass("list-card")) {
+                        handler.emit(EventHandler.CARD_REMOVED, m.removedNodes[0]);
+                        handler.emit(EventHandler.LIST_MODIFIED, $(m.target).parent()[0]);
+                    } else if (m.addedNodes.length === 2 &&
+                        m.removedNodes.length === 2 &&
+                        m.addedNodes[1].parentElement.localName === "span" &&
+                        $(m.addedNodes[1].parentElement).hasClass("list-card-title")) {
+                        handler.emit(EventHandler.CARD_MODIFIED, $(m.target).closest("a")[0],
+                            m.addedNodes[1].textContent, m.removedNodes[1].textContent);
+                    } else if ($(m.target).hasClass("list-header-name-assist") && m.addedNodes.length === 1) {
+                        handler.emit(EventHandler.LIST_TITLE_MODIFIED, $(m.target).closest("div.list"),
+                            m.addedNodes[0].textContent);
+                    }
+                });
+            });
+
+            let conf = {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree: true,
+            };
+
+            $lists.each(function () {
+                listObserver.observe(this, conf);
+            });
+        },
+
+        /**
+         *
+         */
+        connectCardObserver(params) {
+
+        },
+
+        get events() {
+            // ? Is this needed - should use convenience methods instead
+            return EventHandler;
+        },
+
+        /**
+         *
+         */
+        onBoardChanged(callback) {
+            handler.addListener(EventHandler.BOARD_CHANGED, callback);
+        },
+
+        /**
+         *
+         */
+        onListModified(callback) {
+            handler.addListener(EventHandler.LIST_MODIFIED, callback);
+        },
+
+        /**
+         *
+         * @param {Function} callback
+         */
+        onCardAdded(callback) {
+            handler.addListener(EventHandler.CARD_ADDED, callback);
+        },
+
+        /**
+         *
+         */
+        onCardModified(callback) {
+            handler.addListener(EventHandler.CARD_MODIFIED, callback);
+        },
+
+        onListTitleModified(callback) {
+            handler.addListener(EventHandler.LIST_TITLE_MODIFIED, callback);
+        },
+
+        //#endregion EVENT MANAGEMENT
+
+
+        /**
+         * Extracts the board ID from the URL.
+         */
+        getBoardIdFromUrl() {
+            let url = document.URL.split("/");
+            return url[url.length - 2];
+        },
+
+        /**
+         * Gets the `div.list` element for the list containing the card.
+         *
+         * @param {Element} card The card whose list to get
+         */
+        getListForCard(card) {
+            return $(card).closest("div.list")[0];
+        },
 
         /**
          * Given a parent element, returns the name of the list.
@@ -21,12 +291,12 @@ const tdom = (function (factory) {
             if (!el) {
                 throw new TypeError();
             }
-            let nameElement = $(el).find("h2.js-list-name-assist");
+            let nameElement = $(el).find("h2.list-header-name-assist");
             if (nameElement.length === 0) {
-                throw new ReferenceError("No js-list-name-assist H2 tag found");
+                throw new ReferenceError("No [H2.list-header-name-assist] tag found");
             }
             if (nameElement.length !== 1) {
-                throw new RangeError("More than one js-list-name-assist H2 tag found");
+                throw new RangeError("More than one [H2.list-header-name-assist] tag found");
             }
             return nameElement.text();
         },
@@ -41,13 +311,19 @@ const tdom = (function (factory) {
         getLists(name, filter) {
             let jLists;
 
-            jLists = $("div.js-list-content").has(`h2:contains('${name||""}')`);
+            if (name instanceof RegExp) {
+                jLists = $("div.js-list-content").filter(function () {
+                    return name.test($(this).find("h2").text());
+                });
+            } else {
+                jLists = $("div.js-list-content").has(`h2:contains('${name||""}')`);
+            }
 
             if (filter !== undefined) {
                 jLists = jLists.filter(function () {
                     let titleText = $(this).find("h2").text();
                     for (let i = 0; i < filter.length; ++i) {
-                        if (titleText.indexOf(filter[i]) !== -1) {
+                        if (titleText.search(filter[i]) !== -1) {
                             return false;
                         }
                     }
@@ -56,6 +332,19 @@ const tdom = (function (factory) {
             }
 
             return jLists;
+        },
+
+        /**
+         *
+         */
+        getCardName($card) {
+            let title = $card.find("span.list-card-title")
+                .clone() //clone the element
+                .children() //select all the children
+                .remove() //remove all the children
+                .end() //again go back to selected element
+                .text();
+            return title;
         },
 
         /**
@@ -69,12 +358,7 @@ const tdom = (function (factory) {
                 throw new TypeError();
             }
             let jCards = $("a.list-card").filter(function () {
-                let title = $(this).find("span.list-card-title")
-                    .clone() //clone the element
-                    .children() //select all the children
-                    .remove() //remove all the children
-                    .end() //again go back to selected element
-                    .text();
+                let title = self.getCardName($(this));
                 if (exactMatch) {
                     return title === name;
                 }
@@ -84,6 +368,17 @@ const tdom = (function (factory) {
             //     return null;
             // }
             return jCards;
+        },
+
+        /**
+         *
+         */
+        countCards(list, filter) {
+            let $cards = $(list).find("a.list-card").filter(function () {
+                const title = self.getCardName($(this));
+                return title.indexOf(filter) === -1;
+            });
+            return $cards.length;
         },
 
         /**

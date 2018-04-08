@@ -29,3 +29,48 @@
     height: 100%;
     padding-left: 10px;
 }
+
+.icon-expanded {
+    background-image:url('chrome-extension://__MSG_@@extension_id__/img/icons8-sort-down-16.png');
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+}
+
+.icon-collapsed {
+    background-image:url('chrome-extension://__MSG_@@extension_id__/img/icons8-sort-right-16.png');
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+}
+
+.wip-limit-reached {
+    border-top: solid 10px #ffab4a;
+}
+
+.collapsed-limit-reached {
+    border-right: solid 10px #ffab4a;
+}
+
+.wip-limit-exceeded {
+    border-top: solid 10px #b04632;
+}
+
+.collapsed-limit-exceeded {
+    border-right: solid 10px #b04632;
+}
+
+.section-card {
+    background: rgba(0,0,0,0.0) !important;
+    border: none !important;
+    font-weight: bold;
+    font-size: 10pt;
+    padding: 0px;
+    margin: 0px;
+    position: relative;
+    top: 5px;
+}

@@ -16,8 +16,8 @@ const expect = chai.expect;
 requirejs.config({
     baseUrl: ".",
     paths: {
-        tdom: "extension/tdom"
-    }
+        tdom: "extension/tdom",
+    },
 });
 
 describe('tdom', function() {
@@ -39,10 +39,10 @@ describe('tdom', function() {
 
     describe("dom", function() {
         it("should have a list called 'List Alpha'", function() {
-            var jName = $.find("h2.js-list-name-assist:contains('List Alpha')");
+            let jName = $.find("h2.js-list-name-assist:contains('List Alpha')");
             expect(jName).to.exist;
             expect(jName.length).to.equal(1);
-        })
+        });
     });
 
     describe("definition", function() {
@@ -53,13 +53,42 @@ describe('tdom', function() {
 
     });
 
+    describe("events", function() {
+        it("should have an event named CARD_ADDED", function() {
+            expect(tdom.events.CARD_ADDED).to.be.a("Symbol");
+        });
+    });
+
+    describe("EventHandler", function() {
+
+        it("should call an added listener", function() {
+            let handler = new tdom.events;
+            let calls = 0;
+            let arg;
+            let myListener = (data) => {
+                calls++;
+                arg = data;
+            };
+           handler.addListener(handler.CARD_ADDED, myListener);
+           expect(calls).to.equal(0);
+           handler.emit(handler.CARD_ADDED, "foo");
+           expect(calls).to.equal(1);
+           expect(arg).to.equal("foo");
+           handler.removeListener(handler.CARD_ADDED, myListener);
+           handler.emit(handler.CARD_ADDED, "bar");
+           expect(calls).to.equal(1);
+           expect(arg).to.equal("foo");
+        });
+
+    });
+
     describe("getListName()", function() {
 
         it("should throw an error when no parameter given", function() {
             expect(tdom.getListName).to.throw(TypeError);
         });
         it("should return 'List Alpha' when called with first js-list DIV", function() {
-            var jList = $("div.list")[0];
+            let jList = $("div.list")[0];
             expect(tdom.getListName(jList)).to.equal("List Alpha");
         });
 
@@ -84,7 +113,7 @@ describe('tdom', function() {
             expect(tdom.getCardsByName("Card A")).to.be.null;
         });
         it("should return DOM elements of type 'a.list-card'", function() {
-            var jCards = tdom.getCardsByName("Card A1");
+            let jCards = tdom.getCardsByName("Card A1");
             expect(jCards[0].tagName).to.equal("A");
             expect(jCards[0].classList.contains("list-card")).to.be.true;
         });
@@ -95,19 +124,19 @@ describe('tdom', function() {
 
         it("should throw an error if no parameter", function() {
             expect(tdom.countListLabels).to.throw(TypeError);
-        })
+        });
         it("should return an array with length 6 without a filter'", function() {
             let jLists = $("div.list");
             let labels = tdom.countListLabels(jLists);
             expect(Object.keys(labels)).to.have.lengthOf(6);
             expect(labels["Label A"]).to.equal(2);
             expect(labels["Label B"]).to.equal(1);
-        })
+        });
         it("should return an array with length 5 with filter 'C' for 'List Alpha'", function() {
             let jLists = $("div.list");
             let labels = tdom.countListLabels(jLists, ["C"]);
             expect(Object.keys(labels)).to.have.lengthOf(5);
-        })
+        });
 
     });
 
@@ -116,29 +145,29 @@ describe('tdom', function() {
             let jLists = tdom.getLists();
             expect(jLists).to.be.instanceOf($);
             expect(jLists).to.have.lengthOf(4);
-        })
+        });
         it("should return an object with length 3 with parameter 'List'", function() {
             expect(tdom.getLists("List")).to.have.lengthOf(3);
-        })
+        });
         it("should return an object with length 1 with parameters '' and ['List']", function() {
             expect(tdom.getLists("", ["List"])).to.have.lengthOf(1);
-        })
+        });
     });
 
     describe("getCardLabels()", function() {
         it("should throw an error if no parameter", function() {
             expect(tdom.getCardLabels).to.throw(TypeError);
-        })
+        });
         it("should return an array with length 3 for 'List Alpha'=>'Card A1'", function() {
             let cardEl = tdom.getCardsByName("Card A1")[0];
             let labels = tdom.getCardLabels(cardEl);
             expect(labels).to.have.lengthOf(3);
-        })
+        });
         it("should return an array with length 2 for 'List Alpha'=>'Card A1' and filter 'B'", function () {
             let cardEl = tdom.getCardsByName("Card A1")[0];
             let labels = tdom.getCardLabels(cardEl, ["B"]);
             expect(labels).to.has.lengthOf(2);
-        })
+        });
     });
 
     describe("getCardFields()", function() {
@@ -151,6 +180,6 @@ describe('tdom', function() {
     });
 
     describe("countLabelsInList()", function() {
-        it("...")
+        it("...");
     });
 });

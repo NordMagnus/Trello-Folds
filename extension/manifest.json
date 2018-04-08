@@ -19,5 +19,6 @@
         "css": ["styles.css"],
         "js": ["lib/jquery.js", "tdom.js", "trello-folds.js", "content.js"],
         "matches": ["https://trello.com/*"]
-    }]
+    }],
+    "web_accessible_resources": ["img/*.png"]
 }
