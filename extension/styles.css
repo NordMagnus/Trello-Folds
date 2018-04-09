@@ -49,15 +49,35 @@
 }
 
 .wip-limit-reached {
-    border-top: solid 10px #ffab4a;
+    border-top: solid 10px #fb7928;
 }
 
 .collapsed-limit-reached {
-    border-right: solid 10px #ffab4a;
+    border-right: solid 10px #fb7928;
 }
 
 .wip-limit-exceeded {
     border-top: solid 10px #b04632;
+}
+
+.wip-limit-title {
+    font-weight: bold;
+    width: 100%;
+    display: block;
+    line-height: 1.2em;
+}
+
+.wip-limit-badge {
+    padding: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    background-color: #bec3c6;
+    color: white;
+    font-size: 9pt;
+    margin-left: 5px;
+    position: relative;
+    top: -1px;
 }
 
 .collapsed-limit-exceeded {

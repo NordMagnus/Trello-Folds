@@ -273,11 +273,12 @@ const tdom = (function (factory) {
         },
 
         /**
-         * Gets the `div.list` element for the list containing the card.
+         * Gets the `div.list` element for the list containing the given element.
          *
          * @param {Element} card The card whose list to get
+         * @returns {Element} The containing list element
          */
-        getListForCard(card) {
+        getContainingList(card) {
             return $(card).closest("div.list")[0];
         },
 
@@ -345,6 +346,17 @@ const tdom = (function (factory) {
                 .end() //again go back to selected element
                 .text();
             return title;
+        },
+
+        getCardsInList(list, name) {
+            if (!name) {
+                throw new TypeError();
+            }
+            let jCards = $(list).find("a.list-card").filter(function () {
+                let title = self.getCardName($(this));
+                return title.indexOf(name) !== -1;
+            });
+            return jCards;
         },
 
         /**

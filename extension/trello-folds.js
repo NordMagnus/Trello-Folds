@@ -132,7 +132,7 @@ const tfolds = (function (factory) {
                 self.formatAsSection($c);
             }
 
-            self.showWipLimit(tdom.getListForCard(cardEl));
+            self.showWipLimit(tdom.getContainingList(cardEl));
         },
 
         /**
@@ -185,7 +185,29 @@ const tfolds = (function (factory) {
 
             // self.addSectionObservers();
             self.formatSections();
+            self.restoreSectionsViewstate(); // TODO Refactor to "restoreViewstate" including both lists and sections?
             self.formatLists();
+        },
+
+        /**
+         *
+         */
+        restoreSectionsViewstate() {
+            const $lists = tdom.getLists();
+            $lists.each(function() {
+                const $l = $(this);
+                let $sections = tdom.getCardsInList(this, "##");
+                const sectionStates = self.retrieve($l, "sections");
+                if (!sectionStates) {
+                    return;
+                }
+                $sections.each(function() {
+                    const cardName = tdom.getCardName($(this));
+                    if (sectionStates[cardName.substr(2)] === true) {
+                        self.toggleSection($(this).find("span.icon-expanded")[0]);
+                    }
+                });
+            });
         },
 
         /**
@@ -280,7 +302,6 @@ const tfolds = (function (factory) {
         addWipLimits() {
             let $wipLists = tdom.getLists(/\[([0-9]*?)\]/);
             $wipLists.each(function () {
-                console.log(this);
                 self.showWipLimit(this);
             });
         },
@@ -297,6 +318,7 @@ const tfolds = (function (factory) {
                 let wipLimit = parseInt(matches[1]);
                 let numCards = tdom.countCards(list, "##");
                 console.log(`${title} [${numCards}/${wipLimit}]`);
+                self.addListTitleBadge($l, numCards, wipLimit);
                 if (numCards === wipLimit) {
                     $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
                     $l.prev().addClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
@@ -310,6 +332,34 @@ const tfolds = (function (factory) {
 
             $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
             $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
+        },
+
+        /**
+         *
+         */
+        addListTitleBadge($l, numCards, wipLimit) {
+            $l.find("span.wip-limit-title").remove();
+            const title = tdom.getListName($l[0]);
+            const strippedTitle = title.substr(0, title.indexOf('['));
+            const $header = $l.find(".list-header");
+            let $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
+            if (numCards === wipLimit) {
+                $wipTitle.find(".wip-limit-badge").css("background-color", "#fb7928");
+            } else if (numCards > wipLimit) {
+                $wipTitle.find(".wip-limit-badge").css("background-color", "#b04632");
+            }
+            $l.parent().find("div.list-collapsed").empty().append($wipTitle);
+            $wipTitle = $wipTitle.clone();
+            $wipTitle.click(function() {
+                console.log("CLICK!");
+                $(this).hide().siblings("textarea").show().trigger("click").select();
+                return false;
+            });
+            $header.find("textarea").hide().off("blur").blur(function () {
+                console.log("BLUR!");
+                self.showWipLimit($l);
+            });
+            $header.append($wipTitle);
         },
 
         /**
@@ -364,7 +414,16 @@ const tfolds = (function (factory) {
             $s.toggleClass("icon-collapsed icon-expanded");
             let $cards = $s.closest("a").nextUntil("a:contains('##'),div.card-composer");
             $cards.toggle();
-            // TODO Store viewstate
+
+            // const listName = tdom.getListName(tdom.getContainingList(section));
+            const $l = $(tdom.getContainingList(section));
+            let listSections = self.retrieve($l, "sections");
+            if (!listSections) {
+                listSections = {};
+            }
+            const title = $s.next().text();
+            listSections[title] = $s.hasClass("icon-collapsed");
+            self.store($l, "sections", listSections);
         },
 
     };
