@@ -1,9 +1,4 @@
 
-/* global describe */
-/* global it */
-/* global before */
-/* global tdom */
-
 /*
  * requirejs, assert, mocha and jquery installed via node
  */
@@ -11,7 +6,7 @@
 const requirejs = require('requirejs');
 const chai = require('chai');
 // const assert = chai.assert;
-const expect = chai.expect;
+const {expect} = chai;
 
 requirejs.config({
     baseUrl: ".",
@@ -82,6 +77,14 @@ describe('tdom', function() {
 
     });
 
+    describe("getBoardIdFromUrl()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("getContainingList()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
     describe("getListName()", function() {
 
         it("should throw an error when no parameter given", function() {
@@ -94,11 +97,32 @@ describe('tdom', function() {
 
     });
 
+    describe("getLists()", function() {
+        it("should return a jQuery object with length 4 without parameters", function() {
+            let jLists = tdom.getLists();
+            expect(jLists).to.be.instanceOf($);
+            expect(jLists).to.have.lengthOf(4);
+        });
+        it("should return an object with length 3 with parameter 'List'", function() {
+            expect(tdom.getLists("List")).to.have.lengthOf(3);
+        });
+        it("should return an object with length 1 with parameters '' and ['List']", function() {
+            expect(tdom.getLists("", ["List"])).to.have.lengthOf(1);
+        });
+    });
+
+    describe("getCardName()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("getCardsInList()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
     describe("getCardsByName()", function() {
 
-        it("should throw an error when no cards found", function() {
-            // expect(() => tdom.getCardsByName("No card")).to.throw(RangeError);
-            expect(tdom.getCardsByName("No card")).to.be.null;
+        it("should return an empty jQuery object when no card found", function() {
+            expect(tdom.getCardsByName("No card")).to.have.lengthOf(0);
         });
         it("should throw an error when no parameter given", function() {
             expect(tdom.getCardsByName).to.throw(TypeError);
@@ -109,8 +133,8 @@ describe('tdom', function() {
         it("should return a jQuery object with length 1 with argument 'Card A1'", function() {
             expect(tdom.getCardsByName("Card A1")).to.have.lengthOf(1);
         });
-        it("should return null with argument 'Card A'", function() {
-            expect(tdom.getCardsByName("Card A")).to.be.null;
+        it("should return an empty jQuery object with arg 'Card A' with exact match true", function() {
+            expect(tdom.getCardsByName("Card A", true)).to.have.lengthOf(0);
         });
         it("should return DOM elements of type 'a.list-card'", function() {
             let jCards = tdom.getCardsByName("Card A1");
@@ -119,6 +143,9 @@ describe('tdom', function() {
         });
     });
 
+    describe("countCards()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
 
     describe("countListLabels()", function() {
 
@@ -138,20 +165,6 @@ describe('tdom', function() {
             expect(Object.keys(labels)).to.have.lengthOf(5);
         });
 
-    });
-
-    describe("getLists()", function() {
-        it("should return a jQuery object with length 4 without parameters", function() {
-            let jLists = tdom.getLists();
-            expect(jLists).to.be.instanceOf($);
-            expect(jLists).to.have.lengthOf(4);
-        });
-        it("should return an object with length 3 with parameter 'List'", function() {
-            expect(tdom.getLists("List")).to.have.lengthOf(3);
-        });
-        it("should return an object with length 1 with parameters '' and ['List']", function() {
-            expect(tdom.getLists("", ["List"])).to.have.lengthOf(1);
-        });
     });
 
     describe("getCardLabels()", function() {
@@ -180,6 +193,15 @@ describe('tdom', function() {
     });
 
     describe("countLabelsInList()", function() {
-        it("...");
+        it("NO TESTS WRITTEN YET");
     });
+
+    describe("getLabelColors()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("getCardsByLabels()", function() {
+        it("NO TESTS WRITTEN YET");
+    });
+
 });

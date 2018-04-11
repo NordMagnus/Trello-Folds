@@ -15,11 +15,12 @@ const tfolds = (function (factory) {
         debug: false,
         collapsedIconUrl: null,
         expandedIconUrl: null,
+        sectionChar: '#',
+        sectionRepeat: 2,
     };
 
     let storage = {};
     let boardId;
-    let sectionObserver;
 
     const self = {
 
@@ -35,6 +36,26 @@ const tfolds = (function (factory) {
          */
         set debug(debug) {
             config.debug = debug;
+        },
+
+        get sectionCharacter() {
+            return config.sectionChar;
+        },
+
+        get sectionRepeat() {
+            return config.sectionRepeat;
+        },
+
+        set sectionRepeat(repeat) {
+            config.sectionRepeat = repeat;
+        },
+
+        set sectionCharacter(identifier) {
+            config.sectionChar = identifier;
+        },
+
+        get sectionIdentifier() {
+            return config.sectionChar.repeat(config.sectionRepeat);
         },
 
         /**
@@ -112,7 +133,7 @@ const tfolds = (function (factory) {
              * Case 1: Only title changed (was, and still is, a section)
              */
             if (self.isSection(title) && self.isSection(oldTitle)) {
-                $c.find("#section-title").text(title.substr(2));
+                $c.find("#section-title").text(self.getStrippedTitle(title));
                 return;
             }
 
@@ -149,7 +170,20 @@ const tfolds = (function (factory) {
          *
          */
         isSection(title) {
-            return title.indexOf("##") === 0;
+            return title.indexOf(self.sectionIdentifier) !== -1;
+            // return title.search()
+        },
+
+        /**
+         *
+         */
+        getStrippedTitle(title) {
+            let ch = self.sectionCharacter;
+            if (['*', '^', '$', '.', '+', '?', '|', '\\'].indexOf(ch) !== -1) {
+                ch = `\\${ch}`;
+            }
+            let re = new RegExp(`(${ch})\\1{${self.sectionRepeat - 1},}`, 'g');
+            return title.replace(re, "").trim();
         },
 
         /**
@@ -196,14 +230,14 @@ const tfolds = (function (factory) {
             const $lists = tdom.getLists();
             $lists.each(function() {
                 const $l = $(this);
-                let $sections = tdom.getCardsInList(this, "##");
+                let $sections = tdom.getCardsInList(this, self.sectionIdentifier);
                 const sectionStates = self.retrieve($l, "sections");
                 if (!sectionStates) {
                     return;
                 }
                 $sections.each(function() {
                     const cardName = tdom.getCardName($(this));
-                    if (sectionStates[cardName.substr(2)] === true) {
+                    if (sectionStates[self.getStrippedTitle(cardName)] === true) {
                         self.toggleSection($(this).find("span.icon-expanded")[0]);
                     }
                 });
@@ -316,7 +350,7 @@ const tfolds = (function (factory) {
 
             if (matches && matches.length > 1) {
                 let wipLimit = parseInt(matches[1]);
-                let numCards = tdom.countCards(list, "##");
+                let numCards = tdom.countCards(list, self.sectionIdentifier);
                 console.log(`${title} [${numCards}/${wipLimit}]`);
                 self.addListTitleBadge($l, numCards, wipLimit);
                 if (numCards === wipLimit) {
@@ -366,7 +400,7 @@ const tfolds = (function (factory) {
          *
          */
         formatSections() {
-            let $sections = tdom.getCardsByName("##", false);
+            let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
 
             $sections.each(function () {
                 self.formatAsSection($(this));
@@ -382,7 +416,8 @@ const tfolds = (function (factory) {
                 tfolds.toggleSection(this);
                 return false;
             });
-            const strippedTitle = tdom.getCardName($card).substr(2);
+            const strippedTitle = self.getStrippedTitle(tdom.getCardName($card));
+
             $card.prepend(`<span id="section-title">${strippedTitle}</span>`);
             $card.prepend($icon);
             $card.find('span.list-card-title').hide();
@@ -412,7 +447,7 @@ const tfolds = (function (factory) {
         toggleSection(section) {
             let $s = $(section);
             $s.toggleClass("icon-collapsed icon-expanded");
-            let $cards = $s.closest("a").nextUntil("a:contains('##'),div.card-composer");
+            let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
             $cards.toggle();
 
             // const listName = tdom.getListName(tdom.getContainingList(section));
