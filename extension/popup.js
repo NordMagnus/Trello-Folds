@@ -6,7 +6,7 @@ let settings = {
 
 let numOfViewStates = 0;
 
-function sendMessage(msg, data) {
+function sendMessage(msg, data, callback) {
     chrome.tabs.query({
         active: true,
         currentWindow: true,
@@ -15,7 +15,11 @@ function sendMessage(msg, data) {
             msg: msg,
             data: data,
         }, (response) => {
-            console.log(response);
+            if (callback) {
+                callback(response);
+            } else {
+                console.log(`Message ${msg} response`, response);
+            }
         });
     });
 }
@@ -80,6 +84,10 @@ function dumpViewState() {
     sendMessage("dump");
 }
 
+function clearViewState() {
+    sendMessage("clear");
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     /*
@@ -88,8 +96,19 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.sync.get(null, result => {
         if (result["settings"]) {
             settings.settings = result["settings"];
+        } else {
+            // TODO Default settings duplicated form tfolds
+            settings.settings = {
+                sectionChar: "#",
+                sectionRepeat: 2,
+                enableTopBars: true,
+                rememberViewStates: true,
+            };
         }
         numOfViewStates = Object.keys(result).length - 1;
+        if (numOfViewStates < 0) {
+            numOfViewStates = 0;
+        }
 
         document.getElementById('num-view-states').innerText = numOfViewStates;
 
@@ -105,7 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('remember-view-states').addEventListener('change', updateRememberViewStates);
         document.getElementById('remember-view-states').checked = settings.settings.rememberViewStates;
 
+        document.getElementById('clear-view-state').addEventListener('click', clearViewState);
         document.getElementById('clear-view-state').disabled = true;
+        sendMessage("id", undefined, (boardId) => {
+            if (boardId) {
+                document.getElementById('clear-view-state').disabled = false;
+            }
+        });
 
         document.getElementById('dump-viewstate').addEventListener('click', dumpViewState);
     });

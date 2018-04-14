@@ -14,6 +14,8 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
         console.log(request.data);
     } else if (request.msg === "clear") {
         tfolds.clearViewState();
+    } else if (request.msg === "id") {
+        sendResponse(tfolds.boardId);
     } else {
         console.warn(`Unrecognized message from extension: ${request.msg}`, request.data);
     }

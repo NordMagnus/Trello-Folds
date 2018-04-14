@@ -43,6 +43,10 @@ const tfolds = (function (factory) {
             config.debug = debug;
         },
 
+        get boardId() {
+            return boardId;
+        },
+
         get sectionCharacter() {
             return settings.sectionChar;
         },
