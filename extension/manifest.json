@@ -9,10 +9,12 @@
         "128": "icons/icon128-96.png"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "activeTab"
     ],
     "browser_action": {
-        "default_icon": "icons/icon48.png"
+        "default_icon": "icons/icon48.png",
+        "default_popup": "popup.html"
     },
     "description": "Trello restructured",
     "content_scripts": [{

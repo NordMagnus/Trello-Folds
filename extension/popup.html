@@ -10,18 +10,81 @@
 </head>
 <body>
     <div class="content">
-        <h1>Trello Squadification</h1>
-        <table>
-            <tr>
-            <td width="80%"><span>Initial picture size</span></td>
-            <td>
-                <select>
-                    <option value="original">Original</option>
-                    <option value="small">Small</option>
-                    <option value="hidden">Hidden</option>
-                </select>
-        </td>
-        </table>
+
+        <!--
+            HEADING
+        -->
+        <img src="icons/icon64.png" style="float: right; margin-right: 10px;"/><h1>Trello Folds</h1>
+
+        <!--
+            SECTION SETTINGS
+        -->
+        <div class="light-panel panel-first">
+            <h2>Sections</h2>
+            <span>Use <input type="text" id="section-char" value="#" class="small-field"/> 
+                repeated <input type="text" id="section-repeat" value="2" class="small-field"/>
+                times to identify sections.
+            </span>
+
+            <div class="example-area">
+                Cards like <span id="section-example-1" class="example">## Section</span> and 
+                <span id="section-example-2" class="example">### Section ###</span> will be identified as sections. 
+            </div>
+        </div>
+
+        <!--
+            WIP LIMIT SETTINGS
+        -->
+        <div class="dark-panel">
+            <h2>WiP Limits</h2>
+            <input id="wip-list-bar" type="checkbox" name="list-bars" checked="true" />
+            <span>Add color bars at top of WiP lists to indicate work overflow</span>
+
+            <div class="example-area">
+                <span id="top-bar-example-text">Sections will get a top bar when WiP limit is exceeded.</span><br/><br/>
+                <img id="top-bar-img" src="img/List_Top_Bar.png"/>
+            </div>
+        </div>
+
+        <!--
+            VIEW STATE SETTINGS
+        -->
+        <div class="light-panel panel-last">
+            <h2>View State</h2>
+            <input id="remember-view-states" type="checkbox" name="store-viewstate" checked="true" />
+            <span>
+                Remember view states
+            </span>
+
+            <div class="example-area">
+                Next time you open the board lists and sections will be in the same state,
+                i.e. expanded or collapsed, depending on how you left them.
+            </div>
+
+            <span> 
+                <button id="clear-view-state">Clear view state</button> associated with the current board.
+            </span>
+    
+            <div class="example-area">
+                Pressing <i>Clear view state</i> removes all view state data associated
+                with the current board. The board will be reloaded and all lists and
+                sections will be expanded.
+            </div>
+            <div class="example-area"> 
+                View state data is stored for <span id="num-view-states">0</span> board(s).
+                <a id="dump-viewstate" href="#" style="color: #3050ff">Dump</a> the view state to the browser console. Intended
+                mainly for debugging purposes. (The console is accessible in the developer tools.)
+            </div>
+        </div>
+
+        <!--
+            FOOTER
+        -->
+        <div style="margin-top: 10px; border-radius: 5px; color: white; background-color: #f26730;" class="panel example-area"> 
+                If you have a feature request or issue to report please visit the
+                extension GitHub page. Here you can also find some documentation and the code for the extension.
+        </div>
     </div>
+
 </body>
 </html>

@@ -15,8 +15,13 @@ const tfolds = (function (factory) {
         debug: false,
         collapsedIconUrl: null,
         expandedIconUrl: null,
+    };
+
+    let settings = {
         sectionChar: '#',
         sectionRepeat: 2,
+        enableTopBars: true,
+        rememberViewStates: true,
     };
 
     let storage = {};
@@ -39,23 +44,23 @@ const tfolds = (function (factory) {
         },
 
         get sectionCharacter() {
-            return config.sectionChar;
+            return settings.sectionChar;
         },
 
         get sectionRepeat() {
-            return config.sectionRepeat;
+            return settings.sectionRepeat;
         },
 
         set sectionRepeat(repeat) {
-            config.sectionRepeat = repeat;
+            settings.sectionRepeat = repeat;
         },
 
         set sectionCharacter(identifier) {
-            config.sectionChar = identifier;
+            settings.sectionChar = identifier;
         },
 
         get sectionIdentifier() {
-            return config.sectionChar.repeat(config.sectionRepeat);
+            return settings.sectionChar.repeat(settings.sectionRepeat);
         },
 
         /**
@@ -191,14 +196,16 @@ const tfolds = (function (factory) {
          */
         initStorage() {
             // chrome.storage.sync.clear();
-            const url = document.URL.split("/");
-            boardId = url[url.length - 2];
+            boardId = tdom.getBoardIdFromUrl();
 
-            chrome.storage.sync.get([boardId], result => {
-                storage = result[boardId] || {};
+            chrome.storage.sync.get(["settings", boardId], result => {
                 if (config.debug) {
-                    console.info(storage);
+                    console.info(result);
                 }
+                if (result["settings"]) {
+                    settings = result["settings"];
+                }
+                storage = result[boardId] || {};
                 self.setupBoard();
             });
         },
@@ -217,16 +224,35 @@ const tfolds = (function (factory) {
                 console.info("Setting up board");
             }
 
-            // self.addSectionObservers();
+            self.cleanupStorage();
             self.formatSections();
-            self.restoreSectionsViewstate(); // TODO Refactor to "restoreViewstate" including both lists and sections?
+            if (settings.rememberViewStates) {
+                self.restoreSectionsViewState(); // TODO Refactor to "restoreViewstate" including both lists and sections?
+            } else {
+                self.clearViewState();
+            }
             self.formatLists();
         },
 
         /**
          *
          */
-        restoreSectionsViewstate() {
+        cleanupStorage() {
+            console.log(storage);
+            // TODO Implement
+        },
+
+        /**
+         *
+         */
+        clearViewState() {
+            chrome.storage.sync.remove(boardId);
+        },
+
+        /**
+         *
+         */
+        restoreSectionsViewState() {
             const $lists = tdom.getLists();
             $lists.each(function() {
                 const $l = $(this);
@@ -264,7 +290,10 @@ const tfolds = (function (factory) {
             let boardStorage = {};
             boardStorage[boardId] = storage;
             chrome.storage.sync.set(boardStorage, () => {
-                console.log(`[${key}] set to [${value}] for list [${listName}] in board ${boardId}`);
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                }
+                // console.log(`[${key}] set to [${value}] for list [${listName}] in board ${boardId}`);
             });
         },
 
@@ -320,9 +349,11 @@ const tfolds = (function (factory) {
                         return false;
                     });
                     $l.prepend($collapsedList);
-                    const collapsed = self.retrieve($l, "collapsed");
-                    if (collapsed === true) {
-                        tfolds.collapseList($l.find(".list").first().next());
+                    if (settings.rememberViewStates) {
+                        const collapsed = self.retrieve($l, "collapsed");
+                        if (collapsed === true) {
+                            tfolds.collapseList($l.find(".list").first().next());
+                        }
                     }
                 } catch (e) {
                     // Deliberately empty
@@ -351,16 +382,18 @@ const tfolds = (function (factory) {
             if (matches && matches.length > 1) {
                 let wipLimit = parseInt(matches[1]);
                 let numCards = tdom.countCards(list, self.sectionIdentifier);
-                console.log(`${title} [${numCards}/${wipLimit}]`);
+                // console.log(`${title} [${numCards}/${wipLimit}]`);
                 self.addListTitleBadge($l, numCards, wipLimit);
-                if (numCards === wipLimit) {
-                    $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
-                    $l.prev().addClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
-                    return;
-                } else if (numCards > wipLimit) {
-                    $l.removeClass("wip-limit-reached").addClass("wip-limit-exceeded");
-                    $l.prev().removeClass("collapsed-limit-reached").addClass("collapsed-limit-exceeded");
-                    return;
+                if (settings.enableTopBars) {
+                    if (numCards === wipLimit) {
+                        $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
+                        $l.prev().addClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
+                        return;
+                    } else if (numCards > wipLimit) {
+                        $l.removeClass("wip-limit-reached").addClass("wip-limit-exceeded");
+                        $l.prev().removeClass("collapsed-limit-reached").addClass("collapsed-limit-exceeded");
+                        return;
+                    }
                 }
             }
 
@@ -384,13 +417,12 @@ const tfolds = (function (factory) {
             }
             $l.parent().find("div.list-collapsed").empty().append($wipTitle);
             $wipTitle = $wipTitle.clone();
-            $wipTitle.click(function() {
-                console.log("CLICK!");
-                $(this).hide().siblings("textarea").show().trigger("click").select();
-                return false;
+            $header.off("click").click(function(e) {
+                $(this).find(".wip-limit-title").hide();
+                $(this).find("textarea").show().select();
+                return !$(e.target).hasClass("wip-limit-badge");
             });
             $header.find("textarea").hide().off("blur").blur(function () {
-                console.log("BLUR!");
                 self.showWipLimit($l);
             });
             $header.append($wipTitle);
