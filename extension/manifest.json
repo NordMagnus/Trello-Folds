@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Trello Folds",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
@@ -16,7 +16,7 @@
         "default_icon": "icons/icon48.png",
         "default_popup": "popup.html"
     },
-    "description": "Trello restructured",
+    "description": "Foldable lists and sections plus WiP limits for Trello boards",
     "content_scripts": [{
         "css": ["styles.css"],
         "js": ["lib/jquery.js", "tdom.js", "trello-folds.js", "content.js"],
