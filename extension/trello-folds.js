@@ -78,6 +78,7 @@ const tfolds = (function (factory) {
             tdom.debug = config.debug;
             tdom.onBoardChanged(self.boardChanged);
             tdom.onListModified(self.listModified);
+            tdom.onListAdded(self.listAdded);
             tdom.onCardAdded(self.cardAdded);
             tdom.onCardModified(self.cardModified);
             tdom.onListTitleModified(self.listTitleModified);
@@ -104,6 +105,24 @@ const tfolds = (function (factory) {
          *
          */
         listModified(listEl) {
+            console.log("listModified()");
+            if (!listEl) {
+                console.log("[listEl] not defined");
+                return;
+            }
+            self.showWipLimit(listEl);
+        },
+
+        /**
+         *
+         */
+        listAdded(listEl) {
+            console.log("listAdded()");
+            if (!listEl) {
+                return;
+            }
+            self.addFoldingButton(listEl);
+            self.addCollapsedList(listEl);
             self.showWipLimit(listEl);
         },
 
@@ -111,6 +130,7 @@ const tfolds = (function (factory) {
          *
          */
         cardAdded(cardEl) {
+            console.log("cardAdded()");
             const $c = $(cardEl);
             let text = tdom.getCardName($c);
             if (self.isSection(text)) {
@@ -132,6 +152,7 @@ const tfolds = (function (factory) {
          * @param {String} oldTitle The title before it was modified
          */
         cardModified(cardEl, title, oldTitle) {
+            console.log("cardModified()");
             let $c = $(cardEl);
 
             if (!self.isSection(title) && !self.isSection(oldTitle)) {
@@ -204,7 +225,7 @@ const tfolds = (function (factory) {
 
             chrome.storage.sync.get(["settings", boardId], result => {
                 if (config.debug) {
-                    console.info(result);
+                    console.info("Getting settings", result);
                 }
                 if (result["settings"]) {
                     settings = result["settings"];
@@ -218,10 +239,17 @@ const tfolds = (function (factory) {
          * This method is called when the extension is first loaded and when
          * a new board is loaded.
          */
-        setupBoard() {
+        setupBoard(attemptCount = 1) {
             let $canvas = $("div.board-canvas");
             if (!$canvas.length) {
-                throw new ReferenceError("DIV.board-canvas not found");
+                if (attemptCount < 3) {
+                    setTimeout(() => {
+                        console.log(`Trying to find DIV.board-canvas again (attempt ${attemptCount + 1})`);
+                        self.setupBoard(attemptCount + 1);
+                    }, 100);
+                    return;
+                }
+                throw ReferenceError(`DIV.board-canvas not found after ${attemptCount} attempts`);
             }
 
             if (config.debug) {
@@ -321,49 +349,86 @@ const tfolds = (function (factory) {
          *
          */
         formatLists() {
-            self.addListFolding();
+            self.makeListsFoldable();
             self.addWipLimits();
         },
 
-        addListFolding() {
-            // // let $lists = $('textarea.list-header-name');
-            let $headers = $('div.list-header-extras');
+        /**
+         *
+         */
+        makeListsFoldable() {
+            let $lists = $("div.list-wrapper");
+            $lists.each(function() {
+                self.addFoldingButton(this);
+                self.addCollapsedList(this);
+            });
+        },
+
+
+        /**
+         *
+         */
+        addFoldingButton(listEl) {
+            let $header = $(listEl).find('div.list-header-extras');
 
             let $foldIcon = $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
             $foldIcon.click(function () {
                 tfolds.collapseList($(this).closest(".list"));
                 return false;
             });
-            $headers.append($foldIcon);
+            $header.append($foldIcon);
 
-            let $lists = $("div.list-wrapper");
-            $lists.css({
+        },
+
+        // addFoldingButtons() {
+        //     // // let $lists = $('textarea.list-header-name');
+        //     let $headers = $('div.list-header-extras');
+
+        //     let $foldIcon = $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
+        //     $foldIcon.click(function () {
+        //         tfolds.collapseList($(this).closest(".list"));
+        //         return false;
+        //     });
+        //     $headers.append($foldIcon);
+
+        //     let $lists = $("div.list-wrapper");
+        //     $lists.css({
+        //         "position": "relative",
+        //     });
+        //     $lists.each(function () {
+        //         self.addCollapsedList(this);
+        //     });
+        // },
+
+        /**
+         *
+         */
+        addCollapsedList(listEl) {
+            const $l = $(listEl);
+            $l.css({
                 "position": "relative",
             });
-            $lists.each(function () {
-                const $l = $(this);
-                try {
-                    const name = tdom.getListName(this);
-                    let $collapsedList = $(`<div style="display: none" class="list-collapsed list"><span class="list-header-name">${name}</span></div>`);
-                    $collapsedList.click(function () {
-                        /*
-                         * Call expandList with the list wrapper as argument
-                         */
-                        tfolds.expandList($collapsedList);
-                        return false;
-                    });
-                    $l.prepend($collapsedList);
-                    if (settings.rememberViewStates) {
-                        const collapsed = self.retrieve($l, "collapsed");
-                        if (collapsed === true) {
-                            tfolds.collapseList($l.find(".list").first().next());
-                        }
+            try {
+                const name = tdom.getListName(listEl);
+                let $collapsedList = $(`<div style="display: none" class="list-collapsed list"><span class="list-header-name">${name}</span></div>`);
+                $collapsedList.click(function () {
+                    /*
+                     * Call expandList with the list wrapper as argument
+                     */
+                    tfolds.expandList($collapsedList);
+                    return false;
+                });
+                $l.prepend($collapsedList);
+                if (settings.rememberViewStates) {
+                    const collapsed = self.retrieve($l, "collapsed");
+                    if (collapsed === true) {
+                        tfolds.collapseList($l.find(".list").first().next());
                     }
-                } catch (e) {
-                    // Deliberately empty
                 }
-            });
-        },
+            } catch (e) {
+                // Deliberately empty
+            }
+    },
 
         /**
          *
@@ -379,6 +444,7 @@ const tfolds = (function (factory) {
          *
          */
         showWipLimit(list) {
+            console.log(list);
             const $l = $(list);
             let title = tdom.getListName(list);
             let matches = title.match(/\[([0-9]*?)\]/);
@@ -435,11 +501,25 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        formatSections() {
+        formatSections(attemptCount = 1) {
             let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
 
+            if (!$sections.length) {
+                if (attemptCount < 3) {
+                    setTimeout(() => {
+                        console.log(`Trying to find sections again (attempt ${attemptCount + 1})`);
+                        self.formatSections(attemptCount + 1);
+                    }, 100);
+                    return;
+                }
+                console.warn("No sections found");
+            }
+
             $sections.each(function () {
-                self.formatAsSection($(this));
+                // self.formatAsSection($(this));
+                setTimeout(() => {
+                    self.formatAsSection($(this));
+                }, 100);
             });
         },
 
@@ -447,6 +527,7 @@ const tfolds = (function (factory) {
          *
          */
         formatAsSection($card) {
+            console.log("formatAsSection()", tdom.getCardName($card));
             const $icon = $('<span class="icon-expanded"/>');
             $icon.click(function () {
                 tfolds.toggleSection(this);
@@ -454,10 +535,12 @@ const tfolds = (function (factory) {
             });
             const strippedTitle = self.getStrippedTitle(tdom.getCardName($card));
 
-            $card.prepend(`<span id="section-title">${strippedTitle}</span>`);
+            console.log($card.prepend(`<span id="section-title">${strippedTitle}</span>`));
             $card.prepend($icon);
             $card.find('span.list-card-title').hide();
             $card.addClass("section-card");
+
+            console.log($card);
         },
 
         /**

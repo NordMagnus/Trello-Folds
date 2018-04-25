@@ -63,7 +63,6 @@ const tdom = (function (factory) {
     //#region PRIVATE MEMBERS
 
     let handler = new EventHandler();
-    let boardObserver;
     let currentBoardId;
     let debug = false;
 
@@ -86,11 +85,18 @@ const tdom = (function (factory) {
         /**
          *
          */
-        initialize() {
+        initialize(attemptCount = 0) {
             let $content = $("DIV#content");
 
             if (!$content.length) {
-                throw ReferenceError("DIV#content not found");
+                if (attemptCount < 3) {
+                    setTimeout(() => {
+                        console.log(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
+                        self.initialize(attemptCount + 1);
+                    }, 100);
+                    return;
+                }
+                throw ReferenceError(`DIV#content not found after ${attemptCount} attempts`);
             }
 
             let boardObserver = new MutationObserver(function (mutations) {
@@ -102,7 +108,6 @@ const tdom = (function (factory) {
                     const boardId = self.getBoardIdFromUrl();
                     console.info(`NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
                     if (currentBoardId !== boardId) {
-                        console.log("Calling onBoardChanged()");
                         self.boardChanged(boardId);
                     }
                 }
@@ -135,10 +140,7 @@ const tdom = (function (factory) {
             if (debug) {
                 console.info(`INITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
             }
-            self.connectObservers();
-            const oldBoardId = currentBoardId;
-            currentBoardId = boardId;
-            handler.emit(EventHandler.BOARD_CHANGED, oldBoardId, currentBoardId);
+            self.connectObservers(boardId);
         },
 
         // /**
@@ -163,9 +165,53 @@ const tdom = (function (factory) {
         /**
          *
          */
-        connectObservers() {
+        connectObservers(boardId, attemptCount = 1) {
+            let $content = $("DIV#board");
+
+            if (!$content.length) {
+                if (attemptCount < 3) {
+                    setTimeout(() => {
+                        console.log(`Trying to find DIV#board again (attempt ${attemptCount + 1})`);
+                        self.connectObservers(boardId, attemptCount + 1);
+                    }, 100);
+                    return;
+                }
+                throw ReferenceError(`DIV#board not found after ${attemptCount} attempts`);
+            }
+            self.connectBoardObserver($content);
             self.connectListObserver();
-            self.connectCardObserver();
+
+            const oldBoardId = currentBoardId;
+            currentBoardId = boardId;
+            handler.emit(EventHandler.BOARD_CHANGED, oldBoardId, currentBoardId);
+        },
+
+        /**
+         * Setting up the observer to check for added and removed lists by looking for
+         * added and removed children to `DIV#board` having the CSS class `list-wrapper`.
+         */
+        connectBoardObserver($content) {
+            let boardObserver = new MutationObserver(function (mutations) {
+                for (let m of mutations) {
+                    // console.log("BOARD OBSERVER MUTATION", m);
+                    if (m.addedNodes.length === 1 &&
+                        $(m.addedNodes[0]).hasClass("list-wrapper")) {
+                        handler.emit(EventHandler.LIST_ADDED, m.addedNodes[0]);
+                    } else if (m.removedNodes.length === 1 &&
+                        $(m.removedNodes[0]).hasClass("list-wrapper")) {
+                        handler.emit(EventHandler.LIST_REMOVED, m.removedNodes[0]);
+                    }
+                }
+            });
+
+            let conf = {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree: false,
+            };
+
+            boardObserver.observe($content[0], conf);
         },
 
         /**
@@ -216,13 +262,6 @@ const tdom = (function (factory) {
             });
         },
 
-        /**
-         *
-         */
-        connectCardObserver(params) {
-
-        },
-
         get events() {
             // ? Is this needed - should use convenience methods instead
             return EventHandler;
@@ -240,6 +279,14 @@ const tdom = (function (factory) {
          */
         onListModified(callback) {
             handler.addListener(EventHandler.LIST_MODIFIED, callback);
+        },
+
+        /**
+         *
+         * @param {Function} callback
+         */
+        onListAdded(callback) {
+            handler.addListener(EventHandler.LIST_ADDED, callback);
         },
 
         /**
@@ -290,7 +337,7 @@ const tdom = (function (factory) {
          */
         getListName(el) {
             if (!el) {
-                throw new TypeError();
+                throw new TypeError("Parameter [el] undefined");
             }
             let nameElement = $(el).find("h2.list-header-name-assist");
             if (nameElement.length === 0) {
