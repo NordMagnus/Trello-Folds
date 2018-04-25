@@ -97,7 +97,6 @@ const tfolds = (function (factory) {
          *
          */
         boardChanged(oldBoardId, newBoardId) {
-            console.info("BOARD CHANGED");
             self.initStorage();
         },
 
@@ -105,7 +104,6 @@ const tfolds = (function (factory) {
          *
          */
         listModified(listEl) {
-            console.log("listModified()");
             if (!listEl) {
                 console.log("[listEl] not defined");
                 return;
@@ -117,7 +115,6 @@ const tfolds = (function (factory) {
          *
          */
         listAdded(listEl) {
-            console.log("listAdded()");
             if (!listEl) {
                 return;
             }
@@ -130,7 +127,6 @@ const tfolds = (function (factory) {
          *
          */
         cardAdded(cardEl) {
-            console.log("cardAdded()");
             const $c = $(cardEl);
             let text = tdom.getCardName($c);
             if (self.isSection(text)) {
@@ -444,7 +440,6 @@ const tfolds = (function (factory) {
          *
          */
         showWipLimit(list) {
-            console.log(list);
             const $l = $(list);
             let title = tdom.getListName(list);
             let matches = title.match(/\[([0-9]*?)\]/);
@@ -452,8 +447,7 @@ const tfolds = (function (factory) {
             if (matches && matches.length > 1) {
                 let wipLimit = parseInt(matches[1]);
                 let numCards = tdom.countCards(list, self.sectionIdentifier);
-                // console.log(`${title} [${numCards}/${wipLimit}]`);
-                self.addListTitleBadge($l, numCards, wipLimit);
+                self.addWipListTitle($l, numCards, wipLimit);
                 if (settings.enableTopBars) {
                     if (numCards === wipLimit) {
                         $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
@@ -465,6 +459,8 @@ const tfolds = (function (factory) {
                         return;
                     }
                 }
+            } else {
+                self.removeWipListTitle($l);
             }
 
             $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
@@ -474,7 +470,7 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        addListTitleBadge($l, numCards, wipLimit) {
+        addWipListTitle($l, numCards, wipLimit) {
             $l.find("span.wip-limit-title").remove();
             const title = tdom.getListName($l[0]);
             const strippedTitle = title.substr(0, title.indexOf('['));
@@ -501,6 +497,15 @@ const tfolds = (function (factory) {
         /**
          *
          */
+        removeWipListTitle($l) {
+            $l.find("span.wip-limit-title").remove();
+            const $header = $l.find(".list-header");
+            $header.find("textarea").show();
+        },
+
+        /**
+         *
+         */
         formatSections(attemptCount = 1) {
             let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
 
@@ -517,6 +522,7 @@ const tfolds = (function (factory) {
 
             $sections.each(function () {
                 // self.formatAsSection($(this));
+                // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
                 setTimeout(() => {
                     self.formatAsSection($(this));
                 }, 100);
