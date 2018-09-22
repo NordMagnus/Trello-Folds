@@ -27,6 +27,7 @@ describe('tdom', function() {
     before(function() {
         return JSDOM.fromFile("test/squadification-board.html").then((dom) => {
             global.window = dom.window;
+            global.document = {};
             global.$ = require('jquery');
             global.tdom = requirejs("tdom");
         });
@@ -78,7 +79,14 @@ describe('tdom', function() {
     });
 
     describe("getBoardIdFromUrl()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should return the second to last part of a forward slash separated string", function() {
+            document.URL = "https://trello.com/b/aBcdEfGH/board-name";
+            expect(tdom.getBoardIdFromUrl()).to.equal("aBcdEfGH");
+        });
+        it("should throw a RangeError for an invalid URL", function() {
+            document.URL = "invalid url";
+            expect(tdom.getBoardIdFromUrl).to.throw(RangeError);
+        });
     });
 
     describe("getContainingList()", function() {

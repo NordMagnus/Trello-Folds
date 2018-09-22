@@ -313,9 +313,15 @@ const tdom = (function (factory) {
 
         /**
          * Extracts the board ID from the URL.
+         * Assuming the URL has the following format `https://trello.com/b/[BOARD-ID]/[BOARD-NAME]`
+         *
+         * @returns {String} Board ID
          */
         getBoardIdFromUrl() {
             let url = document.URL.split("/");
+            if (url.length < 2) {
+                throw new RangeError(`Unexpected URL: ${url}`);
+            }
             return url[url.length - 2];
         },
 
