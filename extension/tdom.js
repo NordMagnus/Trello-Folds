@@ -389,9 +389,17 @@ const tdom = (function (factory) {
         },
 
         /**
+         * Gets the title of a card by stripping all children
+         * and returning the text inside the `span.list-card-title` element.
          *
+         * @param {jQuery} $card A jQuery object containing a Trello card
+         * @returns {String} The card title
          */
         getCardName($card) {
+            let $span = $card.find("span.list-card-title");
+            if ($span.length === 0) {
+                throw new TypeError("Could not find SPAN tag");
+            }
             let title = $card.find("span.list-card-title")
                 .clone() //clone the element
                 .children() //select all the children

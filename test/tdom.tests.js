@@ -23,13 +23,11 @@ describe('tdom', function() {
     // var $;
     // var tdom;
     // const $ = require("jquery");
-    let mydom;
 
     before(function() {
         return JSDOM.fromFile("test/squadification-board.html", {
             url: "https://trello.com/b/aBcdEfGH/trello-folds-test-board",
         }).then((dom) => {
-            mydom = dom;
             global.window = dom.window;
             global.document = dom.window.document;
             global.$ = require('jquery');
@@ -120,11 +118,27 @@ describe('tdom', function() {
     });
 
     describe("getCardName()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should throw TypeError if given argument does not contain a SPAN.list-card-title element", function() {
+            expect(tdom.getCardName).to.throw(TypeError);
+            expect(() => tdom.getCardName("string")).to.throw(TypeError);
+            expect(() => tdom.getCardName($("<span>blaha<p>foo</p></span>"))).to.throw(TypeError);
+        });
+        it("should return the text inside the SPAN.list-card-title element", function() {
+            const html = "<span class='list-card-title'><p>no</p>yes<div>no</div></span>";
+            expect(tdom.getCardName($(`<div>${html}</div>`))).to.equal("yes");
+            expect(() => tdom.getCardName(html)).to.throw(TypeError);
+        });
     });
 
     describe("getCardsInList()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should throw TypeError with wrong arguments", function() {
+            expect(tdom.getCardsInList).to.throw(TypeError);
+            expect(() => tdom.getCardsInList("<div></div>")).to.throw(TypeError);
+        });
+        it("should return an empty jQuery object given an empty element", function() {
+            expect(tdom.getCardsInList("<div></div>", "foo")).to.be.instanceOf($);
+        });
+        // TODO Add test to look for card in specific list in test file
     });
 
     describe("getCardsByName()", function() {
@@ -132,7 +146,7 @@ describe('tdom', function() {
         it("should return an empty jQuery object when no card found", function() {
             expect(tdom.getCardsByName("No card")).to.have.lengthOf(0);
         });
-        it("should throw an error when no parameter given", function() {
+        it("should throw an error when no argument given", function() {
             expect(tdom.getCardsByName).to.throw(TypeError);
         });
         it("should return a jQuery object with length 2 with argument 'Twins'", function() {
