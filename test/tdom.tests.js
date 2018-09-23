@@ -23,11 +23,15 @@ describe('tdom', function() {
     // var $;
     // var tdom;
     // const $ = require("jquery");
+    let mydom;
 
     before(function() {
-        return JSDOM.fromFile("test/squadification-board.html").then((dom) => {
+        return JSDOM.fromFile("test/squadification-board.html", {
+            url: "https://trello.com/b/aBcdEfGH/trello-folds-test-board",
+        }).then((dom) => {
+            mydom = dom;
             global.window = dom.window;
-            global.document = {};
+            global.document = dom.window.document;
             global.$ = require('jquery');
             global.tdom = requirejs("tdom");
         });
@@ -80,17 +84,13 @@ describe('tdom', function() {
 
     describe("getBoardIdFromUrl()", function() {
         it("should return the second to last part of a forward slash separated string", function() {
-            document.URL = "https://trello.com/b/aBcdEfGH/board-name";
             expect(tdom.getBoardIdFromUrl()).to.equal("aBcdEfGH");
-        });
-        it("should throw a RangeError for an invalid URL", function() {
-            document.URL = "invalid url";
-            expect(tdom.getBoardIdFromUrl).to.throw(RangeError);
         });
     });
 
     describe("getContainingList()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should return null if no div.list found", function() {
+        });
     });
 
     describe("getListName()", function() {
