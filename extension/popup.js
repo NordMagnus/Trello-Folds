@@ -40,7 +40,7 @@ function log(msg) {
     sendMessage("log", msg);
 }
 
-function updateSectionChar() {
+function updateSectionChar(reload = true) {
     let ch = document.getElementById("section-char").value;
     let rpt = parseInt(document.getElementById("section-repeat").value);
 
@@ -54,17 +54,33 @@ function updateSectionChar() {
     settings.settings.sectionChar = ch;
     settings.settings.sectionRepeat = rpt;
 
-    storeAndReload();
+    if (reload) {
+        storeAndReload();
+    }
 }
 
-function updateWipListBar() {
+function updateWipListBar(reload = true) {
     let enabled = document.getElementById("wip-list-bar").checked;
     settings.settings.enableTopBars = enabled;
     document.getElementById("top-bar-img").src = enabled ? "img/List_Top_Bar.png" : "img/List_No_Top_Bar.png";
     document.getElementById("top-bar-example-text").innerText = enabled ?
             "Sections will get a top bar when WiP limit is exceeded." :
             "WiP violations will be indicated with the badge only.";
-    storeAndReload();
+    if (reload) {
+        storeAndReload();
+    }
+}
+
+function updateAlwaysCount(reload = true) {
+    let alwaysCount = document.getElementById("wip-always-count").checked;
+    settings.settings.alwaysCount = alwaysCount;
+    document.getElementById("always-count-img").src = alwaysCount ? "img/List_with_Count.png" : "img/List_without_Count.png";
+    document.getElementById("always-count-example-text").innerText = alwaysCount ?
+            "Always show card count." :
+            "Card count will not show for lists without WiP limits.";
+    if (reload) {
+        storeAndReload();
+    }
 }
 
 function updateRememberViewStates() {
@@ -103,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sectionRepeat: 2,
                 enableTopBars: true,
                 rememberViewStates: true,
+                alwaysCount: false,
             };
         }
         numOfViewStates = Object.keys(result).length - 1;
@@ -117,9 +134,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('section-repeat').addEventListener('change', updateSectionChar);
         document.getElementById('section-repeat').value = settings.settings.sectionRepeat;
+        updateSectionChar(false);
 
         document.getElementById('wip-list-bar').addEventListener('change', updateWipListBar);
         document.getElementById('wip-list-bar').checked = settings.settings.enableTopBars;
+        updateWipListBar(false);
+
+        document.getElementById('wip-always-count').addEventListener('change', updateAlwaysCount);
+        document.getElementById('wip-always-count').checked = settings.settings.alwaysCount;
+        updateAlwaysCount(false);
 
         document.getElementById('remember-view-states').addEventListener('change', updateRememberViewStates);
         document.getElementById('remember-view-states').checked = settings.settings.rememberViewStates;

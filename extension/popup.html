@@ -38,18 +38,30 @@
         <div class="dark-panel">
             <h2>WiP Limits</h2>
             <input id="wip-list-bar" type="checkbox" name="list-bars" checked="true" />
-            <span>Add color bars at top of WiP lists to indicate work overflow</span>
-
+            <span>Add color bars at top of WiP lists to indicate work overflow</span><br/>
             <div class="example-area">
                 <span id="top-bar-example-text">Sections will get a top bar when WiP limit is exceeded.</span><br/><br/>
                 <img id="top-bar-img" src="img/List_Top_Bar.png"/>
+            </div>
+        </div>
+        
+        <!--
+            CARD COUNT SETTINGS
+        -->
+        <div class="light-panel">
+            <h2>Always count cards</h2>
+            <input id="wip-always-count" type="checkbox" name="always-count" />
+            <span>Show card count for lists without a WiP limit</span>
+            <div class="example-area">
+                <span id="always-count-example-text">Card count will not show for lists without WiP limits.</span><br/><br/>
+                <img id="always-count-img" src="img/List_without_Count.png"/>
             </div>
         </div>
 
         <!--
             VIEW STATE SETTINGS
         -->
-        <div class="light-panel panel-last">
+        <div class="dark-panel panel-last">
             <h2>View State</h2>
             <input id="remember-view-states" type="checkbox" name="store-viewstate" checked="true" />
             <span>
