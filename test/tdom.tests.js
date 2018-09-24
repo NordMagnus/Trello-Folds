@@ -166,11 +166,21 @@ describe('tdom', function() {
     });
 
     describe("countCards()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should return zero for an empty tag", function() {
+            const html = "<div></div>";
+            expect(tdom.countCards(html, "")).to.equal(0);
+        });
+        it("should return only cards with titles containing given filter", function() {
+            const html = "<div><a class='list-card'><span class='list-card-title'>foo bar</span></a></div>";
+            expect(tdom.countCards(html, "foo")).to.equal(0);
+            expect(tdom.countCards(html, "bar")).to.equal(0);
+            expect(tdom.countCards(html, "")).to.equal(1);
+            expect(tdom.countCards(html)).to.equal(1);
+            expect(tdom.countCards(html, "hoozit")).to.equal(1);
+        });
     });
 
     describe("countListLabels()", function() {
-
         it("should throw an error if no parameter", function() {
             expect(tdom.countListLabels).to.throw(TypeError);
         });
@@ -186,7 +196,6 @@ describe('tdom', function() {
             let labels = tdom.countListLabels(jLists, ["C"]);
             expect(Object.keys(labels)).to.have.lengthOf(5);
         });
-
     });
 
     describe("getCardLabels()", function() {

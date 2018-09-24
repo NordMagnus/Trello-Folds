@@ -444,12 +444,19 @@ const tdom = (function (factory) {
         },
 
         /**
+         * Count cards in list.
          *
+         * @param {Element} list The containing list
+         * @param {Stringt} filter Cards containing filter will be excluded
+         * @returns {Number} Number of cards found
          */
         countCards(list, filter) {
             let $cards = $(list).find("a.list-card").filter(function () {
                 const title = self.getCardName($(this));
-                return title.indexOf(filter) === -1;
+                if (filter) {
+                    return title.indexOf(filter) === -1;
+                }
+                return true;
             });
             return $cards.length;
         },
