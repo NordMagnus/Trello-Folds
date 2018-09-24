@@ -22,6 +22,7 @@ const tfolds = (function (factory) {
         sectionRepeat: 2,
         enableTopBars: true,
         rememberViewStates: true,
+        alwaysCount: false,
     };
 
     let storage = {};
@@ -430,7 +431,12 @@ const tfolds = (function (factory) {
          *
          */
         addWipLimits() {
-            let $wipLists = tdom.getLists(/\[([0-9]*?)\]/);
+            let $wipLists;
+            if (settings.alwaysCount === true) {
+                $wipLists = tdom.getLists();
+            } else {
+                $wipLists = tdom.getLists(/\[([0-9]*?)\]/);
+            }
             $wipLists.each(function () {
                 self.showWipLimit(this);
             });
@@ -444,9 +450,9 @@ const tfolds = (function (factory) {
             let title = tdom.getListName(list);
             let matches = title.match(/\[([0-9]*?)\]/);
 
+            let numCards = tdom.countCards(list, self.sectionIdentifier);
             if (matches && matches.length > 1) {
                 let wipLimit = parseInt(matches[1]);
-                let numCards = tdom.countCards(list, self.sectionIdentifier);
                 self.addWipListTitle($l, numCards, wipLimit);
                 if (settings.enableTopBars) {
                     if (numCards === wipLimit) {
@@ -460,7 +466,11 @@ const tfolds = (function (factory) {
                     }
                 }
             } else {
-                self.removeWipListTitle($l);
+                if (settings.alwaysCount === true) {
+                    self.addWipListTitle($l, numCards);
+                } else {
+                    self.removeWipListTitle($l);
+                }
             }
 
             $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
@@ -473,13 +483,23 @@ const tfolds = (function (factory) {
         addWipListTitle($l, numCards, wipLimit) {
             $l.find("span.wip-limit-title").remove();
             const title = tdom.getListName($l[0]);
-            const strippedTitle = title.substr(0, title.indexOf('['));
+            let strippedTitle;
+            if (wipLimit !== undefined) {
+                strippedTitle = title.substr(0, title.indexOf('['));
+            } else {
+                strippedTitle = title;
+            }
             const $header = $l.find(".list-header");
-            let $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
-            if (numCards === wipLimit) {
-                $wipTitle.find(".wip-limit-badge").css("background-color", "#fb7928");
-            } else if (numCards > wipLimit) {
-                $wipTitle.find(".wip-limit-badge").css("background-color", "#b04632");
+            let $wipTitle;
+            if (wipLimit === undefined) {
+                $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards}</span></span>`);
+            } else {
+                $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
+                if (numCards === wipLimit) {
+                    $wipTitle.find(".wip-limit-badge").css("background-color", "#fb7928");
+                } else if (numCards > wipLimit) {
+                    $wipTitle.find(".wip-limit-badge").css("background-color", "#b04632");
+                }
             }
             $l.parent().find("div.list-collapsed").empty().append($wipTitle);
             $wipTitle = $wipTitle.clone();
