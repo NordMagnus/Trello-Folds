@@ -16,7 +16,7 @@
         "default_icon": "icons/icon48.png",
         "default_popup": "popup.html"
     },
-    "description": "Foldable lists and sections plus WiP limits for Trello boards",
+    "description": "Turn your Trello board into a Kanban system with WiP limits and collapsible lists",
     "content_scripts": [{
         "css": ["styles.css"],
         "js": ["lib/jquery.js", "tdom.js", "trello-folds.js", "content.js"],
