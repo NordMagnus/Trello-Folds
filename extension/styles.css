@@ -109,6 +109,7 @@
 .section-card {
     background: rgba(0,0,0,0.0) !important;
     border: none !important;
+    box-shadow: 0 0 !important;
     font-weight: bold;
     font-size: 10pt;
     padding: 0px;
