@@ -109,9 +109,15 @@ describe('tdom', function() {
             expect(jLists).to.be.instanceOf($);
             expect(jLists).to.have.lengthOf(4);
         });
+        /*
+         * Test page has three lists with 'List' in title
+         */
         it("should return an object with length 3 with parameter 'List'", function() {
             expect(tdom.getLists("List")).to.have.lengthOf(3);
         });
+        /*
+         * The test page has one list not having 'List' in the title
+         */
         it("should return an object with length 1 with parameters '' and ['List']", function() {
             expect(tdom.getLists("", ["List"])).to.have.lengthOf(1);
         });
