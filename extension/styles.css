@@ -7,6 +7,28 @@
     margin: 0px;
 }
 
+.super-list {
+    float: left;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    /* background-color: #c0c0c0; */
+    /* background-color: #dfe3e6; */
+    /* background-color: rgba(223, 227, 230, 0.8); */
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 536px;
+    height: 0px;
+    border-radius: 3px;
+    /* styles from trello list-header */
+    min-height: 20px; 
+    padding: 10px 8px 30px;
+    text-align: center;
+}
+
+.sub-list {
+    top: 40px;
+}
+
 .list-collapsed {
     transform: rotate(270deg);
     transform-origin: 100% 0%;
@@ -72,7 +94,7 @@
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 5px;
-    background-color: #bec3c6;
+    background-color: rgb(151, 151, 151);
     color: white;
     font-size: 9pt;
     margin-left: 5px;
