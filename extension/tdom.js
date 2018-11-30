@@ -388,6 +388,14 @@ const tdom = (function (factory) {
             return jLists;
         },
 
+        getPrevList(listEl) {
+            return $(listEl).parent().prev().find("div.js-list-content");
+        },
+
+        getNextList(listEl) {
+            return $(listEl).parent().next().find("div.js-list-content");
+        },
+
         /**
          * Gets the title of a card by stripping all children
          * and returning the text inside the `span.list-card-title` element.
