@@ -12,7 +12,7 @@ const tfolds = (function (factory) {
     'use strict';
 
     let config = {
-        debug: false,
+        debug: true,
         collapsedIconUrl: null,
         expandedIconUrl: null,
     };
@@ -27,6 +27,9 @@ const tfolds = (function (factory) {
 
     let storage = {};
     let boardId;
+
+    const LEFT_LIST = 1;
+    const RIGHT_LIST = 2;
 
     const self = {
 
@@ -66,6 +69,14 @@ const tfolds = (function (factory) {
 
         get sectionIdentifier() {
             return settings.sectionChar.repeat(settings.sectionRepeat);
+        },
+
+        get alwaysCount() {
+            return settings.alwaysCount;
+        },
+
+        set alwaysCount(alwaysCount) {
+            settings.alwaysCount = alwaysCount;
         },
 
         /**
@@ -286,7 +297,7 @@ const tfolds = (function (factory) {
             $lists.each(function() {
                 const $l = $(this);
                 let $sections = tdom.getCardsInList(this, self.sectionIdentifier);
-                const sectionStates = self.retrieve($l, "sections");
+                const sectionStates = self.retrieve(tdom.getListName($l), "sections");
                 if (!sectionStates) {
                     return;
                 }
@@ -307,11 +318,10 @@ const tfolds = (function (factory) {
          *    +--- setting
          * ```
          */
-        store($list, key, value) {
+        store(listName, key, value) {
             if (!boardId) {
                 throw new ReferenceError("Board ID not set");
             }
-            const listName = tdom.getListName($list[0]);
 
             let setting = storage[listName] || {};
             setting[key] = value;
@@ -329,8 +339,7 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        retrieve($list, key) {
-            const listName = tdom.getListName($list[0]);
+        retrieve(listName, key) {
             let value;
             try {
                 value = storage[listName][key];
@@ -346,9 +355,113 @@ const tfolds = (function (factory) {
          *
          */
         formatLists() {
+            self.combineLists();
             self.makeListsFoldable();
             self.addWipLimits();
         },
+
+        //#region COMBINED LISTS
+
+        /**
+         *
+         */
+        combineLists() {
+            let $lists = tdom.getLists(".");
+            for (let i = 0; i < $lists.length - 1; ++i) {
+                const listName = tdom.getListName($lists[i]);
+                const nextName = tdom.getListName($lists[i+1]);
+                if (listName.substr(0, listName.indexOf(".")) ===
+                        nextName.substr(0, nextName.indexOf("."))) {
+                            console.info(`Combining lists:${listName} and ${nextName}`);
+                            self.combineListWithNext($lists[i], $lists[i+1]);
+                            ++i;
+                        }
+            }
+        },
+
+        combineListWithNext(leftList, rightList) {
+            self.addSuperList(leftList, rightList);
+            $(leftList).addClass("sub-list");
+            $(leftList).data("subList", LEFT_LIST);
+            $(rightList).addClass("sub-list");
+            $(rightList).data("subList", RIGHT_LIST);
+        },
+
+        addSuperList(leftList, rightList) {
+            // let $canvas = $("div#board");
+            let $leftList = $(leftList);
+            let $superList = $('<div class="super-list"></div>');
+            let $title = $('<span class="super-list-header"></span>');
+            let $extras = $('<div class="list-header-extras"></div>');
+
+            $title.append($extras);
+
+            /*
+            * Make list same height as contained lists. This height is also
+            * tweaked using CSS padding.
+            */
+           $superList.append($title);
+
+           $leftList.parent().prepend($superList);
+
+           let title = self.updateSuperList(leftList, LEFT_LIST);
+
+           self.addCollapsedSuperList($superList, title);
+        },
+
+        /**
+         *
+         */
+        addCollapsedSuperList($superList, title) {
+            try {
+                let $collapsedList = $(`<div style="display: none" class="list-collapsed list"><span class="list-header-name">${name}</span></div>`);
+                $collapsedList.click(function() {
+                    tfolds.expandList($collapsedList);
+                    return false;
+                });
+                $superList.prepend($collapsedList);
+                if (settings.rememberViewStates) {
+                    const collapsed = self.retrieve(title, "collapsed");
+                    if (collapsed === true) {
+                        // TODO Collapse super list
+                        //tfolds.collapseList($l.find(".list").first().next());
+                    }
+                }
+            } catch(e) {
+                // Deliberately empty
+            }
+        },
+
+        updateSuperList(subList, listPos) {
+            let $superList = $(subList).siblings("div.super-list");
+            // if (config.debug) {
+            //     console.log($superList);
+            //     console.info($(subList).parent().siblings());
+            // }
+            let $title = $superList.find("span.super-list-header");
+            $title.find("span.wip-limit-title").remove();
+
+            /*
+             * Get the WiP limit from the left list
+             */
+            let wipLimit = self.extractWipLimit(subList);
+            let pairedList;
+            if (listPos === LEFT_LIST) {
+                pairedList = tdom.getNextList(subList)[0];
+            } else {
+                pairedList = tdom.getPrevList(subList)[0];
+            }
+            console.info(pairedList);
+            let totNumOfCards = tdom.countCards(subList) + tdom.countCards(pairedList); //+ tdom.countCards(rightList);
+            let title = tdom.getListName(subList);
+            title = title.substr(0, title.indexOf('.'));
+            $title.append(self.createWipTitle(title, totNumOfCards, wipLimit));
+            $superList.css("height", Math.max($(subList).height(), $(pairedList).height()));
+
+            return title;
+        },
+
+        //#region COMBINED LISTS
 
         /**
          *
@@ -361,41 +474,29 @@ const tfolds = (function (factory) {
             });
         },
 
-
         /**
          *
          */
         addFoldingButton(listEl) {
-            let $header = $(listEl).find('div.list-header-extras');
+            let $l = $(listEl);
 
-            let $foldIcon = $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
+            if ($l.find(".js-list-content").data("subList") > 0) {
+                return;
+            }
+
+            let $header = $l.find('div.list-header-extras');
+            let $foldIcon = self.createFoldIcon();
+
             $foldIcon.click(function () {
                 tfolds.collapseList($(this).closest(".list"));
                 return false;
             });
             $header.append($foldIcon);
-
         },
 
-        // addFoldingButtons() {
-        //     // // let $lists = $('textarea.list-header-name');
-        //     let $headers = $('div.list-header-extras');
-
-        //     let $foldIcon = $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
-        //     $foldIcon.click(function () {
-        //         tfolds.collapseList($(this).closest(".list"));
-        //         return false;
-        //     });
-        //     $headers.append($foldIcon);
-
-        //     let $lists = $("div.list-wrapper");
-        //     $lists.css({
-        //         "position": "relative",
-        //     });
-        //     $lists.each(function () {
-        //         self.addCollapsedList(this);
-        //     });
-        // },
+        createFoldIcon() {
+            return $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
+        },
 
         /**
          *
@@ -417,7 +518,7 @@ const tfolds = (function (factory) {
                 });
                 $l.prepend($collapsedList);
                 if (settings.rememberViewStates) {
-                    const collapsed = self.retrieve($l, "collapsed");
+                    const collapsed = self.retrieve(tdom.getListName($l), "collapsed");
                     if (collapsed === true) {
                         tfolds.collapseList($l.find(".list").first().next());
                     }
@@ -425,7 +526,7 @@ const tfolds = (function (factory) {
             } catch (e) {
                 // Deliberately empty
             }
-    },
+        },
 
         /**
          *
@@ -445,15 +546,16 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        showWipLimit(list) {
-            const $l = $(list);
-            let title = tdom.getListName(list);
-            let matches = title.match(/\[([0-9]*?)\]/);
+        showWipLimit(listEl) {
+            const $l = $(listEl);
+            let numCards = tdom.countCards(listEl, self.sectionIdentifier);
+            let wipLimit = self.extractWipLimit(listEl);
 
-            let numCards = tdom.countCards(list, self.sectionIdentifier);
-            if (matches && matches.length > 1) {
-                let wipLimit = parseInt(matches[1]);
-                self.addWipListTitle($l, numCards, wipLimit);
+            if ($l.data("subList") > 0) {
+                self.addWipLimit($l, numCards);
+                self.updateSuperList($l, $l.data("subList"));
+            } else if (wipLimit !== null) {
+                self.addWipLimit($l, numCards, wipLimit);
                 if (settings.enableTopBars) {
                     if (numCards === wipLimit) {
                         $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
@@ -467,9 +569,9 @@ const tfolds = (function (factory) {
                 }
             } else {
                 if (settings.alwaysCount === true) {
-                    self.addWipListTitle($l, numCards);
+                    self.addWipLimit($l, numCards);
                 } else {
-                    self.removeWipListTitle($l);
+                    self.removeWipLimit($l);
                 }
             }
 
@@ -479,28 +581,58 @@ const tfolds = (function (factory) {
 
         /**
          *
+         * @param {*} listEl
          */
-        addWipListTitle($l, numCards, wipLimit) {
+        extractWipLimit(listEl) {
+            let title = tdom.getListName(listEl);
+            let matches = title.match(/\[([0-9]*?)\]/);
+
+            if (matches && matches.length > 1) {
+                return parseInt(matches[1]);
+            }
+
+            return null;
+        },
+
+        /**
+         *
+         * @param {*} $l
+         * @param {*} numCards
+         * @param {*} wipLimit
+         */
+        addWipLimit($l, numCards, wipLimit) {
+            let strippedTitle;
+
             $l.find("span.wip-limit-title").remove();
             const title = tdom.getListName($l[0]);
-            let strippedTitle;
-            if (wipLimit !== undefined) {
+            let isSubList = $l.data("subList") > 0;
+
+            if (title.indexOf('[') !== -1) {
                 strippedTitle = title.substr(0, title.indexOf('['));
             } else {
                 strippedTitle = title;
             }
-            const $header = $l.find(".list-header");
-            let $wipTitle;
-            if (wipLimit === undefined) {
-                $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards}</span></span>`);
-            } else {
-                $wipTitle = $(`<span class="wip-limit-title">${strippedTitle} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
-                if (numCards === wipLimit) {
-                    $wipTitle.find(".wip-limit-badge").css("background-color", "#fb7928");
-                } else if (numCards > wipLimit) {
-                    $wipTitle.find(".wip-limit-badge").css("background-color", "#b04632");
-                }
+
+            if (isSubList) {
+                strippedTitle = strippedTitle.substr(strippedTitle.indexOf(".") + 1);
             }
+
+            self.addWipListTitle($l, numCards, !isSubList ? wipLimit : null, strippedTitle);
+        },
+
+        /**
+         *
+         * @param {*} $l
+         * @param {*} numCards
+         * @param {*} wipLimit
+         * @param {*} strippedTitle
+         */
+        addWipListTitle($l, numCards, wipLimit, strippedTitle) {
+            let $wipTitle;
+            let $header = $l.find(".list-header");
+
+            $wipTitle = this.createWipTitle(strippedTitle, numCards, wipLimit);
+
             $l.parent().find("div.list-collapsed").empty().append($wipTitle);
             $wipTitle = $wipTitle.clone();
             $header.off("click").click(function(e) {
@@ -517,7 +649,27 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        removeWipListTitle($l) {
+        createWipTitle(title, numCards, wipLimit) {
+            let $wipTitle;
+
+            if (wipLimit === null) {
+                $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards}</span></span>`);
+            } else {
+                $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
+                if (numCards === wipLimit) {
+                    $wipTitle.find(".wip-limit-badge").css("background-color", "#fb7928");
+                } else if (numCards > wipLimit) {
+                    $wipTitle.find(".wip-limit-badge").css("background-color", "#b04632");
+                }
+            }
+
+            return $wipTitle;
+        },
+
+        /**
+         *
+         */
+        removeWipLimit($l) {
             $l.find("span.wip-limit-title").remove();
             const $header = $l.find(".list-header");
             $header.find("textarea").show();
@@ -575,7 +727,7 @@ const tfolds = (function (factory) {
         collapseList($list) {
             $list.toggle().prev().toggle().parent().css("width", "40px");
             $list.prev().find(".list-header-name").text(tdom.getListName($list[0]));
-            self.store($list, "collapsed", true);
+            self.store(tdom.getListName($list), "collapsed", true);
         },
 
         /**
@@ -583,7 +735,7 @@ const tfolds = (function (factory) {
          */
         expandList($list) {
             $list.toggle().next().toggle().parent().css("width", "270px");
-            self.store($list.next(), "collapsed", false);
+            self.store(tdom.getListName($list.next()), "collapsed", false);
         },
 
         /**
@@ -597,13 +749,13 @@ const tfolds = (function (factory) {
 
             // const listName = tdom.getListName(tdom.getContainingList(section));
             const $l = $(tdom.getContainingList(section));
-            let listSections = self.retrieve($l, "sections");
+            let listSections = self.retrieve(tdom.getListName($l), "sections");
             if (!listSections) {
                 listSections = {};
             }
             const title = $s.next().text();
             listSections[title] = $s.hasClass("icon-collapsed");
-            self.store($l, "sections", listSections);
+            self.store(tdom.getListName($l), "sections", listSections);
         },
 
     };
