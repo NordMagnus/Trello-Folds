@@ -54,9 +54,11 @@ const tdom = (function (factory) {
     EventHandler.CARD_ADDED = Symbol("card_added");
     EventHandler.CARD_REMOVED = Symbol("card_removed");
     EventHandler.CARD_MODIFIED = Symbol("card_modified");
-    EventHandler.LIST_ADDED = Symbol("list_added"); // TODO
+    EventHandler.LIST_ADDED = Symbol("list_added");
     EventHandler.LIST_MODIFIED = Symbol("list_modified");
     EventHandler.LIST_TITLE_MODIFIED = Symbol("list_title_modified");
+    EventHandler.LIST_DRAGGED = Symbol("list_dragged");
+    EventHandler.LIST_DROPPED = Symbol("list_dropped");
 
     Object.freeze(EventHandler);
 
@@ -192,14 +194,31 @@ const tdom = (function (factory) {
          */
         connectBoardObserver($content) {
             let boardObserver = new MutationObserver(function (mutations) {
+                let isDropped = false;
+                let addedList;
                 for (let m of mutations) {
-                    // console.log("BOARD OBSERVER MUTATION", m);
                     if (m.addedNodes.length === 1 &&
+                        m.addedNodes[0].localName === "div" &&
+                        $(m.addedNodes).hasClass("placeholder")) {
+                            let $draggedList = $("div#classic-body").find(".ui-sortable-helper");
+                            handler.emit(EventHandler.LIST_DRAGGED, $draggedList[0]);
+                    } else if (m.removedNodes.length === 1 &&
+                        m.removedNodes[0].localName === "div" &&
+                        $(m.removedNodes[0]).hasClass("placeholder")) {
+                            isDropped = true;
+                    } else if (m.addedNodes.length === 1 &&
                         $(m.addedNodes[0]).hasClass("list-wrapper")) {
-                        handler.emit(EventHandler.LIST_ADDED, m.addedNodes[0]);
+                            addedList = m.addedNodes[0];
                     } else if (m.removedNodes.length === 1 &&
                         $(m.removedNodes[0]).hasClass("list-wrapper")) {
-                        handler.emit(EventHandler.LIST_REMOVED, m.removedNodes[0]);
+                            handler.emit(EventHandler.LIST_REMOVED, m.removedNodes[0]);
+                    }
+                }
+                if (addedList) {
+                    if (isDropped) {
+                        handler.emit(EventHandler.LIST_DROPPED, addedList);
+                    } else {
+                        handler.emit(EventHandler.LIST_ADDED, addedList);
                     }
                 }
             });
@@ -227,6 +246,10 @@ const tdom = (function (factory) {
             let listObserver = new MutationObserver(function (mutations) {
                 mutations.forEach((m) => {
                     // console.log("LIST OBSERVER MUTATION", m);
+                    // if (m.type === "attributes") {
+                    //     console.log(`${m.target.localName} attribute '${m.attributeName}': ${m.oldValue} => `, m.target[m.attributeName]);
+                    //     return;
+                    // }
                     if (m.addedNodes.length > 0 &&
                         m.addedNodes[0].localName === "a" &&
                         $(m.addedNodes[0]).hasClass("list-card")) {
@@ -291,6 +314,21 @@ const tdom = (function (factory) {
 
         /**
          *
+         */
+        onListDragged(callback) {
+            handler.addListener(EventHandler.LIST_DRAGGED, callback);
+        },
+
+        /**
+         *
+         * @param {Function} callback
+         */
+        onListDropped(callback) {
+            handler.addListener(EventHandler.LIST_DROPPED, callback);
+        },
+
+        /**
+         *
          * @param {Function} callback
          */
         onCardAdded(callback) {
@@ -347,6 +385,7 @@ const tdom = (function (factory) {
             }
             let nameElement = $(el).find("h2.list-header-name-assist");
             if (nameElement.length === 0) {
+                console.error("No [H2.list-header-name-assist] found", el);
                 throw new ReferenceError("No [H2.list-header-name-assist] tag found");
             }
             if (nameElement.length !== 1) {
