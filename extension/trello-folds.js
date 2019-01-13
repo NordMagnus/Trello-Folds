@@ -94,6 +94,8 @@ const tfolds = (function (factory) {
             tdom.onCardAdded(self.cardAdded);
             tdom.onCardModified(self.cardModified);
             tdom.onListTitleModified(self.listTitleModified);
+            tdom.onListDragged(self.listDragged);
+            tdom.onListDropped(self.listDropped);
             tdom.initialize();
 
             /*
@@ -128,11 +130,32 @@ const tfolds = (function (factory) {
          */
         listAdded(listEl) {
             if (!listEl) {
+                console.log("[listEl] not defined");
                 return;
             }
             self.addFoldingButton(listEl);
             self.addCollapsedList(listEl);
-            self.showWipLimit(listEl);
+            self.showWipLimit($(listEl).find(".js-list-content")[0]);
+        },
+
+        listDragged(listEl) {
+            let $list = $(listEl).find(".js-list-content");
+            let subList = self.isSubList($list);
+            if (subList) {
+                self.removeSubListProps($list);
+                if (subList === LEFT_LIST) {
+                    $list.parent().find(".super-list,.super-list-collapsed").remove();
+                    self.removeSubListProps($("div.placeholder").next().find(".js-list-content"));
+                } else {
+                    let $leftList = $("div.placeholder").prev().find(".js-list-content");
+                    self.removeSubListProps($leftList);
+                    $leftList.parent().find(".super-list,.super-list-collapsed").remove();
+                }
+            }
+        },
+
+        listDropped(listEl) {
+            self.combineLists();
         },
 
         /**
@@ -299,7 +322,7 @@ const tfolds = (function (factory) {
          *
          */
         cleanupStorage() {
-            console.log(storage);
+            console.log("cleanupStorage()", storage);
             // TODO Implement
         },
 
@@ -315,14 +338,14 @@ const tfolds = (function (factory) {
          */
         restoreSectionsViewState() {
             const $lists = tdom.getLists();
-            $lists.each(function() {
+            $lists.each(function () {
                 const $l = $(this);
                 let $sections = tdom.getCardsInList(this, self.sectionIdentifier);
                 const sectionStates = self.retrieve(tdom.getListName($l), "sections");
                 if (!sectionStates) {
                     return;
                 }
-                $sections.each(function() {
+                $sections.each(function () {
                     const cardName = tdom.getCardName($(this));
                     if (sectionStates[self.getStrippedTitle(cardName)] === true) {
                         self.toggleSection($(this).find("span.icon-expanded")[0]);
@@ -387,11 +410,17 @@ const tfolds = (function (factory) {
          *
          */
         combineLists() {
-            let $lists = tdom.getLists(".");
-            for (let i = 0; i < $lists.length - 1; ++i) {
-                if (self.areListsRelated($lists[i], $lists[i+1])) {
-                    self.combineListWithNext($lists[i], $lists[i+1]);
+            let $lists = tdom.getLists();
+            for (let i = 0; i < $lists.length; ++i) {
+                if (tdom.getListName($lists[i]).indexOf(".") === -1 || i === $lists.length - 1) {
+                    self.removeSubListProps($lists.eq(i));
+                    continue;
+                }
+                if (self.areListsRelated($lists[i], $lists[i + 1])) {
+                    self.combineListWithNext($lists[i], $lists[i + 1]);
                     ++i; // Increase i again to skip one list when combining
+                } else {
+                    self.removeSubListProps($lists.eq(i));
                 }
             }
         },
@@ -456,7 +485,9 @@ const tfolds = (function (factory) {
          *
          */
         removeSubListProps($l) {
-            console.info("removeSubListProps()");
+            if ($l.data("subList") === LEFT_LIST) {
+                $l.parent().find(".super-list,.super-list-collapsed").remove();
+            }
             $l.removeData("subList").removeClass("sub-list");
             self.addFoldingButton($l[0]);
             self.showWipLimit($l[0]);
@@ -496,17 +527,17 @@ const tfolds = (function (factory) {
             $superList.data("superList", true);
 
             /*
-            * Make list same height as contained lists. This height is also
-            * tweaked using CSS padding.
-            */
-           $superList.append($title);
+             * Make list same height as contained lists. This height is also
+             * tweaked using CSS padding.
+             */
+            $superList.append($title);
 
-           $leftList.parent().prepend($superList);
+            $leftList.parent().prepend($superList);
 
-           self.addCollapsedSuperList($superList);
+            self.addCollapsedSuperList($superList);
 
-           self.updateSuperList(leftList, LEFT_LIST);
-           self.addFoldingButton($superList[0]);
+            self.updateSuperList(leftList, LEFT_LIST);
+            self.addFoldingButton($superList[0]);
         },
 
         /**
@@ -516,7 +547,7 @@ const tfolds = (function (factory) {
             try {
                 let $collapsedList = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
                 $superList.parent().prepend($collapsedList);
-                $collapsedList.click(function() {
+                $collapsedList.click(function () {
                     tfolds.expandSuperList($collapsedList);
                     return false;
                 });
@@ -527,7 +558,7 @@ const tfolds = (function (factory) {
                 //         //tfolds.collapsBeList($l.find(".list").first().next());
                 //     }
                 // }
-            } catch(e) {
+            } catch (e) {
                 // Deliberately empty
             }
         },
@@ -536,8 +567,10 @@ const tfolds = (function (factory) {
             let $superList = $(subList).siblings("div.super-list");
             let $title = $superList.find("span.super-list-header");
 
+            /*
+             * Only modify if the left sub list
+             */
             if (listPos !== 1) {
-                console.warn("RETURNING");
                 return;
             }
 
@@ -548,7 +581,6 @@ const tfolds = (function (factory) {
              */
             let wipLimit;
             let pairedList;
-            console.info(`listPos=${listPos}`);
             if (listPos === LEFT_LIST) {
                 pairedList = tdom.getNextList(subList);
                 wipLimit = self.extractWipLimit(subList);
@@ -558,15 +590,13 @@ const tfolds = (function (factory) {
             }
             let totNumOfCards = tdom.countCards(subList) + tdom.countCards(pairedList); //+ tdom.countCards(rightList);
             let title = tdom.getListName(subList);
-            console.info(title);
             title = title.substr(0, title.indexOf('.'));
-            console.info(`strippedTitle=${title}`);
             let $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
-            console.info($wipTitle[0].outerHTML);
+            self.updateWipBars($superList, totNumOfCards, wipLimit);
             $title.append($wipTitle);
             $superList.css("height", Math.max($(subList).height(), $(pairedList).height()));
 
-           self.updateCollapsedSuperList($superList, $wipTitle.clone());
+            self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
             return $wipTitle;
         },
@@ -586,7 +616,7 @@ const tfolds = (function (factory) {
          */
         makeListsFoldable() {
             let $lists = $("div.list-wrapper");
-            $lists.each(function() {
+            $lists.each(function () {
                 self.addFoldingButton(this);
                 self.addCollapsedList(this);
             });
@@ -603,6 +633,7 @@ const tfolds = (function (factory) {
             }
 
             let $header = $l.find('div.list-header-extras');
+            $header.find(".icon-close").parent().remove();
             let $foldIcon = self.createFoldIcon();
 
             $foldIcon.click(function () {
@@ -639,6 +670,9 @@ const tfolds = (function (factory) {
          */
         addCollapsedList(listEl) {
             const $l = $(listEl);
+            if ($l.hasClass("js-add-list")) {
+                return;
+            }
             $l.css({
                 "position": "relative",
             });
@@ -689,22 +723,13 @@ const tfolds = (function (factory) {
             let subList = $l.data("subList");
 
             if (subList > 0) {
-                console.info("Updating super list");
                 self.addWipLimit($l, numCards);
                 self.updateSuperList($l, subList);
+                $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
+                $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
             } else if (wipLimit !== null) {
                 self.addWipLimit($l, numCards, wipLimit);
-                if (settings.enableTopBars) {
-                    if (numCards === wipLimit) {
-                        $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
-                        $l.prev().addClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
-                        return;
-                    } else if (numCards > wipLimit) {
-                        $l.removeClass("wip-limit-reached").addClass("wip-limit-exceeded");
-                        $l.prev().removeClass("collapsed-limit-reached").addClass("collapsed-limit-exceeded");
-                        return;
-                    }
-                }
+                self.updateWipBars($l, numCards, wipLimit);
             } else {
                 if (settings.alwaysCount === true) {
                     self.addWipLimit($l, numCards);
@@ -712,7 +737,23 @@ const tfolds = (function (factory) {
                     self.removeWipLimit($l);
                 }
             }
+        },
 
+        /**
+         *
+         */
+        updateWipBars($l, numCards, wipLimit) {
+            if (typeof wipLimit === "number" && settings.enableTopBars) {
+                if (numCards === wipLimit) {
+                    $l.addClass("wip-limit-reached").removeClass("wip-limit-exceeded");
+                    $l.siblings(".list-collapsed,.super-list-collapsed").addClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
+                    return;
+                } else if (numCards > wipLimit) {
+                    $l.removeClass("wip-limit-reached").addClass("wip-limit-exceeded");
+                    $l.siblings(".list-collapsed,.super-list-collapsed").removeClass("collapsed-limit-reached").addClass("collapsed-limit-exceeded");
+                    return;
+                }
+            }
             $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
             $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
         },
@@ -773,7 +814,7 @@ const tfolds = (function (factory) {
 
             $l.parent().find("div.list-collapsed").empty().append($wipTitle);
             $wipTitle = $wipTitle.clone();
-            $header.off("click").click(function(e) {
+            $header.off("click").click(function (e) {
                 $(this).find(".wip-limit-title").hide();
                 $(this).find("textarea").show().select();
                 return !$(e.target).hasClass("wip-limit-badge");
@@ -790,7 +831,7 @@ const tfolds = (function (factory) {
         createWipTitle(title, numCards, wipLimit) {
             let $wipTitle;
 
-            if (wipLimit === null || wipLimit === undefined) {
+            if (!(typeof wipLimit === "number")) {
                 $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards}</span></span>`);
             } else {
                 $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
@@ -894,7 +935,7 @@ const tfolds = (function (factory) {
          *
          */
         expandList($list) {
-            $list.toggle().next().toggle().parent().css("width", "270px");
+            $list.toggle().next().toggle().parent().css("width", "272px");
             self.store(tdom.getListName($list.next()), "collapsed", false);
         },
 
@@ -903,7 +944,7 @@ const tfolds = (function (factory) {
          */
         expandSuperList($collapsedList) {
             let $superList = $collapsedList.toggle().siblings(".super-list");
-            $superList.toggle().parent().css("width", "270px").next().show();
+            $superList.toggle().parent().css("width", "272px").next().show();
             $superList.siblings(".sub-list").show();
             $superList.parent().next().find(".js-list-content").show();
 
