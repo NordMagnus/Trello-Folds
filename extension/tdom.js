@@ -56,7 +56,7 @@ const tdom = (function (factory) {
     EventHandler.CARD_MODIFIED = Symbol("card_modified");
     EventHandler.LIST_ADDED = Symbol("list_added"); // TODO
     EventHandler.LIST_MODIFIED = Symbol("list_modified");
-    EventHandler.LIST_TITLE_MODIFIED = Symbol("list_title_modified"); // TODO
+    EventHandler.LIST_TITLE_MODIFIED = Symbol("list_title_modified");
 
     Object.freeze(EventHandler);
 
@@ -389,11 +389,13 @@ const tdom = (function (factory) {
         },
 
         getPrevList(listEl) {
-            return $(listEl).parent().prev().find("div.js-list-content");
+            let $prev = $(listEl).parent().prev().find("div.js-list-content");
+            return $prev.length ? $prev[0]: null;
         },
 
         getNextList(listEl) {
-            return $(listEl).parent().next().find("div.js-list-content");
+            let $next = $(listEl).parent().next().find("div.js-list-content");
+            return $next.length ? $next[0] : null;
         },
 
         /**
