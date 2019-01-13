@@ -199,7 +199,28 @@ const tfolds = (function (factory) {
          */
         listTitleModified(list, title) {
             console.log("listTitleModified()", list, title);
-            self.showWipLimit(list);
+            let $l = $(list);
+
+            if (self.isSubList($l)) {
+                if (self.splitLists($l)) {
+                    $l.parent().find(".super-list,.super-list-collapsed").remove();
+                } else {
+                    self.updateSuperList(list, $l.data("subList"));
+                }
+            }
+
+            /*
+             * Check if it should be a super list with any adjacent list.
+             */
+            let prev = tdom.getPrevList($l[0]);
+            let next = tdom.getNextList($l[0]);
+            if (next && self.areListsRelated($l, $(next))) {
+                self.combineListWithNext($l[0], next);
+            } else if (prev && self.areListsRelated($(prev), $l)) {
+                self.combineListWithNext(prev, $l[0]);
+            } else {
+                self.showWipLimit(list);
+            }
         },
 
         //#endregion EVENT HANDLERS
@@ -368,15 +389,77 @@ const tfolds = (function (factory) {
         combineLists() {
             let $lists = tdom.getLists(".");
             for (let i = 0; i < $lists.length - 1; ++i) {
-                const listName = tdom.getListName($lists[i]);
-                const nextName = tdom.getListName($lists[i+1]);
-                if (listName.substr(0, listName.indexOf(".")) ===
-                        nextName.substr(0, nextName.indexOf("."))) {
-                            console.info(`Combining lists:${listName} and ${nextName}`);
-                            self.combineListWithNext($lists[i], $lists[i+1]);
-                            ++i;
-                        }
+                if (self.areListsRelated($lists[i], $lists[i+1])) {
+                    self.combineListWithNext($lists[i], $lists[i+1]);
+                    ++i; // Increase i again to skip one list when combining
+                }
             }
+        },
+
+        /**
+         *
+         */
+        areListsRelated($l1, $l2) {
+            const name1 = tdom.getListName($l1);
+            const name2 = tdom.getListName($l2);
+            return (name1.substr(0, name1.indexOf(".")) === name2.substr(0, name2.indexOf(".")));
+        },
+
+        /**
+         * Splits the lists into two ordinary lists assuming they are combined
+         * and no longer matches.
+         *
+         * This would typically happen if a list is moved around or its title changed.
+         *
+         * @param {jQuery} $list The list object for the list being modified
+         * @return {boolean} `true` if lists split, otherwise `false`
+         */
+        splitLists($list) {
+            let isSubList = $list.data("subList");
+            if (!isSubList) {
+                console.warn("Called splitLists() with a list that isn't a sublist", $list);
+                return false;
+            }
+
+            let $leftList;
+            let $rightList;
+
+            if (isSubList === LEFT_LIST) {
+                $leftList = $list;
+                $rightList = $list.parent().next().find(".js-list-content");
+                console.info($rightList);
+                if (!self.isSubList($rightList)) {
+                    console.warn("List to right not a sub list");
+                    return false;
+                }
+            } else {
+                $rightList = $list;
+                $leftList = $list.parent().prev().find(".js-list-content");
+                console.info($leftList);
+                if (!self.isSubList($leftList)) {
+                    console.warn("List to left not a sub list");
+                    return false;
+                }
+            }
+
+            if (self.areListsRelated($leftList, $rightList)) {
+                return false;
+            }
+
+            self.removeSubListProps($leftList);
+            self.removeSubListProps($rightList);
+
+            return true;
+        },
+
+        /**
+         *
+         */
+        removeSubListProps($l) {
+            console.info("removeSubListProps()");
+            $l.removeData("subList").removeClass("sub-list");
+            self.addFoldingButton($l[0]);
+            self.showWipLimit($l[0]);
         },
 
         combineListWithNext(leftList, rightList) {
@@ -385,6 +468,20 @@ const tfolds = (function (factory) {
             $(leftList).data("subList", LEFT_LIST);
             $(rightList).addClass("sub-list");
             $(rightList).data("subList", RIGHT_LIST);
+            self.removeFoldingButton(leftList);
+            self.removeFoldingButton(rightList);
+            self.showWipLimit(leftList);
+            self.showWipLimit(rightList);
+        },
+
+        /**
+         *
+         */
+        isSubList($l) {
+            if (!$l) {
+                throw new TypeError("Parameter [$l] undefined");
+            }
+            return $l.data("subList");
         },
 
         addSuperList(leftList, rightList) {
@@ -396,6 +493,8 @@ const tfolds = (function (factory) {
 
             $title.append($extras);
 
+            $superList.data("superList", true);
+
             /*
             * Make list same height as contained lists. This height is also
             * tweaked using CSS padding.
@@ -404,29 +503,30 @@ const tfolds = (function (factory) {
 
            $leftList.parent().prepend($superList);
 
-           let title = self.updateSuperList(leftList, LEFT_LIST);
+           self.addCollapsedSuperList($superList);
 
-           self.addCollapsedSuperList($superList, title);
+           self.updateSuperList(leftList, LEFT_LIST);
+           self.addFoldingButton($superList[0]);
         },
 
         /**
          *
          */
-        addCollapsedSuperList($superList, title) {
+        addCollapsedSuperList($superList) {
             try {
-                let $collapsedList = $(`<div style="display: none" class="list-collapsed list"><span class="list-header-name">${name}</span></div>`);
+                let $collapsedList = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
+                $superList.parent().prepend($collapsedList);
                 $collapsedList.click(function() {
-                    tfolds.expandList($collapsedList);
+                    tfolds.expandSuperList($collapsedList);
                     return false;
                 });
-                $superList.prepend($collapsedList);
-                if (settings.rememberViewStates) {
-                    const collapsed = self.retrieve(title, "collapsed");
-                    if (collapsed === true) {
-                        // TODO Collapse super list
-                        //tfolds.collapseList($l.find(".list").first().next());
-                    }
-                }
+                // if (settings.rememberViewStates) {
+                //     const collapsed = self.retrieve(title, "collapsed");
+                //     if (collapsed === true) {
+                //         // TODO Collapse super list
+                //         //tfolds.collapsBeList($l.find(".list").first().next());
+                //     }
+                // }
             } catch(e) {
                 // Deliberately empty
             }
@@ -434,31 +534,49 @@ const tfolds = (function (factory) {
 
         updateSuperList(subList, listPos) {
             let $superList = $(subList).siblings("div.super-list");
-            // if (config.debug) {
-            //     console.log($superList);
-            //     console.info($(subList).parent().siblings());
-            // }
             let $title = $superList.find("span.super-list-header");
+
+            if (listPos !== 1) {
+                console.warn("RETURNING");
+                return;
+            }
+
             $title.find("span.wip-limit-title").remove();
 
             /*
              * Get the WiP limit from the left list
              */
-            let wipLimit = self.extractWipLimit(subList);
+            let wipLimit;
             let pairedList;
+            console.info(`listPos=${listPos}`);
             if (listPos === LEFT_LIST) {
-                pairedList = tdom.getNextList(subList)[0];
+                pairedList = tdom.getNextList(subList);
+                wipLimit = self.extractWipLimit(subList);
             } else {
-                pairedList = tdom.getPrevList(subList)[0];
+                pairedList = tdom.getPrevList(subList);
+                wipLimit = self.extractWipLimit(pairedList);
             }
-            console.info(pairedList);
             let totNumOfCards = tdom.countCards(subList) + tdom.countCards(pairedList); //+ tdom.countCards(rightList);
             let title = tdom.getListName(subList);
+            console.info(title);
             title = title.substr(0, title.indexOf('.'));
-            $title.append(self.createWipTitle(title, totNumOfCards, wipLimit));
+            console.info(`strippedTitle=${title}`);
+            let $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
+            console.info($wipTitle[0].outerHTML);
+            $title.append($wipTitle);
             $superList.css("height", Math.max($(subList).height(), $(pairedList).height()));
 
-            return title;
+           self.updateCollapsedSuperList($superList, $wipTitle.clone());
+
+            return $wipTitle;
+        },
+
+        /**
+         *
+         */
+        updateCollapsedSuperList($superList, $wipTitle) {
+            let $header = $superList.parent().find(".super-list-collapsed > span.list-header-name");
+            $header.empty().append($wipTitle);
         },
 
         //#region COMBINED LISTS
@@ -488,7 +606,17 @@ const tfolds = (function (factory) {
             let $foldIcon = self.createFoldIcon();
 
             $foldIcon.click(function () {
-                tfolds.collapseList($(this).closest(".list"));
+                // console.log($(this).closest(".list"));
+                let $l = $(this).closest(".list");
+                if ($l.length === 1) {
+                    tfolds.collapseList($l);
+                } else {
+                    if ($l.length !== 0) {
+                        console.error("Expected to find ONE list or super list");
+                        return;
+                    }
+                    self.collapseSuperList($(this).closest(".super-list"));
+                }
                 return false;
             });
             $header.append($foldIcon);
@@ -496,6 +624,14 @@ const tfolds = (function (factory) {
 
         createFoldIcon() {
             return $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
+        },
+
+        /**
+         *
+         */
+        removeFoldingButton(listEl) {
+            let $l = $(listEl);
+            $l.find("div.list-header-extras > a > span.icon-close").remove();
         },
 
         /**
@@ -550,10 +686,12 @@ const tfolds = (function (factory) {
             const $l = $(listEl);
             let numCards = tdom.countCards(listEl, self.sectionIdentifier);
             let wipLimit = self.extractWipLimit(listEl);
+            let subList = $l.data("subList");
 
-            if ($l.data("subList") > 0) {
+            if (subList > 0) {
+                console.info("Updating super list");
                 self.addWipLimit($l, numCards);
-                self.updateSuperList($l, $l.data("subList"));
+                self.updateSuperList($l, subList);
             } else if (wipLimit !== null) {
                 self.addWipLimit($l, numCards, wipLimit);
                 if (settings.enableTopBars) {
@@ -652,7 +790,7 @@ const tfolds = (function (factory) {
         createWipTitle(title, numCards, wipLimit) {
             let $wipTitle;
 
-            if (wipLimit === null) {
+            if (wipLimit === null || wipLimit === undefined) {
                 $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards}</span></span>`);
             } else {
                 $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
@@ -712,8 +850,7 @@ const tfolds = (function (factory) {
                 return false;
             });
             const strippedTitle = self.getStrippedTitle(tdom.getCardName($card));
-
-            console.log($card.prepend(`<span id="section-title">${strippedTitle}</span>`));
+            $card.prepend(`<span id="section-title">${strippedTitle}</span>`);
             $card.prepend($icon);
             $card.find('span.list-card-title').hide();
             $card.addClass("section-card");
@@ -732,10 +869,45 @@ const tfolds = (function (factory) {
 
         /**
          *
+         * @param {jQuery} $superList
+         */
+        collapseSuperList($superList) {
+            $superList.toggle().siblings(".super-list-collapsed").toggle().parent().css("width", "40px").next().hide();
+            // $superList.prev().find(".list-header-name").text(tdom.getListName("foo"));
+            /*
+             *  Hide sub lists
+             */
+            $superList.siblings(".sub-list").hide();
+            $superList.parent().next().find(".list").hide();
+            // FIXME Store setting
+        },
+
+        /**
+         *
+         * @param {jQuery} $superList
+         */
+        getSubLists($superList) {
+
+        },
+
+        /**
+         *
          */
         expandList($list) {
             $list.toggle().next().toggle().parent().css("width", "270px");
             self.store(tdom.getListName($list.next()), "collapsed", false);
+        },
+
+        /**
+         *
+         */
+        expandSuperList($collapsedList) {
+            let $superList = $collapsedList.toggle().siblings(".super-list");
+            $superList.toggle().parent().css("width", "270px").next().show();
+            $superList.siblings(".sub-list").show();
+            $superList.parent().next().find(".js-list-content").show();
+
+            // self.store(tdom.getListName($list.next()), "collapsed", false);
         },
 
         /**
