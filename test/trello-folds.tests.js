@@ -137,6 +137,7 @@ describe('tfolds', function() {
             let $span;
 
             $l.data("subList", false);
+            tfolds.alwaysCount = true; // TODO Create test with alwaysCount === false
 
             tfolds.addWipLimit($l, 5);
             expect($l).to.have.descendants("span.wip-limit-badge");
@@ -161,6 +162,7 @@ describe('tfolds', function() {
             let $l = tdom.getLists("List Alpha");
             let $span;
 
+            tfolds.alwaysCount = true; // TODO Create test with alwaysCount === false
             $l.data("subList", true);
             tfolds.addWipLimit($l, 5);
             expect($l).to.have.descendants("span.wip-limit-badge");
