@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* global chrome */
 
 let settings = {
@@ -83,6 +84,18 @@ function updateAlwaysCount(reload = true) {
     }
 }
 
+function updateCombiningLists(reload = true) {
+    let enableCombiningLists = document.getElementById("enable-combining-lists").checked;
+    settings.settings.enableCombiningLists = enableCombiningLists;
+    document.getElementById("combining-lists-img").src = enableCombiningLists ? "img/Lists_Combined.png" : "img/Lists_not_Combined.png";
+    document.getElementById("combining-lists-example-text").innerText = enableCombiningLists ?
+            "Two adjacent lists with same dot prefix, e.g. 'myList.' will be combined. (WiP limit from left list is applied.)" :
+            "List combination is disabled.";
+    if (reload) {
+        storeAndReload();
+    }
+}
+
 function updateRememberViewStates() {
     let enabled = document.getElementById("remember-view-states").checked;
     settings.settings.rememberViewStates = enabled;
@@ -120,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 enableTopBars: true,
                 rememberViewStates: true,
                 alwaysCount: false,
+                enableCombiningLists: false,
             };
         }
         numOfViewStates = Object.keys(result).length - 1;
@@ -143,6 +157,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('wip-always-count').addEventListener('change', updateAlwaysCount);
         document.getElementById('wip-always-count').checked = settings.settings.alwaysCount;
         updateAlwaysCount(false);
+
+        document.getElementById('enable-combining-lists').addEventListener('change', updateCombiningLists);
+        document.getElementById('enable-combining-lists').checked = settings.settings.enableCombiningLists;
+        updateCombiningLists(false);
 
         document.getElementById('remember-view-states').addEventListener('change', updateRememberViewStates);
         document.getElementById('remember-view-states').checked = settings.settings.rememberViewStates;
