@@ -332,7 +332,9 @@ const tfolds = (function (factory) {
          */
         cleanupStorage() {
             console.log("cleanupStorage()", storage);
-            // TODO Remove any superList settings if combine lists turned off
+            if (settings.enableCombiningLists === false) {
+                // TODO Add function to clear super list states
+            }
         },
 
         /**
