@@ -50,7 +50,7 @@ function updateSectionChar(reload = true) {
     }
 
     document.getElementById("section-example-1").innerText = `${ch.repeat(rpt)} Section`;
-    document.getElementById("section-example-2").innerText = `${ch.repeat(rpt+1)} Section ${ch.repeat(rpt+1)}`;
+    document.getElementById("section-example-2").innerText = `${ch.repeat(rpt)} Section ${ch.repeat(rpt+1)}`;
 
     settings.settings.sectionChar = ch;
     settings.settings.sectionRepeat = rpt;
