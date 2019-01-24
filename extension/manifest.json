@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Trello Folds",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
@@ -16,7 +16,7 @@
         "default_icon": "icons/icon48.png",
         "default_popup": "popup.html"
     },
-    "description": "Turn your Trello board into a Kanban system with WiP limits, card count and collapsible lists",
+    "description": "Turn your Trello board into a Kanban system with WiP limits, combining lists, card count and collapsible lists",
     "content_scripts": [{
         "css": ["styles.css"],
         "js": ["lib/jquery.js", "tdom.js", "trello-folds.js", "content.js"],
