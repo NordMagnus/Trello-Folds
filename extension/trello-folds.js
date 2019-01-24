@@ -320,7 +320,7 @@ const tfolds = (function (factory) {
             self.cleanupStorage();
             self.formatSections();
             if (settings.rememberViewStates) {
-                self.restoreSectionsViewState(); // TODO Refactor to "restoreViewstate" including both lists and sections?
+                self.restoreSectionsViewState();
             } else {
                 self.clearViewState();
             }
@@ -333,7 +333,6 @@ const tfolds = (function (factory) {
         cleanupStorage() {
             console.log("cleanupStorage()", storage);
             // TODO Remove any superList settings if combine lists turned off
-            // TODO Remove any collapsed states if remember viewstate turned off - or do globally from popup.js
         },
 
         /**
@@ -356,10 +355,13 @@ const tfolds = (function (factory) {
                     return;
                 }
                 $sections.each(function () {
-                    const cardName = tdom.getCardName($(this));
-                    if (sectionStates[self.getStrippedTitle(cardName)] === true) {
-                        self.toggleSection($(this).find("span.icon-expanded")[0]);
-                    }
+                    setTimeout(() => {
+                        const cardName = tdom.getCardName($(this));
+                        if (sectionStates[self.getStrippedTitle(cardName)] === true) {
+                            let $section = $(this).find(".icon-expanded");
+                            self.toggleSection($section[0]);
+                        }
+                    }, 150);
                 });
             });
         },
@@ -963,6 +965,7 @@ const tfolds = (function (factory) {
          *
          */
         toggleSection(section) {
+            console.log(section);
             let $s = $(section);
             $s.toggleClass("icon-collapsed icon-expanded");
             let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
