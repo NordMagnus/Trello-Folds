@@ -253,7 +253,9 @@ const tdom = (function (factory) {
                     if (m.addedNodes.length > 0 &&
                         m.addedNodes[0].localName === "a" &&
                         $(m.addedNodes[0]).hasClass("list-card")) {
-                        handler.emit(EventHandler.CARD_ADDED, m.addedNodes[0]);
+                        if (!$(m.addedNodes[0]).hasClass("placeholder")) {
+                            handler.emit(EventHandler.CARD_ADDED, m.addedNodes[0]);
+                        }
                         handler.emit(EventHandler.LIST_MODIFIED, $(m.target).parent()[0]);
                     } else if (m.removedNodes.length > 0 &&
                         m.removedNodes[0].localName === "a" &&
@@ -447,7 +449,10 @@ const tdom = (function (factory) {
         getCardName($card) {
             let $span = $card.find("span.list-card-title");
             if ($span.length === 0) {
-                throw new TypeError("Could not find SPAN tag");
+                if (self.debug === true) {
+                    console.warn("span.list-card-title element not found");
+                }
+                return;
             }
             let title = $card.find("span.list-card-title")
                 .clone() //clone the element
@@ -496,13 +501,13 @@ const tdom = (function (factory) {
          * Count cards in list.
          *
          * @param {Element} list The containing list
-         * @param {Stringt} filter Cards containing filter will be excluded
+         * @param {String} filter Cards containing filter will be excluded
          * @returns {Number} Number of cards found
          */
         countCards(list, filter) {
             let $cards = $(list).find("a.list-card").filter(function () {
                 const title = self.getCardName($(this));
-                if (filter) {
+                if (filter && title) {
                     return title.indexOf(filter) === -1;
                 }
                 return true;
