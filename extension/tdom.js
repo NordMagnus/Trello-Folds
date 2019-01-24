@@ -447,6 +447,12 @@ const tdom = (function (factory) {
          * @returns {String} The card title
          */
         getCardName($card) {
+            if (!$card) {
+                throw new TypeError("Parameter [$card] undefined");
+            }
+            if (!$card.find) {
+                throw new TypeError("Parameter [$card] does not seem to be a jQuery object");
+            }
             let $span = $card.find("span.list-card-title");
             if ($span.length === 0) {
                 if (self.debug === true) {

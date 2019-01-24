@@ -127,7 +127,9 @@ describe('tdom', function() {
         it("should throw TypeError if given argument does not contain a SPAN.list-card-title element", function() {
             expect(tdom.getCardName).to.throw(TypeError);
             expect(() => tdom.getCardName("string")).to.throw(TypeError);
-            expect(() => tdom.getCardName($("<span>blaha<p>foo</p></span>"))).to.throw(TypeError);
+        });
+        it("should return undefined if span not found", function() {
+            expect(tdom.getCardName($("<span>blaha<p>foo</p></span>"))).to.be.undefined;
         });
         it("should return the text inside the SPAN.list-card-title element", function() {
             const html = "<span class='list-card-title'><p>no</p>yes<div>no</div></span>";
