@@ -1,6 +1,6 @@
 /* global chrome */
 
-console.info("Running TRELLO FOLDS Chrome extension");
+console.info("%cRunning TRELLO FOLDS Chrome extension", "font-weight: bold; color: #0088ff;");
 
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
     if (request.msg === "dump") {
