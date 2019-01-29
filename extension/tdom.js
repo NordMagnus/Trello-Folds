@@ -87,13 +87,28 @@ const tdom = (function (factory) {
         /**
          *
          */
+        init() {
+            document.addEventListener('readystatechange', event => {
+                if (event.target.readyState === 'interactive') {
+//                    console.info("INTERACTIVE");
+                }
+                else if (event.target.readyState === 'complete') {
+//                    console.info("COMPLETE");
+                    self.initialize();
+                }
+              });
+        },
+
+        /**
+         *
+         */
         initialize(attemptCount = 0) {
             let $content = $("DIV#content");
 
             if (!$content.length) {
                 if (attemptCount < 3) {
                     setTimeout(() => {
-                        console.log(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
+                        console.warn(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
                         self.initialize(attemptCount + 1);
                     }, 100);
                     return;
@@ -101,9 +116,10 @@ const tdom = (function (factory) {
                 throw ReferenceError(`DIV#content not found after ${attemptCount} attempts`);
             }
 
-            let boardObserver = new MutationObserver(function (mutations) {
+            // TODO Rename
+            let initObserver = new MutationObserver(function (mutations) {
                 if (debug) {
-                    console.log("Board observer invoked");
+                    console.log("Init observer invoked");
                 }
 
                 if (mutations.length !== 0 && $(mutations[mutations.length - 1].addedNodes)) {
@@ -124,15 +140,7 @@ const tdom = (function (factory) {
 
             self.boardChanged(self.getBoardIdFromUrl());
 
-            /*
-             * Give the page a chance to catch its breath before continuing.
-             */
-            // self.delay(200).then(() => {
-            //     boardObserver.observe($content[0], conf);
-            // })
-            setTimeout(() => {
-                boardObserver.observe($content[0], conf);
-            }, 200);
+            initObserver.observe($content[0], conf);
         },
 
         /**
@@ -140,27 +148,10 @@ const tdom = (function (factory) {
          */
         boardChanged(boardId) {
             if (debug) {
-                console.info(`INITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
+                console.info(`%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`, "font-weight: bold;");
             }
             self.connectObservers(boardId);
         },
-
-        // /**
-        //  * https://stackoverflow.com/questions/34255351/is-there-a-version-of-settimeout-that-returns-an-es6-promise
-        //  */
-        // delay(ms) {
-        //     let ctr;
-        //     let rej;
-        //     let p = new Promise(function(resolve, reject) {
-        //         ctr = setTimeout(resolve, ms);
-        //         rej = reject;
-        //     });
-        //     p.cancel = function() {
-        //         clearTimeout(ctr);
-        //         rej(Error("Cancelled"));
-        //     };
-        //     return p;
-        // },
 
         //#region EVENT MANAGEMENT
 
@@ -193,10 +184,18 @@ const tdom = (function (factory) {
          * added and removed children to `DIV#board` having the CSS class `list-wrapper`.
          */
         connectBoardObserver($content) {
+
             let boardObserver = new MutationObserver(function (mutations) {
                 let isDropped = false;
                 let addedList;
+
                 for (let m of mutations) {
+                    // if (m.addedNodes.length !== 0) {
+                    //     console.info(m.addedNodes);
+                    //     if ($(m.addedNodes[0]).hasClass("is-icon-only")) {
+                    //         console.error("BOARD LOADED", m.addedNodes[0]);
+                    //     }
+                    // }
                     if (m.addedNodes.length === 1 &&
                         m.addedNodes[0].localName === "div" &&
                         $(m.addedNodes).hasClass("placeholder")) {
@@ -245,11 +244,6 @@ const tdom = (function (factory) {
 
             let listObserver = new MutationObserver(function (mutations) {
                 mutations.forEach((m) => {
-                    // console.log("LIST OBSERVER MUTATION", m);
-                    // if (m.type === "attributes") {
-                    //     console.log(`${m.target.localName} attribute '${m.attributeName}': ${m.oldValue} => `, m.target[m.attributeName]);
-                    //     return;
-                    // }
                     if (m.addedNodes.length > 0 &&
                         m.addedNodes[0].localName === "a" &&
                         $(m.addedNodes[0]).hasClass("list-card")) {
@@ -261,7 +255,10 @@ const tdom = (function (factory) {
                         m.removedNodes[0].localName === "a" &&
                         $(m.removedNodes[0]).hasClass("list-card")) {
                         handler.emit(EventHandler.CARD_REMOVED, m.removedNodes[0]);
-                        handler.emit(EventHandler.LIST_MODIFIED, $(m.target).parent()[0]);
+                        let $target = $(m.target);
+                        if ($target.parent().length !== 0) {
+                            handler.emit(EventHandler.LIST_MODIFIED, $target.closest("div.list")[0]);
+                        }
                     } else if (m.addedNodes.length === 2 &&
                         m.removedNodes.length === 2 &&
                         m.addedNodes[1].parentElement.localName === "span" &&
@@ -429,11 +426,23 @@ const tdom = (function (factory) {
             return jLists;
         },
 
+        /**
+         * Given a list element, tries to find the previous list.
+         *
+         * @param {Element} listEl List whos predecessor to get
+         * @returns {Element} List element or ``null`` if not found
+         */
         getPrevList(listEl) {
             let $prev = $(listEl).parent().prev().find("div.js-list-content");
             return $prev.length ? $prev[0]: null;
         },
 
+        /**
+         * Given a list element, tries to find the following list.
+         *
+         * @param {Element} listEl List whos successor to get
+         * @returns {Element} List element or ``null`` if not found
+         */
         getNextList(listEl) {
             let $next = $(listEl).parent().next().find("div.js-list-content");
             return $next.length ? $next[0] : null;
@@ -487,7 +496,7 @@ const tdom = (function (factory) {
          * @throws {TypeError} when missing parameter
          */
         getCardsByName(name, exactMatch = false) {
-            if (!name) {
+            if (name === undefined) {
                 throw new TypeError();
             }
             let jCards = $("a.list-card").filter(function () {
