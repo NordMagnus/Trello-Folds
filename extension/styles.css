@@ -27,6 +27,20 @@
     top: 40px;
 }
 
+.blocked-card {
+    background: rgb(233, 77, 56) !important;
+    color: #ffffff;
+}
+
+.comment-card {
+    background: rgba(0,0,0,0.0) !important;
+    border: none !important;
+    box-shadow: 0 0 !important;
+    font-style: italic;
+    padding: 0px;
+    margin: 0px;
+}
+
 .super-list-collapsed,
 .list-collapsed {
     transform: rotate(270deg);
