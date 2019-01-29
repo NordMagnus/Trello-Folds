@@ -105,7 +105,7 @@ const tfolds = (function (factory) {
             tdom.onListTitleModified(self.listTitleModified);
             tdom.onListDragged(self.listDragged);
             tdom.onListDropped(self.listDropped);
-            tdom.initialize();
+            tdom.init();
 
             /*
              * Get icon URLs
@@ -171,12 +171,13 @@ const tfolds = (function (factory) {
          *
          */
         cardAdded(cardEl) {
-            const $c = $(cardEl);
-            let text = tdom.getCardName($c);
-            if (self.isSection(text)) {
-                console.error("TODO: Add logic to add new section");
-                self.formatAsSection($c);
-            }
+            // const $c = $(cardEl);
+            // let text = tdom.getCardName($c);
+            self.formatCard(cardEl);
+            // if (self.isSection(text)) {
+            //     console.error("TODO: Add logic to add new section");
+            //     self.formatAsSection($c);
+            // }
         },
 
         /**
@@ -192,7 +193,10 @@ const tfolds = (function (factory) {
          * @param {String} oldTitle The title before it was modified
          */
         cardModified(cardEl, title, oldTitle) {
-            console.log("cardModified()");
+            if (config.debug) {
+                console.trace();
+            }
+
             let $c = $(cardEl);
 
             if (!self.isSection(title) && !self.isSection(oldTitle)) {
@@ -286,7 +290,10 @@ const tfolds = (function (factory) {
 
             chrome.storage.sync.get(["settings", boardId], result => {
                 if (config.debug) {
-                    console.info("Getting settings", result);
+                    console.table(result.settings);
+                    if (result.settings["rememberViewStates"] === true) {
+                        console.table(result[boardId]);
+                    }
                 }
                 if (result["settings"]) {
                     settings = result["settings"];
@@ -303,9 +310,14 @@ const tfolds = (function (factory) {
         setupBoard(attemptCount = 1) {
             let $canvas = $("div.board-canvas");
             if (!$canvas.length) {
+                /*
+                 * Trying to find the board again in 100 ms if not found directly.
+                 * Should not happen after changes to ``tdom.js`` but let's play it safe and
+                 * keep it - changing log level to warn.
+                 */
                 if (attemptCount < 3) {
                     setTimeout(() => {
-                        console.log(`Trying to find DIV.board-canvas again (attempt ${attemptCount + 1})`);
+                        console.warn(`Trying to find DIV.board-canvas again (attempt ${attemptCount + 1})`);
                         self.setupBoard(attemptCount + 1);
                     }, 100);
                     return;
@@ -314,11 +326,11 @@ const tfolds = (function (factory) {
             }
 
             if (config.debug) {
-                console.info("Setting up board");
+                console.info("%cSetting up board", "font-weight: bold;");
             }
 
             self.cleanupStorage();
-            self.formatSections();
+            self.formatCards();
             if (settings.rememberViewStates) {
                 self.restoreSectionsViewState();
             } else {
@@ -331,7 +343,7 @@ const tfolds = (function (factory) {
          *
          */
         cleanupStorage() {
-            console.log("cleanupStorage()", storage);
+            // console.log("cleanupStorage()", storage);
             if (settings.enableCombiningLists === false) {
                 // TODO Add function to clear super list states
             }
@@ -740,6 +752,7 @@ const tfolds = (function (factory) {
          */
         showWipLimit(listEl) {
             const $l = $(listEl);
+            // FIXME Exclude cards beginning with double slashes //
             let numCards = tdom.countCards(listEl, self.sectionIdentifier);
             let wipLimit = self.extractWipLimit(listEl);
             let subList = $l.data("subList");
@@ -880,28 +893,76 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        formatSections(attemptCount = 1) {
-            let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
-
-            if (!$sections.length) {
-                if (attemptCount < 3) {
-                    setTimeout(() => {
-                        console.log(`Trying to find sections again (attempt ${attemptCount + 1})`);
-                        self.formatSections(attemptCount + 1);
-                    }, 100);
-                    return;
-                }
-                console.warn("No sections found");
-            }
-
-            $sections.each(function () {
-                // self.formatAsSection($(this));
-                // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
-                setTimeout(() => {
-                    self.formatAsSection($(this));
-                }, 100);
+        formatCards($canvas) {
+            console.info("Formatting cards - Yihaa!");
+            let $cards = tdom.getCardsByName("", false);
+            $cards.each(function() {
+                self.formatCard(this);
             });
         },
+
+        /**
+         *
+         */
+        formatCard(cardEl) {
+            let $c = $(cardEl);
+            let cardName = tdom.getCardName($c);
+            if (cardName.indexOf(self.sectionIdentifier) === 0) {
+                console.info(`CARD ${cardName} is a section`);
+                // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
+                // self.formatAsSection($(this));
+                setTimeout(() => {
+                    self.formatAsSection($c);
+                }, 100);
+            } else if (cardName.indexOf("//") === 0) {
+                console.info(`CARD ${cardName} is a comment`);
+                console.dir(this);
+                setTimeout(() => {
+                    $c.addClass("comment-card");
+                }, 100);
+            } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
+                console.info(`CARD ${cardName} is BLOCKED`);
+                setTimeout(() => {
+                    $c.addClass("blocked-card");
+                    $c.find(".list-card-title").css("color", "White").css("font-weight", "bold");
+                    $c.find("div.badge").children().css("color", "White");
+                }, 100);
+            }
+        },
+
+        // /**
+        //  *
+        //  */
+        // formatSections(attemptCount = 1) {
+        //     let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
+
+        //     console.log("Formatting sections");
+
+        //     // if (!$sections.length) {
+        //     //     if (attemptCount < 3) {
+        //     //         setTimeout(() => {
+        //     //             console.log(`Trying to find sections again (attempt ${attemptCount + 1})`);
+        //     //             self.formatSections(attemptCount + 1);
+        //     //         }, 100);
+        //     //         return;
+        //     //     }
+        //     //     console.warn("No sections found");
+        //     // }
+
+        //     if (!$sections.length) {
+        //         console.info("No sections found (might simply be that there are none)");
+        //     }
+
+        //     $sections.each(function () {
+        //         // self.formatAsSection($(this));
+        //         console.log("Formatting section", this);
+        //         // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
+        //         // self.formatAsSection($(this));
+        //         setTimeout(() => {
+        //             self.formatAsSection($(this));
+        //         }, 100);
+        //     });
+        // },
 
         /**
          *
