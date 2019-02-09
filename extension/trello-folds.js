@@ -164,7 +164,7 @@ const tfolds = (function (factory) {
             }
         },
 
-        listDropped(listEl) {
+        listDropped() {
             self.combineLists();
         },
 
@@ -172,13 +172,7 @@ const tfolds = (function (factory) {
          *
          */
         cardAdded(cardEl) {
-            // const $c = $(cardEl);
-            // let text = tdom.getCardName($c);
             self.formatCard(cardEl);
-            // if (self.isSection(text)) {
-            //     console.error("TODO: Add logic to add new section");
-            //     self.formatAsSection($c);
-            // }
         },
 
         cardBadgesModified(cardEl) {
@@ -648,7 +642,7 @@ const tfolds = (function (factory) {
                 pairedList = tdom.getPrevList(subList);
                 wipLimit = self.extractWipLimit(pairedList);
             }
-            let totNumOfCards = tdom.countCards(subList) + tdom.countCards(pairedList); //+ tdom.countCards(rightList);
+            let totNumOfCards = self.countWorkCards(subList) + self.countWorkCards(pairedList);
             let title = tdom.getListName(subList);
             title = title.substr(0, title.indexOf('.'));
             let $wipTitle;
@@ -784,7 +778,7 @@ const tfolds = (function (factory) {
         showWipLimit(listEl) {
             const $l = $(listEl);
             // FIXME Exclude cards beginning with double slashes //
-            let numCards = tdom.countCards(listEl, self.sectionIdentifier);
+            let numCards = self.countWorkCards(listEl);
             let wipLimit = self.extractWipLimit(listEl);
             let subList = $l.data("subList");
 
@@ -803,6 +797,17 @@ const tfolds = (function (factory) {
                     self.removeWipLimit($l);
                 }
             }
+        },
+
+        /**
+         * Counts cards representing work in the specified list.
+         * In other words, count all cards except those representing sections or notes.
+         *
+         * @param {Element} listEl The list for which to count cards
+         */
+        countWorkCards(listEl) {
+            // TODO Replace "//" with setting
+            return tdom.countCards(listEl, [self.sectionIdentifier, "//"]);
         },
 
         /**
