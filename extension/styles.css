@@ -32,6 +32,15 @@
     color: #ffffff;
 }
 
+.blocked-title {
+    color: white !important;
+    font-weight: bold;
+}
+
+.blocked-badges {
+    color: White !important;
+}
+
 .comment-card {
     background: rgba(0,0,0,0.0) !important;
     border: none !important;
