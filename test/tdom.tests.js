@@ -243,4 +243,41 @@ describe('tdom', function() {
         it("NO TESTS WRITTEN YET");
     });
 
+    describe("containsAny()", function() {
+        it("should return false if filter not found", function() {
+            const testString = "Why do cars have breaks?";
+            /*
+             * Using strings for filtering
+             */
+            expect(tdom.containsAny(testString, "foo")).to.be.false;
+            expect(tdom.containsAny(testString, "why")).to.be.false;
+            expect(tdom.containsAny(testString, "??")).to.be.false;
+            expect(tdom.containsAny(testString, "have  ")).to.be.false;
+            expect(tdom.containsAny(testString, "w")).to.be.false;
+            /*
+            * Using array for filtering
+            */
+           expect(tdom.containsAny(testString, ["foo"])).to.be.false;
+           expect(tdom.containsAny(testString, ["w"])).to.be.false;
+           expect(tdom.containsAny(testString, ["w", "??", "hoozit"])).to.be.false;
+        });
+        it("should return true if filter found", function() {
+            const testString = "Why do cars have breaks?";
+            /*
+             * Using strings for filtering
+             */
+            expect(tdom.containsAny(testString, "Why")).to.be.true;
+            expect(tdom.containsAny(testString, "")).to.be.true;
+            expect(tdom.containsAny(testString, " ")).to.be.true;
+            expect(tdom.containsAny(testString, "car")).to.be.true;
+            /*
+             * Using array for filtering
+             */
+            expect(tdom.containsAny(testString, ["Why", "do", "cars"])).to.be.true;
+            expect(tdom.containsAny(testString, ["Why"])).to.be.true;
+            expect(tdom.containsAny(testString, ["", "", ""])).to.be.true;
+            expect(tdom.containsAny(testString, ["?"])).to.be.true;
+            expect(tdom.containsAny(testString, ["??", "?"])).to.be.true;
+        });
+    });
 });
