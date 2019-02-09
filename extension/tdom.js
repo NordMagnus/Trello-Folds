@@ -539,11 +539,33 @@ const tdom = (function (factory) {
             let $cards = $(list).find("a.list-card").filter(function () {
                 const title = self.getCardName($(this));
                 if (filter && title) {
-                    return title.indexOf(filter) === -1;
+                    return !self.containsAny(title, filter);
                 }
                 return true;
             });
             return $cards.length;
+        },
+
+        /**
+         * Looks for instances of one string within another.
+         *
+         * @param {String} string The string to search
+         * @param {*} filter Either a string or an array to look for
+         * @returns ``true`` if filter found in string, otherwise ``false``
+         */
+        containsAny(string, filter) {
+            if (typeof filter === "string") {
+                return string.includes(filter);
+            }
+            if (typeof filter !== "object") {
+                throw new TypeError();
+            }
+            for(let f of filter) {
+                if (string.includes(f)) {
+                    return true;
+                }
+            }
+            return false;
         },
 
         /**
