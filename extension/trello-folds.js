@@ -105,6 +105,7 @@ const tfolds = (function (factory) {
             tdom.onListTitleModified(self.listTitleModified);
             tdom.onListDragged(self.listDragged);
             tdom.onListDropped(self.listDropped);
+            tdom.onBadgesModified(self.cardBadgesModified);
             tdom.init();
 
             /*
@@ -180,13 +181,28 @@ const tfolds = (function (factory) {
             // }
         },
 
+        cardBadgesModified(cardEl) {
+            let $c = $(cardEl);
+            if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
+                $c.addClass("blocked-card");
+                $c.find(".list-card-title").addClass("blocked-title");
+                $c.find("div.badge").children().addClass("blocked-badges");
+            } else {
+                $c.removeClass("blocked-card");
+                $c.find(".list-card-title").removeClass("blocked-title");
+                $c.find("div.badge").children().removeClass("blocked-badges");
+            }
+        },
+
         /**
          * This method is called when a list card changes. There are basically
          * three changes that we need to handle:
          * 1. A section card's title changed
          * 2. A card was changed __into__ a section
-         * 3. A card was changed __from_ a section to a normal card
+         * 3. A card was changed __from__ a section to a normal card
          * In addition for item 2 and 3 above the list WIP has to be updated
+         *
+         * After checking all of that we still need to consider it might now be a comment card.
          *
          * @param {Element} cardEl The card that was modified
          * @param {String} title The new title
@@ -199,6 +215,23 @@ const tfolds = (function (factory) {
 
             let $c = $(cardEl);
 
+            $c.removeClass("comment-card");
+
+            self.checkSectionChange($c, title, oldTitle);
+
+            if (!self.isSection(title)) {
+                if (title.indexOf("//") === 0) {
+                    $c.addClass("comment-card");
+                }
+            }
+
+            self.showWipLimit(tdom.getContainingList(cardEl));
+        },
+
+        /**
+         *
+         */
+        checkSectionChange($c, title, oldTitle) {
             if (!self.isSection(title) && !self.isSection(oldTitle)) {
                 return;
             }
@@ -226,8 +259,6 @@ const tfolds = (function (factory) {
                  */
                 self.formatAsSection($c);
             }
-
-            self.showWipLimit(tdom.getContainingList(cardEl));
         },
 
         /**
@@ -894,11 +925,16 @@ const tfolds = (function (factory) {
          *
          */
         formatCards($canvas) {
-            console.info("Formatting cards - Yihaa!");
             let $cards = tdom.getCardsByName("", false);
+            if (config.debug) {
+                console.group("Formatting cards");
+            }
             $cards.each(function() {
                 self.formatCard(this);
             });
+            if (config.debug) {
+                console.groupEnd();
+            }
         },
 
         /**
@@ -916,7 +952,6 @@ const tfolds = (function (factory) {
                 }, 100);
             } else if (cardName.indexOf("//") === 0) {
                 console.info(`CARD ${cardName} is a comment`);
-                console.dir(this);
                 setTimeout(() => {
                     $c.addClass("comment-card");
                 }, 100);
@@ -924,8 +959,10 @@ const tfolds = (function (factory) {
                 console.info(`CARD ${cardName} is BLOCKED`);
                 setTimeout(() => {
                     $c.addClass("blocked-card");
-                    $c.find(".list-card-title").css("color", "White").css("font-weight", "bold");
-                    $c.find("div.badge").children().css("color", "White");
+                    $c.find(".list-card-title").addClass("blocked-title");
+                    $c.find("div.badge").children().addClass("blocked-badges");
+                    // $c.find(".list-card-title").addClass("blocked-title");
+                    // $c.find("div.badge").children().addClass("blocked-badges");
                 }, 100);
             }
         },
