@@ -485,7 +485,7 @@ const tfolds = (function (factory) {
         areListsRelated($l1, $l2) {
             const name1 = tdom.getListName($l1);
             const name2 = tdom.getListName($l2);
-            return (name1.substr(0, name1.indexOf(".")) === name2.substr(0, name2.indexOf(".")));
+            return name1.includes(".") && (name1.substr(0, name1.indexOf(".")) === name2.substr(0, name2.indexOf(".")));
         },
 
         /**
@@ -556,7 +556,7 @@ const tfolds = (function (factory) {
             self.removeFoldingButton(rightList);
             self.showWipLimit(leftList);
             self.showWipLimit(rightList);
-            self.addSuperList(leftList, rightList);
+            self.addSuperList(leftList);
         },
 
         /**
@@ -569,7 +569,7 @@ const tfolds = (function (factory) {
             return $l.data("subList");
         },
 
-        addSuperList(leftList, rightList) {
+        addSuperList(leftList) {
             // let $canvas = $("div#board");
             let $leftList = $(leftList);
             let $superList = $('<div class="super-list"></div>');
