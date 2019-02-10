@@ -30,7 +30,7 @@ describe('tfolds', function() {
     ];
 
     before(function() {
-        return JSDOM.fromFile("test/squadification-board.html").then((dom) => {
+        return JSDOM.fromFile("test/trello-folds-test-board.html").then((dom) => {
             global.window = dom.window;
             global.jQuery = global.$ = require('jquery');
             chai.use(chaiJquery);
@@ -42,6 +42,14 @@ describe('tfolds', function() {
     beforeEach(function() {
         tfolds.sectionCharacter = "#";
         tfolds.sectionRepeat = 2;
+    });
+
+    describe("Verify test board HTML", function() {
+        it("should have a list named Alpha containing 5 cards", function() {
+            let $l = tdom.getLists("Alpha");
+            expect($l).to.have.lengthOf(1);
+            expect(tdom.countCards($l[0])).to.equal(5);
+        });
     });
 
     describe("sectionIdentifier", function() {
@@ -82,13 +90,28 @@ describe('tfolds', function() {
         });
     });
 
+    describe("areListsRelated()", function() {
+        it("should return true if provided lists have same prefix", function() {
+            let $lists = tdom.getLists("Delta");
+            expect($lists).to.have.lengthOf(3);
+            expect(tfolds.areListsRelated($lists[0], $lists[1])).to.be.true;
+        });
+        it("should return false if provided lists do not have same prefix", function() {
+            let $l1 = tdom.getLists("Alpha");
+            let $l2 = tdom.getLists("Bravo");
+            expect($l1).to.have.lengthOf(1);
+            expect($l2).to.have.lengthOf(1);
+            expect(tfolds.areListsRelated($l1, $l2)).to.be.false;
+        });
+    });
+
     describe("showWipLimit()", function() {
         it("should not show WiP limit when not defined for list", function() {
             /*
              * List A does not have a WiP limit defined,
              * e.g. does not end with [x]
              */
-            let $l = tdom.getLists("List Alpha");
+            let $l = tdom.getLists("Alpha");
             expect($l).to.have.lengthOf(1);
             tfolds.showWipLimit($l[0]);
             expect($l).to.not.have.class("wip-limit-reached");
@@ -97,7 +120,7 @@ describe('tfolds', function() {
         });
         it("should show WiP limit if settings.alwaysCount is true", function() {
             tfolds.alwaysCount = true;
-            let $l = tdom.getLists("List Alpha");
+            let $l = tdom.getLists("Alpha");
             expect($l).to.have.lengthOf(1);
             tfolds.showWipLimit($l[0]);
             expect($l).to.not.have.class("wip-limit-reached");
@@ -109,8 +132,8 @@ describe('tfolds', function() {
     });
 
     describe("extractWipLimit()", function() {
-        it("should return 'null' if now WiP limit (i.e. no [x] in title)", function() {
-            let $l = tdom.getLists("List Alpha");
+        it("should return 'null' if no WiP limit (i.e. no [x] in title)", function() {
+            let $l = tdom.getLists("Alpha");
             let wipLimit = tfolds.extractWipLimit($l[0]);
             expect(wipLimit).to.be.null;
         });
@@ -119,21 +142,21 @@ describe('tfolds', function() {
 
     describe("addWipLimit()", function() {
         it("should contain a span.wip-limit-title with the title", function() {
-            let $l = tdom.getLists("List Alpha");
+            let $l = tdom.getLists("Alpha");
 
             $l.data("subList", false);
 
             tfolds.addWipLimit($l, 5);
             let titleEl = $l.find("span.wip-limit-title");
 
-            expect($(titleEl)).to.contain("List Alpha");
+            expect($(titleEl)).to.contain("Alpha");
         });
         /*
          * addWipLimit() is only called when a badge should be displayed
          * so a span.wip-limit-badge should always be created after calling this method.
          */
         it("should always add a span.wip-limit-badge", function() {
-            let $l = tdom.getLists("List Alpha");
+            let $l = tdom.getLists("Alpha");
             let $span;
 
             $l.data("subList", false);
@@ -159,7 +182,7 @@ describe('tfolds', function() {
          * list instead and never displayed.
          */
         it("should never display a limit for sub lists", function() {
-            let $l = tdom.getLists("List Alpha");
+            let $l = tdom.getLists("Alpha");
             let $span;
 
             tfolds.alwaysCount = true; // TODO Create test with alwaysCount === false

@@ -1,0 +1,4192 @@
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="description" content="Organize anything, together. Trello is a collaboration tool that organizes your projects into boards. In one glance, know what's being worked on, who's working on what, and where something is in a process.">
+  <meta name="viewport" content="maximum-scale=1.0,width=device-width,initial-scale=1.0,user-scalable=0">
+  <meta name="apple-itunes-app" content="app-id=461504587, app-argument=https://trello.com/b/waii4PCH/trello-folds-test-board-do-not-modify">
+  <meta name="slack-app-id" content="A074YH40Z">
+  <meta name="robots" content="noarchive">
+  <meta name="referrer" content="origin-when-cross-origin">
+  <title>Trello Folds Test Board | Trello</title>
+  <script src="https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.en.XJ59ec7s7KY.O/m=auth/rt=j/sv=1/d=1/ed=1/am=wQ/rs=AGLTcCNs5IgvBOFBg5RBx9jQCiMeE_z9Dg/cb=gapi.loaded_0"
+    async=""></script>
+  <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-PJ8M5SK&amp;gtm_auth=chlg06CfblVj204fihGEqA&amp;gtm_preview=env-8&amp;gtm_cookies_win=x"></script>
+  <script async="" src="//www.google-analytics.com/analytics.js"></script>
+  <script>
+    var _failed = function (a) {
+      a = a.src || a.href;
+      var b = function (a) {
+          if (a = /^https?:\/\/[^\/]+/.exec(a)) return a[0]
+        },
+        b = b(a) || b(location.href) || "unknown";
+      ga('send', 'event', 'Load Failure', b, a)
+    };
+  </script>
+  <link rel="stylesheet" href="https://a.trellocdn.com/prgb/dist/core.6c37a7dd1a11ed47d979.css" onerror="_failed(this)">
+  <script>
+    ! function (e) {
+      var t = {};
+
+      function r(n) {
+        if (t[n]) return t[n].exports;
+        var a = t[n] = {
+          i: n,
+          l: !1,
+          exports: {}
+        };
+        return e[n].call(a.exports, a, a.exports, r), a.l = !0, a.exports
+      }
+      r.m = e, r.c = t, r.d = function (e, t, n) {
+        r.o(e, t) || Object.defineProperty(e, t, {
+          configurable: !1,
+          enumerable: !0,
+          get: n
+        })
+      }, r.n = function (e) {
+        var t = e && e.__esModule ? function () {
+          return e.default
+        } : function () {
+          return e
+        };
+        return r.d(t, "a", t), t
+      }, r.o = function (e, t) {
+        return Object.prototype.hasOwnProperty.call(e, t)
+      }, r.p = "https://a.trellocdn.com/prgb/dist/", r(r.s = "hXt6")
+    }({
+      hXt6: function (e, t, r) {
+        "use strict";
+
+        function n(e, t) {
+          for (var r = 0; r < t.length; r++) {
+            var n = t[r];
+            n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(
+              e, n.key, n)
+          }
+        }
+
+        function a(e, t, r) {
+          return t in e ? Object.defineProperty(e, t, {
+            value: r,
+            enumerable: !0,
+            configurable: !0,
+            writable: !0
+          }) : e[t] = r, e
+        }
+        Object.defineProperty(t, "__esModule", {
+          value: !0
+        }), r.d(t, "PerfKeys", function () {
+          return o
+        });
+        var o = {
+            NAVIGATION: "startup:navigation",
+            NAVIGATION_TLS: "startup:navigation-tls",
+            NAVIGATION_TTFB: "startup:navigation-ttfb",
+            HTML: "startup:html",
+            TIME_TO_INTERACTIVE: "startup:time-to-interactive",
+            LOAD_TO_INTERACTIVE: "startup:page-load-to-interactive",
+            APP: "startup:app.js",
+            APP_DOWNLOAD: "download:app.js",
+            LTP: "startup:ltp.js",
+            LTP_DOWNLOAD: "download:ltp.js",
+            QL_MEMBER_HEADER: "quickload:memberHeader",
+            QL_MEMBER_BOARDS: "quickload:memberBoards",
+            QL_MEMBER_QUICK_BOARDS: "quickload:memberQuickBoards",
+            QL_SEARCH: "quickload:quickBoardSearch",
+            QL_BOARD_MIN: "quickload:currentBoardMinimal",
+            QL_BOARD_SECONDARY: "quickload:currentBoardSecondary",
+            QL_BOARD_PLUGINS: "quickload:currentBoardPluginData",
+            QL_CARD: "quickload:card",
+            QL_ORGS: "quickload:organizationBoardsPage",
+            BOOTSTRAP_HOME_VIEW: "bootstrap:member-home-view",
+            BOOTSTRAP_SUPERHOME_VIEW: "bootstrap:member-super-home-view",
+            BOOTSTRAP_CARD_VIEW: "bootstrap:card-view",
+            BOOTSTRAP_BOARD_VIEW: "bootstrap:boards-view"
+          },
+          i = "performance" in window,
+          c = function (e) {},
+          s = Object.keys(o).map(function (e) {
+            return o[e]
+          }),
+          u = "requestIdleCallback" in window ? window.requestIdleCallback : setTimeout,
+          p = function () {
+            function e() {
+              var t = this;
+              ! function (e, t) {
+                if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function")
+              }(this, e), a(this, "startupReported", !1), a(this, "Keys", o), a(this, "startMeasurement", i ?
+                function (e) {
+                  if (-1 !== s.indexOf(e)) try {
+                    window.performance.mark("".concat(e, "-start"))
+                  } catch (e) {}
+                } : c), a(this, "stopMeasurement", i ? function (e) {
+                if (-1 !== s.indexOf(e)) try {
+                  window.performance.mark("".concat(e, "-end")), window.performance.measure(e, "".concat(e,
+                    "-start"), "".concat(e, "-end"));
+                  var r = window.performance.getEntriesByName(e)[0];
+                  t.reportMetrics([{
+                    name: e,
+                    totalTime: r.duration
+                  }])
+                } catch (e) {}
+              } : c)
+            }
+            var t, r, p;
+            return t = e, (r = [{
+              key: "reportMetrics",
+              value: function (e) {
+                u(function () {
+                  e.forEach(function (e) {
+                    e.name, e.totalTime
+                  })
+                })
+              }
+            }, {
+              key: "reportStartupMetrics",
+              value: function () {
+                if (!this.startupReported) {
+                  try {
+                    performance.mark("done"), window.performance.measure(o.LOAD_TO_INTERACTIVE,
+                      "startup:html-start", "done");
+                    var e = window.performance.getEntriesByType("navigation")[0],
+                      t = window.performance.getEntriesByType("resource").filter(function (e) {
+                        return "script" === e.initiatorType && e.name.includes("ltp")
+                      })[0],
+                      r = window.performance.getEntriesByType("resource").filter(function (e) {
+                        return "script" === e.initiatorType && e.name.includes("app")
+                      })[0],
+                      n = window.performance.getEntriesByName(o.LOAD_TO_INTERACTIVE)[0],
+                      a = window.performance.getEntriesByName("done")[0];
+                    this.reportMetrics([{
+                      name: o.NAVIGATION,
+                      totalTime: e.responseEnd - e.fetchStart
+                    }, {
+                      name: o.NAVIGATION_TLS,
+                      totalTime: e.secureConnectionStart > 0 ? e.connectEnd - e.secureConnectionStart :
+                        0
+                    }, {
+                      name: o.NAVIGATION_TTFB,
+                      totalTime: e.responseStart - e.requestStart
+                    }, {
+                      name: o.TIME_TO_INTERACTIVE,
+                      totalTime: n.duration
+                    }, {
+                      name: o.LOAD_TO_INTERACTIVE,
+                      totalTime: a.startTime - e.startTime
+                    }, {
+                      name: o.LTP_DOWNLOAD,
+                      totalTime: t.responseEnd - t.responseStart
+                    }, {
+                      name: o.APP_DOWNLOAD,
+                      totalTime: r.responseEnd - r.responseStart
+                    }])
+                  } catch (e) {}
+                  this.startupReported = !0
+                }
+              }
+            }]) && n(t.prototype, r), p && n(t, p), e
+          }();
+        window.TrelloPerf = window.TrelloPerf ? window.TrelloPerf : new p, t.default = window.TrelloPerf
+      }
+    });
+    //# sourceMappingURL=perf.82f12fe8b922ad724407.js.map
+    TrelloPerf.startMeasurement(TrelloPerf.Keys.HTML);
+  </script>
+  <!-- GDPR Banner Configuration preventTrelloCookieConsent prevents banner from opening on page load-->
+  <script>
+    window.preventTrelloCookieConsent = true
+  </script>
+  <script src="https://a.trellocdn.com/prgb/dist/cookieConsent.c401e60b96f3336fd1ce.js" crossorigin="anonymous" onerror="_failed(this)"></script>
+  <!-- Google Analytics, load failure tracking, and data load kickoff -->
+  <script>
+    if ((document.cookie.indexOf("gdpr-cookie-consent=accepted") !== -1) || (document.cookie.indexOf("gdpr-user=true") ===
+        -1)) {
+      (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+      var page = location.pathname;
+      if (page === "/") page = "/boards";
+      ga('create', 'UA-53826304-2', {
+        cookieDomain: 'trello.com',
+        sampleRate: 1
+      });
+      var versionComponents = 'build-2646'.split('-');
+      ga('set', 'dimension1', versionComponents[0]);
+      ga('set', 'dimension2', versionComponents[1]);
+      ga('send', 'pageview', page);
+    }
+
+    (function (i, c, e) {
+      if (!i[e]) {
+        i.GlobalSnowplowNamespace = i.GlobalSnowplowNamespace || [];
+        i.GlobalSnowplowNamespace.push(e);
+        i[e] = function () {
+          (i[e].q = i[e].q || []).push(arguments)
+        };
+        i[e].q = i[e].q || [];
+      }
+    }(window, document, "sp"));
+  </script>
+  <script src="https://a.trellocdn.com/prgb/dist/snowplow.ec8588b890fbbfa0f970.js" async="" crossorigin="anonymous"
+    onerror="_failed(this)"></script>
+
+  <script type="text/javascript">
+    if ((document.cookie.indexOf("gdpr-cookie-consent=accepted") !== -1) || (document.cookie.indexOf("gdpr-user=true") ===
+        -1)) {
+      window.dataLayer = window.dataLayer || [];
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+          'gtm.start': new Date().getTime(),
+          event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl +
+          '&gtm_auth=chlg06CfblVj204fihGEqA&gtm_preview=env-8&gtm_cookies_win=x';
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-PJ8M5SK');
+    }
+  </script>
+
+  <script src="https://a.trellocdn.com/prgb/dist/quickload.94237340485fa8d00d18.js" crossorigin="anonymous" onerror="_failed(this)"></script>
+  <script>(function(b,c){var a=b.createElement("link");a.href=c;a.rel="stylesheet";a.type="text/css";b.getElementsByTagName("head")[0].appendChild(a)})(document,"https://a.trellocdn.com/prgb/dist/images.0a827509b19560815767.css");</script>
+  <link href="https://a.trellocdn.com/prgb/dist/images.0a827509b19560815767.css" rel="stylesheet" type="text/css">
+
+  <link rel="mask-icon" href="https://a.trellocdn.com/prgb/dist/images/pinned-tab-icon.225c8d1cf8bbf74add43.svg" color="#0079BF">
+
+  <!-- For third-generation iPad with high-resolution Retina display and iOS7: -->
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-152x152-precomposed.0307bc39ec6c9ff499c8.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-144x144-precomposed.0dbf6daf256eb7678e5e.png">
+  <!-- For iPhone with high-resolution Retina display and iOS7: -->
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-120x120-precomposed.a68051b5c9144abe859b.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-114x114-precomposed.7f4a80b64fd8fd99840b.png">
+  <!-- For first- and second-generation iPad: -->
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-72x72-precomposed.91a3a04ec68a60903801.png">
+  <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+  <link rel="apple-touch-icon-precomposed" href="https://a.trellocdn.com/prgb/dist/images/ios/apple-touch-icon-precomposed.8de2074e8a785dd5d498.png">
+
+  <!-- To enable tab-to-search in Chrome -->
+  <link type="application/opensearchdescription+xml" rel="search" href="/osd.xml">
+  <style type="text/css">
+    ._3-Xrz8XpMpyaUL {
+      height: 100%;
+      position: relative;
+      z-index: 0
+    }
+
+    ._12CFb1p8rKvr6X {
+      left: 0;
+      position: absolute;
+      top: 0;
+      z-index: 1
+    }
+
+    .SfJ6cPRUGPgPFd {
+      left: 0;
+      position: absolute;
+      top: 0;
+      z-index: 2
+    }
+
+    ._1cyB3mbofYLxk_ {
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 3
+    }
+  </style>
+  <style type="text/css">
+    ._2niHILAGNUiDkF {
+      display: flex;
+      flex-direction: row
+    }
+
+    ._3SieLtd9GLSPTK {
+      display: flex;
+      flex-direction: column
+    }
+
+    ._306mz5vxI3msrm {
+      position: relative
+    }
+
+    ._2rNutVyw87Q5pR {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between
+    }
+
+    ._1N21sj-RNkdA8N,
+    .DmJIXbxZukqIj4 {
+      display: flex;
+      flex-direction: column;
+      justify-content: center
+    }
+
+    ._1N21sj-RNkdA8N {
+      width: 100%
+    }
+
+    ._2ogDyOSxObQ3Yy {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: normal;
+      margin-left: 8px
+    }
+
+    ._2ogDyOSxObQ3Yy._3YicHmmtQAs5i5 {
+      height: 18px;
+      margin-bottom: 4px;
+      min-width: 100px
+    }
+
+    ._3CyyJ3E9X_Xcdh {
+      font-size: 14px;
+      letter-spacing: -.3px;
+      line-height: normal;
+      margin-left: 7px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: no-wrap
+    }
+
+    ._2u-0p_h9un013r {
+      background-position: 50%;
+      background-repeat: no-repeat;
+      background-size: cover;
+      border-radius: 4px;
+      display: inline-block;
+      text-align: center;
+      height: 32px;
+      width: 32px
+    }
+
+    ._2693F6QUYP9PSq {
+      font-size: 14px;
+      margin-top: 8px;
+      line-height: 18px;
+      height: 54px;
+      overflow: hidden
+    }
+
+    ._3MN0gWa5LZFzy_ {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      padding: 10px;
+      height: 100px
+    }
+
+    ._3MN0gWa5LZFzy_:hover {
+      background: rgba(0, 0, 0, .05)
+    }
+
+    .WkF3fRmxxpFRxe {
+      background: #fff;
+      min-width: 304px;
+      max-height: 368px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15)
+    }
+
+    ._3pHPdDA7fG89cS {
+      padding: 10px;
+      height: 100px
+    }
+
+    ._2JRMHgg_c8gQTZ {
+      height: 240px;
+      width: 100%;
+      border-radius: 4px 4px 0 0
+    }
+
+    @-webkit-keyframes _398QvhQPwJJ9CL {
+      0% {
+        background-position: -468px 0
+      }
+
+      to {
+        background-position: 468px 0
+      }
+    }
+
+    @keyframes _398QvhQPwJJ9CL {
+      0% {
+        background-position: -468px 0
+      }
+
+      to {
+        background-position: 468px 0
+      }
+    }
+
+    ._3YicHmmtQAs5i5 {
+      -webkit-animation-duration: 1.5s;
+      animation-duration: 1.5s;
+      -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+      -webkit-animation-iteration-count: infinite;
+      animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+      -webkit-animation-name: _398QvhQPwJJ9CL;
+      animation-name: _398QvhQPwJJ9CL;
+      background: linear-gradient(90deg, #ebeef0 8%, #dfe3e6 18%, #ebeef0 33%);
+      background-size: 800px 104px
+    }
+
+    ._3dQBX2xv1cTynf {
+      height: 24px;
+      min-width: 64px;
+      margin-top: 3px;
+      border-radius: 3px
+    }
+  </style>
+  <style type="text/css">
+    @font-face {
+      font-family: trellicons;
+      src: url(https://a.trellocdn.com/prgb/dist/fonts/trellicons.f91041f7538332ce9a4a.eot?#iefix) format("embedded-opentype"), url(https://a.trellocdn.com/prgb/dist/fonts/trellicons.467d7023fe591cbac8bc.woff) format("woff"), url(https://a.trellocdn.com/prgb/dist/fonts/trellicons.862ca7f98c7c96f0a0ac.ttf) format("truetype");
+      font-weight: 400;
+      font-style: normal
+    }
+
+    ._2O4TvNuF7v0hxu {
+      color: #798d99;
+      display: inline-block;
+      font-family: trellicons;
+      font-size: 12px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: none
+    }
+
+    ._2KEwvRY1oTHWsQ {
+      height: 32px;
+      font-size: 16px;
+      line-height: 32px;
+      width: 32px
+    }
+
+    .PFt09HVBG7wMY9 {
+      height: 20px;
+      font-size: 12px;
+      line-height: 20px;
+      width: 20px
+    }
+
+    .Ti1qtx843DNeij:before {
+      content: "\E968"
+    }
+
+    ._2p2TP4mBgXTJP3:before {
+      content: "\E967"
+    }
+
+    ._1lRR-WGFaAL7Rg:before {
+      content: "\E966"
+    }
+
+    .sVIW73wwiyo-ks:before {
+      content: "\E965"
+    }
+
+    ._1OryvMSh-C4bWl:before {
+      content: "\E964"
+    }
+
+    ._1de3r8WsF7Yh8K:before {
+      content: "\E963"
+    }
+
+    ._3i67k-gVumomHu:before {
+      content: "\E962"
+    }
+
+    ._31TAf4mRgtkVX1:before {
+      content: "\E961"
+    }
+
+    ._2RhErfMv_mzFHP:before {
+      content: "\E960"
+    }
+
+    ._2H2bc6x5IUre2M:before {
+      content: "\E95F"
+    }
+
+    ._3dQefSBi-fAz7d:before {
+      content: "\E95E"
+    }
+
+    .XJAu7LvbAvjSOO:before {
+      content: "\E95D"
+    }
+
+    ._2X44dse6n-cQsb:before {
+      content: "\E95C"
+    }
+
+    .AWpfRMKS6EXBgD:before {
+      content: "\E95B"
+    }
+
+    ._2Vf6cuxKtYocO6:before {
+      content: "\E95A"
+    }
+
+    .bwL1OKx7tRehy-:before {
+      content: "\E959"
+    }
+
+    ._3aNdzOPsziq37o:before {
+      content: "\E958"
+    }
+
+    ._3jWf4yaZ1WbIbz:before {
+      content: "\E957"
+    }
+
+    .GOq5Er_TVbEM3t:before {
+      content: "\E956"
+    }
+
+    ._3bSwJmXnSoGyIF:before {
+      content: "\E955"
+    }
+
+    ._1ecbMWhcUXKTSA:before {
+      content: "\E954"
+    }
+
+    ._2aGFP06p1cMlIx:before {
+      content: "\E953"
+    }
+
+    ._2gw3dyIjIZ9sq2:before {
+      content: "\E952"
+    }
+
+    ._13OvihIH2x9qPC:before {
+      content: "\E951"
+    }
+
+    .w7LPN0RMWIlifw:before {
+      content: "\E900"
+    }
+
+    ._2LDR5G_PpSxWfb:before {
+      content: "\E950"
+    }
+
+    .Amzy_Uos05KXvv:before {
+      content: "\E969"
+    }
+
+    .kj9GoITAoCRkdj:before {
+      content: "\E94F"
+    }
+
+    ._1iYaKo0RX8H9ru:before {
+      content: "\E94E"
+    }
+
+    ._1fL5z3XH482eN5:before {
+      content: "\E94D"
+    }
+
+    ._3yvLyGoTOAT9qT:before {
+      content: "\E94C"
+    }
+
+    ._1EwQ2oHkNsiADA:before {
+      content: "\E94B"
+    }
+
+    .vdBcgQU6hl9lzB:before {
+      content: "\E94A"
+    }
+
+    ._1AbPzXbLiU6DBx:before {
+      content: "\E949"
+    }
+
+    ._1DgL8G7FyUK95B:before {
+      content: "\E948"
+    }
+
+    .Cx6OtYkXvepdVq:before {
+      content: "\E947"
+    }
+
+    ._3p9lCCWVHR6BSx:before {
+      content: "\E946"
+    }
+
+    ._2rNnr3ETX6mXzD:before {
+      content: "\E945"
+    }
+
+    ._1mBrhlvsvlpwcc:before {
+      content: "\E95C"
+    }
+
+    .OCwurYbNo7exw-:before {
+      content: "\E96A"
+    }
+
+    ._3hB6G7sWgqEa8J:before {
+      content: "\E943"
+    }
+
+    ._3OYBKwtawjhkpS:before {
+      content: "\E942"
+    }
+
+    .YAVHR-EsDMUS67:before {
+      content: "\E941"
+    }
+
+    ._17VIYXBt9LbrAX:before {
+      content: "\E940"
+    }
+
+    .hBOQrhTyYiyWpP:before {
+      content: "\E93F"
+    }
+
+    .Aq6JvvJzzQG_LS:before {
+      content: "\E93E"
+    }
+
+    ._1IsBDopvw0Ps8G:before {
+      content: "\E93D"
+    }
+
+    ._3xX87war6kiKUx:before {
+      content: "\E93C"
+    }
+
+    ._3O-t8dMdckBYfp:before {
+      content: "\E93B"
+    }
+
+    ._3dyNaHJbcj05xX:before {
+      content: "\E93A"
+    }
+
+    ._1-V4UGOtGJ2onp:before {
+      content: "\E939"
+    }
+
+    ._3q13SK6onKjP88:before {
+      content: "\E938"
+    }
+
+    ._1ZcNOf4L984ydB:before {
+      content: "\E937"
+    }
+
+    ._2CENIFUGJiOGXv:before {
+      content: "\E936"
+    }
+
+    ._2EfyWTDpEkHT61:before {
+      content: "\E935"
+    }
+
+    ._2Pq6e7oDbt-d6z:before {
+      content: "\E934"
+    }
+
+    ._1VuRaE6Dbw2YzY:before {
+      content: "\E933"
+    }
+
+    ._3NYW3XvrmkIoKJ:before {
+      content: "\E932"
+    }
+
+    ._3tgCx0PzFeUBN8:before {
+      content: "\E931"
+    }
+
+    ._3fedpJLJNwVuQm:before {
+      content: "\E930"
+    }
+
+    ._1LZDugQxAR89Bm:before {
+      content: "\E92F"
+    }
+
+    ._1mH50w4lUjz9Fn:before {
+      content: "\E92E"
+    }
+
+    ._3l-yWOxaUhbaGp:before {
+      content: "\E92D"
+    }
+
+    ._2I0xb0lGrBoRrS:before {
+      content: "\E92C"
+    }
+
+    ._2DDU2VVNethndp:before {
+      content: "\E92B"
+    }
+
+    ._3XUwX1WIcXAEC2:before {
+      content: "\E92A"
+    }
+
+    ._1Upx0nDNwFTx5X:before {
+      content: "\E929"
+    }
+
+    ._37OV9KYc0DXzo8:before {
+      content: "\E928"
+    }
+
+    ._2IWAj9kVByUqPJ:before {
+      content: "\E927"
+    }
+
+    ._2syIlSEp6XYRO8:before {
+      content: "\E926"
+    }
+
+    ._3SOVsrsFw0SGE-:before {
+      content: "\E925"
+    }
+
+    .pFLO1xfZl_Bj7w:before {
+      content: "\E924"
+    }
+
+    ._1Q601QlF9WO1QV:before {
+      content: "\E923"
+    }
+
+    ._2Kj3d5i2Qjr8aG:before {
+      content: "\E922"
+    }
+
+    ._1C3x6uLK1iHji2:before {
+      content: "\E921"
+    }
+
+    .FSQn-rRezBxRsd:before {
+      content: "\E920"
+    }
+
+    ._3NAjZ7Lb64OgRH:before {
+      content: "\E91F"
+    }
+
+    ._3h89p9a1joW_ZC:before {
+      content: "\E91E"
+    }
+
+    ._2nxa8a6h3qQAUw:before {
+      content: "\E91D"
+    }
+
+    .JeDac5VAHNAG1E:before {
+      content: "\E91C"
+    }
+
+    .P7i-lDJAPu15-s:before {
+      content: "\E91B"
+    }
+
+    .NpUTU5L2vhNGah:before {
+      content: "\E91A"
+    }
+
+    ._3xHzCTg385YiPY:before {
+      content: "\E919"
+    }
+
+    ._273MVfajSysp2O:before {
+      content: "\E918"
+    }
+
+    ._3hW0TjuC6RZfLX:before {
+      content: "\E917"
+    }
+
+    .zCHe47Sgl8DZ62:before {
+      content: "\E96B"
+    }
+
+    .Xv4j2oCUS0ERTx:before {
+      content: "\E916"
+    }
+
+    ._2K0KaEjbursXxA:before {
+      content: "\E915"
+    }
+
+    .zH4gsM1wwvGTmh:before {
+      content: "\E914"
+    }
+
+    ._3ZK2k7fKTF3d4a:before {
+      content: "\E913"
+    }
+
+    ._3fETDcYRfkn87K:before {
+      content: "\E912"
+    }
+
+    ._1uKgl_VMpLwfVL:before {
+      content: "\E911"
+    }
+
+    .U9-aK52CDjGfeq:before {
+      content: "\E910"
+    }
+
+    .Pat28bw06E_P32:before {
+      content: "\E90F"
+    }
+
+    ._9u-WgNpJWvbpNP:before {
+      content: "\E90E"
+    }
+
+    ._29g588uvcJXhvA:before {
+      content: "\E90D"
+    }
+
+    ._19mezUfQbuHuUw:before {
+      content: "\E90C"
+    }
+
+    ._38STGU-ixIrOBL:before {
+      content: "\E90B"
+    }
+
+    ._2Gubtp6gwDKNDv:before {
+      content: "\E90A"
+    }
+
+    ._2CpZUG02yRFySt:before {
+      content: "\E909"
+    }
+
+    ._2mT3ANYbKxf-vt:before {
+      content: "\E908"
+    }
+
+    .s7iPuxr2K-1-AW:before {
+      content: "\E907"
+    }
+
+    ._2vf5pKL-unmT_a:before {
+      content: "\E906"
+    }
+
+    ._2r45eMJlxLajlU:before {
+      content: "\E905"
+    }
+
+    ._-9Kx6TSvjhPQF6:before {
+      content: "\E904"
+    }
+
+    ._1gc0YynY7WvINC:before {
+      content: "\E903"
+    }
+
+    ._2-s0edbBUCZLfs:before {
+      content: "\E902"
+    }
+
+    .XHBQk9Sh9PAFMV:before {
+      content: "\E901"
+    }
+
+    ._2lskq-tiMh5Cmj:before {
+      content: "\E95C"
+    }
+
+    ._3YlMR-aKPE-6Py {
+      color: #eb5a46
+    }
+
+    ._2wIkDUITn0rQgB {
+      color: #61bd4f
+    }
+
+    .bq0exRhZzT3mQH {
+      color: #798d99
+    }
+
+    ._3Equ0AwjtQdiIh {
+      color: #fff
+    }
+
+    ._2wTuPX_wSmi5Oi {
+      color: #516b7a
+    }
+
+    ._3y6MSD-EkP17zT {
+      color: #f2d600
+    }
+
+    ._34fwZQzLHT7jnh {
+      color: #0079bf
+    }
+
+    ._3nZZwYm5iLUjZl {
+      color: #c377e0
+    }
+
+    .kHbjplgB9Uk0aR {
+      color: #ff78cb
+    }
+
+    ._1wOU2f8ttRfB6_ {
+      text-align: center;
+      vertical-align: middle
+    }
+
+    ._1wOU2f8ttRfB6_:before {
+      content: "";
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: cover
+    }
+
+    ._1wOU2f8ttRfB6_.PFt09HVBG7wMY9:before {
+      width: 12px;
+      height: 12px
+    }
+
+    ._1wOU2f8ttRfB6_._2KEwvRY1oTHWsQ:before {
+      width: 16px;
+      height: 16px
+    }
+
+    ._1wOU2f8ttRfB6_.zCHe47Sgl8DZ62:before {
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/icon-member-remove.d593d380f1af40571ddc.svg)
+    }
+
+    ._1wOU2f8ttRfB6_.Amzy_Uos05KXvv:before {
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/icon-copy.c7eb02d1643329d1d35a.svg)
+    }
+  </style>
+  <style type="text/css">
+    ._1wsVKP33UvhH19 {
+      background: #dfe3e6;
+      border-radius: 3px;
+      border: 0;
+      box-shadow: 0 1px 0 0 #c2ccd1;
+      color: #17394d;
+      cursor: pointer;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 20px;
+      outline: 0;
+      padding: 6px 12px;
+      text-decoration: none
+    }
+
+    ._1wsVKP33UvhH19:hover {
+      background: #c2ccd1;
+      box-shadow: 0 1px 0 0 #b3bec4
+    }
+
+    ._1wsVKP33UvhH19:hover ._1k0dwSxmGvvtYW {
+      color: #092d42
+    }
+
+    ._1wsVKP33UvhH19:active {
+      background: #17394d;
+      box-shadow: 0 1px 0 0 #c2ccd1;
+      color: #fff
+    }
+
+    ._1wsVKP33UvhH19:active ._1k0dwSxmGvvtYW {
+      color: #fff
+    }
+
+    ._3PniEr89PZiqWW {
+      display: inline-flex;
+      align-items: center
+    }
+
+    ._3PniEr89PZiqWW.PvUFXaJ8njyKZe {
+      height: 32px
+    }
+
+    ._3PniEr89PZiqWW._2c98SFtV4xtvQh {
+      height: 40px
+    }
+
+    ._3PniEr89PZiqWW ._3ckAOgqD1zw_D0 {
+      width: 12px;
+      height: 12px;
+      line-height: 12px
+    }
+
+    ._3PniEr89PZiqWW .XtJtX_gkmGIi51 {
+      width: 16px;
+      height: 16px;
+      line-height: 16px
+    }
+
+    ._3PniEr89PZiqWW ._2Vd6ZHbc1s1Yb4 {
+      margin-left: 8px
+    }
+
+    ._1LsB1Fm13rEW9M {
+      background: #5aac44;
+      box-shadow: 0 1px 0 0 #3f6f21;
+      color: #fff
+    }
+
+    ._1LsB1Fm13rEW9M:hover {
+      background: #519839;
+      box-shadow: 0 1px 0 0 #3f6f21
+    }
+
+    ._1LsB1Fm13rEW9M:active {
+      background: #3f6f21;
+      box-shadow: 0 1px 0 0 #3f6f21
+    }
+
+    .V_pTWmzazO4UQ1 {
+      background: #eb5a46;
+      box-shadow: 0 1px 0 0 #b04632;
+      color: #fff
+    }
+
+    .V_pTWmzazO4UQ1:hover {
+      background: #cf513d;
+      box-shadow: 0 1px 0 0 #b04632
+    }
+
+    .V_pTWmzazO4UQ1:active {
+      background: #6e2f1a;
+      box-shadow: 0 1px 0 0 #6e2f1a
+    }
+
+    ._5PqecDbWTf5v2F,
+    ._5PqecDbWTf5v2F:active,
+    ._5PqecDbWTf5v2F:hover {
+      background: #f5f6f7;
+      box-shadow: none;
+      color: #97a7b0
+    }
+
+    ._1thuYnCmZHZEWI {
+      padding: 6px 24px
+    }
+
+    ._3YfYZ0or7NE-mX {
+      width: 100%
+    }
+
+    ._2mgIKCNaQ3gcfB,
+    ._37UgrBPk8jkWYc {
+      background: none;
+      box-shadow: none;
+      cursor: pointer;
+      display: block;
+      outline: none
+    }
+
+    ._2mgIKCNaQ3gcfB {
+      border-radius: 3px;
+      color: #6b808c;
+      font-weight: 400;
+      margin: 2px 0;
+      padding: 6px 12px;
+      position: relative;
+      text-align: left;
+      text-decoration: underline;
+      transition-duration: 85ms;
+      transition-property: background-color, border-color, box-shadow;
+      transition-timing-function: ease;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text
+    }
+
+    ._2mgIKCNaQ3gcfB:active,
+    ._2mgIKCNaQ3gcfB:focus,
+    ._2mgIKCNaQ3gcfB:hover {
+      background-color: rgba(9, 45, 66, .13);
+      box-shadow: none;
+      color: #17394d
+    }
+  </style>
+  <style type="text/css">
+    ._1188PbsmyD-Hrh {
+      display: block;
+      background-color: #42548e;
+      color: #fff;
+      padding: 10px 8px 10px 38px;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-weight: 400;
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      align-items: center;
+      margin: 0
+    }
+
+    ._1188PbsmyD-Hrh._3ypNXNIG4wOpv4 {
+      border-radius: 3px;
+      padding: 7px 15px
+    }
+
+    ._1188PbsmyD-Hrh ._3r8XrssVVY5Kb8 {
+      cursor: pointer
+    }
+
+    ._1188PbsmyD-Hrh ._3bThrzYr4rMCw7 {
+      padding-right: 25px;
+      flex-grow: 1;
+      color: #fff;
+      font-size: 14px;
+      line-height: 24px
+    }
+
+    ._1188PbsmyD-Hrh ._3bThrzYr4rMCw7 a {
+      color: #fff
+    }
+
+    ._1188PbsmyD-Hrh ._3TcdbJZ-56NfN8 {
+      margin: 0 20px;
+      flex-shrink: 0
+    }
+
+    ._1188PbsmyD-Hrh ._3TcdbJZ-56NfN8 button {
+      margin-top: 0;
+      cursor: pointer
+    }
+
+    ._1188PbsmyD-Hrh ._3TcdbJZ-56NfN8 button:hover {
+      background-color: #c2ccd1
+    }
+
+    ._1188PbsmyD-Hrh ._3TcdbJZ-56NfN8 button:active {
+      background-color: #b3bec4;
+      color: #17394d
+    }
+  </style>
+  <style type="text/css">
+    ._3A6w5gDHPXcvOd {
+      padding-top: 12px;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      line-height: 20px
+    }
+
+    ._3A6w5gDHPXcvOd .RePlpPYxmGSa9l {
+      color: #6b808c;
+      text-decoration: none
+    }
+
+    ._3A6w5gDHPXcvOd .RePlpPYxmGSa9l:hover {
+      text-decoration: underline
+    }
+
+    ._1KepOZHWd3kPd_ {
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 3px;
+      background-color: #42548e;
+      color: #fff;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      line-height: 20px
+    }
+
+    ._1KepOZHWd3kPd_ ._19pWPIH_TpTtzG {
+      margin-top: 14px
+    }
+
+    ._1KepOZHWd3kPd_ ._19pWPIH_TpTtzG .RePlpPYxmGSa9l {
+      color: #b6bbbf;
+      text-decoration: none
+    }
+
+    ._1KepOZHWd3kPd_ ._19pWPIH_TpTtzG .RePlpPYxmGSa9l:hover {
+      text-decoration: underline
+    }
+
+    ._1KepOZHWd3kPd_ p>a {
+      color: #fff
+    }
+  </style>
+  <style type="text/css">
+    ._1I99IpkK2Whkso {
+      display: flex;
+      margin-top: 8px;
+      min-height: 184px;
+      border-radius: 3px;
+      background-color: #ebeef0
+    }
+
+    ._1I99IpkK2Whkso .RuhRi5TPHC1yQT {
+      margin: 16px 0 12px 16px;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 400
+    }
+
+    ._1I99IpkK2Whkso .RuhRi5TPHC1yQT .mVLtiSp-IlJMIK {
+      font-weight: 600;
+      margin: 0 0 8px
+    }
+
+    ._1I99IpkK2Whkso .RuhRi5TPHC1yQT ul {
+      line-height: 175%;
+      list-style: none;
+      padding: 0;
+      margin: 0
+    }
+
+    ._1I99IpkK2Whkso .RuhRi5TPHC1yQT ._1VQJ8HVHsHaCav {
+      margin-left: 8px
+    }
+
+    ._1I99IpkK2Whkso ._3id4Sla5a98s9j {
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/organization/out-of-free-team-boards.f8b57dee17ba25a2f66a.svg);
+      background-repeat: no-repeat;
+      min-width: 120px;
+      margin: 12px 0 0 4px
+    }
+
+    ._1I99IpkK2Whkso ._1cwZQeSK5Y8a_E {
+      margin-top: 16px
+    }
+
+    ._1I99IpkK2Whkso ._1cwZQeSK5Y8a_E .MtCOtX5rmUNSvh {
+      font-size: 12px;
+      color: #6b808c;
+      text-decoration: none
+    }
+
+    ._1I99IpkK2Whkso ._1cwZQeSK5Y8a_E .MtCOtX5rmUNSvh:hover {
+      text-decoration: underline
+    }
+  </style>
+  <style type="text/css"></style>
+  <style data-styled-components=""></style>
+  <style type="text/css">
+    ._3Mb8DcaL4EnqWk {
+      padding-top: 12px;
+      font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      line-height: 20px
+    }
+
+    ._3Mb8DcaL4EnqWk a {
+      color: #17394d
+    }
+  </style>
+  <style type="text/css">
+    ._3PkArOCivNaGbn {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._2sEmDwdKAFBPyU,
+    ._3PkArOCivNaGbn {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._37IEL0Akk36jTV {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._1uzJVe3pfrG5b3 {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._2Q3bWC2fanKXN- {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._2ZgPEdD9m14C0q {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._1jqOl00mh8jzdY {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    ._22jQFY4t2PlpGw {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    ._22jQFY4t2PlpGw,
+    ._22jQFY4t2PlpGw:active,
+    ._22jQFY4t2PlpGw:focus,
+    ._22jQFY4t2PlpGw:hover {
+      background: none
+    }
+
+    .DXykHEDax5MmIG {
+      background-color: #faf3c0;
+      border-radius: 4px;
+      display: flex;
+      color: #17394d;
+      margin-bottom: 16px;
+      padding: 8px
+    }
+
+    .DXykHEDax5MmIG ._34Voi9IMmQOuBO {
+      color: #17394d
+    }
+
+    .DXykHEDax5MmIG ._34Voi9IMmQOuBO:hover {
+      color: #111
+    }
+
+    .DXykHEDax5MmIG ._1wRFpbIe4G7--Y {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      margin-left: auto
+    }
+
+    .DXykHEDax5MmIG ._1wRFpbIe4G7--Y,
+    .DXykHEDax5MmIG ._1wRFpbIe4G7--Y:active,
+    .DXykHEDax5MmIG ._1wRFpbIe4G7--Y:focus,
+    .DXykHEDax5MmIG ._1wRFpbIe4G7--Y:hover {
+      background: none
+    }
+  </style>
+  <style type="text/css">
+    ._3X6fhwGGHA9HYG {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._2RghK8y2b16_mk,
+    ._3X6fhwGGHA9HYG {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._132tJnlvWBeULc {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._12owYKxiUTMHry {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._3OrE9p5Y-T9ZXM {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._2z7-8lwY4CHhPA {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._3RqQZnPO1AJckD {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    ._3prYtBDzDN4U_r {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    ._3prYtBDzDN4U_r,
+    ._3prYtBDzDN4U_r:active,
+    ._3prYtBDzDN4U_r:focus,
+    ._3prYtBDzDN4U_r:hover {
+      background: none
+    }
+
+    ._2Z6-2YpRyX1CN0 {
+      align-items: baseline;
+      display: flex;
+      height: 32px;
+      justify-content: flex-start;
+      margin-bottom: 8px;
+      padding: 0 0 0 8px
+    }
+
+    ._1knk4cfeN16FGg {
+      margin: 0
+    }
+
+    ._1SpVsrdOAb3rKW {
+      color: #6b808c;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      line-height: 16px;
+      margin-top: 16px;
+      text-transform: uppercase;
+      flex: 1 1 auto;
+      margin: 0;
+      padding: 8px 0
+    }
+
+    ._2h8hPY61T8O7ph {
+      flex: 0 0 auto;
+      margin-left: -8px;
+      position: relative;
+      text-align: center;
+      top: 1px;
+      width: 32px
+    }
+
+    ._1bPglZrs1zG-6K {
+      align-items: center;
+      background-image: none !important;
+      border-radius: 16px;
+      box-shadow: 0 1px 0 0 #c4c9cc;
+      color: #333;
+      display: flex;
+      font-size: 12px;
+      font-weight: 400;
+      height: 32px;
+      justify-content: center;
+      margin: 0 0 0 8px;
+      padding: 0 16px;
+      text-decoration: none
+    }
+
+    ._1bPglZrs1zG-6K,
+    ._1bPglZrs1zG-6K:focus {
+      background-color: #e2e4e6
+    }
+
+    ._1bPglZrs1zG-6K:hover {
+      background-color: #d6dadc;
+      color: #333
+    }
+
+    ._1bPglZrs1zG-6K:active {
+      background-color: #c4c9cc;
+      box-shadow: 0 1px 0 0 #a5acb0
+    }
+
+    .wDL1An_7s_iwCv {
+      color: #838c91;
+      margin-left: -6px
+    }
+
+    ._1_a9FzaewxJrnI {
+      color: currentcolor !important
+    }
+
+    ._3Ctjylzf-NVHVU {
+      margin: 0 4px
+    }
+
+    ._1OgPWbVUS91Ew_ {
+      display: flex;
+      height: 0;
+      justify-content: center;
+      left: 0;
+      opacity: 1;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 408px;
+      -webkit-transform: translateY(-400px);
+      transform: translateY(-400px);
+      transition: opacity .2s, -webkit-transform .2s;
+      transition: transform .2s, opacity .2s;
+      transition: transform .2s, opacity .2s, -webkit-transform .2s;
+      width: 100%;
+      z-index: 1
+    }
+
+    ._1OgPWbVUS91Ew_ ._1bPglZrs1zG-6K {
+      background-color: #61bd4f;
+      box-shadow: 0 1px 0 0 #519839, 0 2px 2px 0 rgba(51, 51, 51, .3);
+      color: #fff;
+      margin: 0
+    }
+
+    ._1OgPWbVUS91Ew_ ._1bPglZrs1zG-6K:hover {
+      color: #fff;
+      background-color: #5aac44
+    }
+
+    ._1OgPWbVUS91Ew_ ._1bPglZrs1zG-6K:active {
+      background-color: #519839;
+      box-shadow: 0 1px 0 0 #49852e, 0 2px 2px 0 rgba(51, 51, 51, .3)
+    }
+
+    ._1OgPWbVUS91Ew_ .wDL1An_7s_iwCv {
+      color: #fff
+    }
+
+    ._1KuEZ34NUGF9GW,
+    ._2vk2Nqq8tCSgA9 {
+      opacity: 0;
+      -webkit-transform: translateY(-424px);
+      transform: translateY(-424px)
+    }
+
+    ._3sU8ZEuS0xRDpT {
+      opacity: 1;
+      -webkit-transform: translateY(-400px);
+      transform: translateY(-400px)
+    }
+  </style>
+  <style type="text/css">
+    .M0Ay0QC_HteeZG {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._33h51dYhy8sBYq,
+    .M0Ay0QC_HteeZG {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._1eQZNF2tsg_rOr {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._3cEq-7BM0V4def {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._2RzoqO3_lDZhhh {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._1Fs1KHp3yzqW1c {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._1eTz25WdY8xSVQ {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    .MUSIExO9ER3pRA {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    .MUSIExO9ER3pRA,
+    .MUSIExO9ER3pRA:active,
+    .MUSIExO9ER3pRA:focus,
+    .MUSIExO9ER3pRA:hover {
+      background: none
+    }
+
+    ._1qSDcrm56Ysl_M+._1qSDcrm56Ysl_M {
+      margin-top: 8px
+    }
+
+    ._3G31tzHDLYeGkX:last-child {
+      margin-bottom: 12px
+    }
+
+    ._15G2jMgZiDLk59 {
+      margin-bottom: 4px
+    }
+
+    ._32Nvj6Jz73OEYe {
+      display: block;
+      flex: 0 0 auto;
+      text-align: center;
+      width: 32px;
+      color: #798d99
+    }
+
+    ._3C9rwrEaxzhr8w:active ._32Nvj6Jz73OEYe,
+    ._3C9rwrEaxzhr8w:hover ._32Nvj6Jz73OEYe,
+    ._37WIj1gz2ov6hI:active ._32Nvj6Jz73OEYe,
+    ._37WIj1gz2ov6hI:hover ._32Nvj6Jz73OEYe {
+      color: #516b7a
+    }
+
+    .jlnEovPXgyz1K5 {
+      color: currentcolor !important
+    }
+
+    .vPHtRmzZ2b-ce0 {
+      display: block;
+      flex: 0 0 auto;
+      margin: 0 8px
+    }
+
+    ._212hsKwJrTyhjh {
+      flex: 1 1 auto
+    }
+
+    ._3C9rwrEaxzhr8w,
+    ._37WIj1gz2ov6hI {
+      align-items: center;
+      background-color: transparent;
+      border-radius: 4px;
+      box-shadow: none;
+      display: flex;
+      font-weight: 700;
+      margin: 0;
+      min-height: 20px;
+      overflow: hidden;
+      padding: 6px 8px 6px 0;
+      text-decoration: none;
+      transition-property: background-color, border-color, box-shadow;
+      transition-duration: 85ms;
+      transition-timing-function: ease
+    }
+
+    ._3C9rwrEaxzhr8w:hover,
+    ._37WIj1gz2ov6hI:hover {
+      background-color: rgba(9, 45, 66, .13)
+    }
+
+    ._3C9rwrEaxzhr8w:active,
+    ._37WIj1gz2ov6hI:active {
+      background-color: rgba(9, 45, 66, .25)
+    }
+
+    ._37WIj1gz2ov6hI {
+      cursor: pointer;
+      font-weight: 400;
+      text-align: left;
+      width: 100%
+    }
+
+    ._37WIj1gz2ov6hI,
+    ._37WIj1gz2ov6hI:active,
+    ._37WIj1gz2ov6hI:focus,
+    ._37WIj1gz2ov6hI:hover {
+      box-shadow: none
+    }
+
+    .ed4jDnnSLWqaX3 {
+      color: rgba(9, 45, 66, .66);
+      font-weight: 400
+    }
+
+    .ed4jDnnSLWqaX3:active,
+    .ed4jDnnSLWqaX3:hover {
+      color: rgba(9, 45, 66, .77)
+    }
+
+    .ed4jDnnSLWqaX3:focus {
+      color: rgba(9, 45, 66, .66)
+    }
+
+    ._3c22X7MRYpWM71 {
+      font-size: 12px
+    }
+
+    ._2EVi-fMjKdKvQx {
+      margin-top: 4px;
+      padding-left: 28px
+    }
+
+    ul li:first-of-type a._2EVi-fMjKdKvQx {
+      margin-top: 8px
+    }
+
+    ul li:last-of-type a._2EVi-fMjKdKvQx {
+      margin-bottom: 16px
+    }
+
+    ._1gsiCYfUL0OjDP._3C9rwrEaxzhr8w,
+    ._1gsiCYfUL0OjDP._37WIj1gz2ov6hI {
+      background-color: #e4f0f6;
+      color: #026aa7
+    }
+
+    ._1gsiCYfUL0OjDP._3C9rwrEaxzhr8w ._32Nvj6Jz73OEYe,
+    ._1gsiCYfUL0OjDP._37WIj1gz2ov6hI ._32Nvj6Jz73OEYe {
+      color: #0079bf
+    }
+
+    ._29on4Xbc9uyZqS {
+      margin-left: auto
+    }
+  </style>
+  <style type="text/css">
+    ._3B4mBM-_HstOFa ._3QWSfkWetuyFT2 {
+      width: 0;
+      height: 18px;
+      opacity: 0;
+      transition-duration: .15s;
+      transition-property: opacity, width, margin
+    }
+
+    ._3B4mBM-_HstOFa:hover ._3QWSfkWetuyFT2 {
+      opacity: .75;
+      width: 18px;
+      margin-right: 6px
+    }
+  </style>
+  <style type="text/css">
+    ._3DPOf3ZwKyH6UM {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._3DPOf3ZwKyH6UM,
+    .iivBybAC33jY_b {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    .sYOxrD1YkQVU9x {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._86WLKkADmfnK5S {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._1BjyMKhmixOF7C {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    .qBzt7tkZL8jfQC {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._185FDB-0gGB4fS {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    ._19i6QUc1cqeIWh {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    ._19i6QUc1cqeIWh,
+    ._19i6QUc1cqeIWh:active,
+    ._19i6QUc1cqeIWh:focus,
+    ._19i6QUc1cqeIWh:hover {
+      background: none
+    }
+
+    ._35K3QHWaOmsAyI {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 1px rgba(9, 45, 66, .25), 0 0 0 1px rgba(9, 45, 66, .08);
+      display: flex;
+      margin-bottom: 16px;
+      position: relative;
+      width: 100%
+    }
+
+    ._2iWUQnlxZN12iu {
+      flex-direction: column
+    }
+
+    ._2iWUQnlxZN12iu span {
+      text-align: center
+    }
+
+    ._3-Q7mG7zxFBbNZ {
+      background-color: #fbedeb;
+      background-position: 50%;
+      background-repeat: no-repeat;
+      border-radius: 4px 0 0 4px;
+      flex: 0 0 auto;
+      min-height: 130px;
+      width: 88px
+    }
+
+    ._1gBW4yULFC8pAg {
+      border-radius: 4px 4px 0 0;
+      min-height: 100px;
+      width: 100%
+    }
+
+    ._2lmIm43abN0sPF {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 16px;
+      width: 100%
+    }
+
+    ._3UvT9eo_DmPr1s {
+      text-align: center
+    }
+
+    ._1myxbJJ-C_qApg {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 24px
+    }
+
+    ._1myxbJJ-C_qApg._3UvT9eo_DmPr1s {
+      padding-bottom: 8px
+    }
+
+    ._21sdQOf2SAf5J0 {
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 20px;
+      margin: 10px 0
+    }
+
+    ._21sdQOf2SAf5J0._3UvT9eo_DmPr1s {
+      padding-bottom: 6px
+    }
+
+    ._3FJfNqomNglepN {
+      font-weight: 400;
+      position: absolute;
+      margin-top: 8px;
+      right: 8px
+    }
+
+    ._3FJfNqomNglepN,
+    ._3FJfNqomNglepN:hover {
+      background-color: transparent;
+      border: none;
+      box-shadow: none
+    }
+
+    ._3FJfNqomNglepN:hover {
+      background-color: rgba(9, 45, 66, .13)
+    }
+
+    ._3FJfNqomNglepN:active {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      background-color: rgba(9, 45, 66, .25)
+    }
+
+    .hx47H2dvMOdbUo {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      font-weight: 400;
+      cursor: pointer;
+      color: #6b808c;
+      font-size: 14px;
+      letter-spacing: 0;
+      line-height: 20px;
+      margin: 4px 0 0;
+      text-decoration: underline
+    }
+
+    .hx47H2dvMOdbUo:hover {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      background-color: rgba(9, 45, 66, .13);
+      color: #17394d
+    }
+
+    .hx47H2dvMOdbUo:active {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      background-color: rgba(9, 45, 66, .25);
+      color: #17394d
+    }
+
+    ._2zU0P0LPOCaPoC {
+      margin-top: 12px;
+      text-align: center
+    }
+
+    ._3HwfR-joXTKdGh {
+      background-color: #f7f0fa;
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/home/orientation/new-user.c95fada45e5b8a72f20d.svg);
+      height: 136px
+    }
+
+    .p56LtZdmfq0eL5 {
+      background-color: #fdf5ec;
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/home/orientation/no-content.e25c676458c1f4cb280b.svg);
+      height: 108px
+    }
+
+    .rWRoKPti2yOVES {
+      background-color: #fdf5ec;
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/home/orientation/up-next.6b180fd2d4526f7925c9.svg)
+    }
+
+    ._2kUWDPJhC6_RLh {
+      background-color: #fef2f9;
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/home/orientation/highlights.2bc06dddced721a031de.svg)
+    }
+
+    ._2chuyY7k7Al7fi {
+      background-color: #fef2f9;
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/home/orientation/feedback.f60abbf7cb5745c0b532.svg);
+      background-position: 50%;
+      background-repeat: no-repeat;
+      background-size: cover
+    }
+
+    input[type=text]._3IVvFKLdAgjkmd {
+      width: 100%
+    }
+
+    ._1zcAXQ6SUA9OTl {
+      margin-top: 0;
+      width: 100%
+    }
+  </style>
+  <style type="text/css">
+    ._3uMFyvQgRsNAGe {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._2FJWJKtJICHkYk,
+    ._3uMFyvQgRsNAGe {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._1k42_IsLuGcTCq {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._2uoXpCNlD0XzfU {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._1YmgM0uWLbfh2x {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    .MHtPNwUtssGSCY {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._7rNnCB3joYYtxA {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    .G7sjjgsk7x5smh {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    .G7sjjgsk7x5smh,
+    .G7sjjgsk7x5smh:active,
+    .G7sjjgsk7x5smh:focus,
+    .G7sjjgsk7x5smh:hover {
+      background: none
+    }
+
+    ._3FZRxKXNhrneTM {
+      position: relative;
+      z-index: 10
+    }
+
+    ._2BMKGX42f9LoN2 {
+      align-items: center;
+      background-color: #333;
+      border-radius: 4px;
+      bottom: 16px;
+      box-sizing: border-box;
+      display: flex;
+      font-size: 14px;
+      height: 48px;
+      left: 16px;
+      opacity: 1;
+      padding: 8px;
+      position: fixed;
+      -webkit-transform-origin: 50% 80%;
+      transform-origin: 50% 80%;
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      transition: opacity .2s, -webkit-transform .2s;
+      transition: opacity .2s, transform .2s;
+      transition: opacity .2s, transform .2s, -webkit-transform .2s;
+      width: 290px
+    }
+
+    @media only screen and (max-width:711px) {
+      ._2BMKGX42f9LoN2 {
+        left: calc(50% - 216px);
+        width: 432px
+      }
+    }
+
+    @media only screen and (max-width:464px) {
+      ._2BMKGX42f9LoN2 {
+        left: 16px;
+        right: 16px;
+        width: auto
+      }
+    }
+
+    @media only screen and (min-width:1092px) {
+      ._2BMKGX42f9LoN2 {
+        left: calc(50% - 216px);
+        margin-left: -14px;
+        width: 432px
+      }
+    }
+
+    .Yd-ajGcMaztOdJ {
+      left: 16px;
+      margin-left: 0;
+      right: auto;
+      width: 290px
+    }
+
+    @media only screen and (min-width:1372px) {
+      .Yd-ajGcMaztOdJ {
+        left: calc(50% - 216px);
+        margin-left: 126px;
+        width: 432px
+      }
+    }
+
+    ._29r_-9QKldmLjM {
+      opacity: 0;
+      -webkit-transform: scale(.93);
+      transform: scale(.93);
+      z-index: 2
+    }
+
+    ._3A4aus-u-GuYX7 {
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      z-index: 2
+    }
+
+    ._1OR8kOcedmOhG7,
+    ._2CtlRhuXjyBp_y {
+      opacity: 0;
+      -webkit-transform: scale(.93);
+      transform: scale(.93);
+      z-index: 1
+    }
+
+    ._2BMKGX42f9LoN2:not(:first-child)._3A4aus-u-GuYX7,
+    ._2BMKGX42f9LoN2:not(:first-child)._29r_-9QKldmLjM,
+    ._2BMKGX42f9LoN2:not(:last-child)._3A4aus-u-GuYX7,
+    ._2BMKGX42f9LoN2:not(:last-child)._29r_-9QKldmLjM {
+      transition: opacity .3s ease, -webkit-transform .3s cubic-bezier(.8, 0, .75, .95);
+      transition: transform .3s cubic-bezier(.8, 0, .75, .95), opacity .3s ease;
+      transition: transform .3s cubic-bezier(.8, 0, .75, .95), opacity .3s ease, -webkit-transform .3s cubic-bezier(.8, 0, .75, .95)
+    }
+
+    ._2BMKGX42f9LoN2:not(:first-child)._1OR8kOcedmOhG7,
+    ._2BMKGX42f9LoN2:not(:first-child)._2CtlRhuXjyBp_y,
+    ._2BMKGX42f9LoN2:not(:last-child)._1OR8kOcedmOhG7,
+    ._2BMKGX42f9LoN2:not(:last-child)._2CtlRhuXjyBp_y {
+      transition: opacity .3s cubic-bezier(.8, 0, .75, .95), -webkit-transform .3s ease;
+      transition: transform .3s ease, opacity .3s cubic-bezier(.8, 0, .75, .95);
+      transition: transform .3s ease, opacity .3s cubic-bezier(.8, 0, .75, .95), -webkit-transform .3s ease
+    }
+
+    .rllAe5An9wWESX {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #edeff0;
+      flex: 1 1 auto;
+      margin: 0 0 0 8px
+    }
+
+    .rllAe5An9wWESX a:link,
+    .rllAe5An9wWESX a:visited {
+      color: #b6bbbf
+    }
+
+    .rllAe5An9wWESX a:hover {
+      color: #cdd2d4
+    }
+
+    .rllAe5An9wWESX a:active {
+      color: #d6dadc
+    }
+
+    ._1MTDSDrNNZg2xP {
+      background: none;
+      border-radius: 4px;
+      box-shadow: none;
+      flex: 0 0 auto;
+      height: 26px;
+      line-height: 26px;
+      text-align: center
+    }
+
+    ._1MTDSDrNNZg2xP:hover {
+      background: #222
+    }
+
+    ._1MTDSDrNNZg2xP:active {
+      background: #000
+    }
+
+    ._1MTDSDrNNZg2xP:focus {
+      background-image: none
+    }
+
+    ._1srmV1asLveHnC {
+      background: none;
+      border-radius: 4px;
+      box-shadow: none;
+      flex: 0 0 auto;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+      color: #5ba4cf;
+      font-weight: 700;
+      margin: 0 0 0 8px;
+      padding: 0 8px
+    }
+
+    ._1srmV1asLveHnC:hover {
+      background: #222
+    }
+
+    ._1srmV1asLveHnC:active {
+      background: #000
+    }
+
+    ._1srmV1asLveHnC:focus {
+      background-image: none
+    }
+
+    ._1srmV1asLveHnC:hover {
+      color: #8bbdd9
+    }
+
+    ._1srmV1asLveHnC:active {
+      color: #bcd9ea
+    }
+
+    ._2X6__EozVxr-Wl {
+      color: #959da1 !important;
+      font-size: 16px !important;
+      line-height: 26px !important
+    }
+
+    ._1jpTy6mkZcWLss {
+      background: none;
+      border-radius: 4px;
+      box-shadow: none;
+      flex: 0 0 auto;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+      margin: 0 3px 0 1px;
+      padding: 0;
+      width: 26px
+    }
+
+    ._1jpTy6mkZcWLss:hover {
+      background: #222
+    }
+
+    ._1jpTy6mkZcWLss:active {
+      background: #000
+    }
+
+    ._1jpTy6mkZcWLss:focus {
+      background-image: none
+    }
+
+    ._1jpTy6mkZcWLss:hover ._2X6__EozVxr-Wl {
+      color: #a5acb0 !important
+    }
+
+    ._1jpTy6mkZcWLss:active ._2X6__EozVxr-Wl {
+      color: #b6bbbf !important
+    }
+  </style>
+  <style type="text/css">
+    ._3tDv-VrE72--9I {
+      margin-top: 8px
+    }
+
+    ._2RsLAlpqJ82N71 {
+      margin-bottom: 16px
+    }
+
+    ._2RsLAlpqJ82N71 svg {
+      display: block;
+      margin-bottom: 16px
+    }
+
+    .mnn30oj78AN7V_ {
+      margin: 0 0 8px 20px
+    }
+  </style>
+  <style type="text/css">
+    ._1kzPNdUsDcMam1._19TLFWjMh2PdXj._2B47E_CfuRpvmD {
+      text-align: center
+    }
+
+    ._1kzPNdUsDcMam1._19TLFWjMh2PdXj>._1Qtvp02qNLbzMo {
+      margin: 0 auto
+    }
+
+    ._1kzPNdUsDcMam1._2B47E_CfuRpvmD>._1Qtvp02qNLbzMo {
+      display: inline-block;
+      vertical-align: middle
+    }
+
+    ._1Qtvp02qNLbzMo {
+      background-image: url(https://a.trellocdn.com/prgb/dist/images/spinner.dd88566680cbf35fabbf.gif);
+      background-size: 30px 30px;
+      display: block;
+      height: 30px;
+      width: 30px
+    }
+
+    ._1Qtvp02qNLbzMo._36uxd9TNDw6AdD {
+      background-size: 18px 18px;
+      height: 18px;
+      width: 18px
+    }
+
+    ._1Qtvp02qNLbzMo._3jNWWV-delQ9_4 {
+      margin-right: 3px
+    }
+  </style>
+  <style type="text/css">
+    ._1VXgdovKXaunoC {
+      max-height: 0;
+      opacity: .01;
+      transition-property: opacity, max-height;
+      transition-duration: .15s;
+      transition-timing-function: ease-out, linear
+    }
+
+    ._3NdPJic6OR8wdi,
+    .b6oU-1arBolXlk {
+      max-height: 300px;
+      opacity: 1
+    }
+
+    .b6oU-1arBolXlk {
+      transition-property: opacity, max-height;
+      transition-duration: .2s;
+      transition-timing-function: ease-out, linear
+    }
+
+    ._23I4gPZCUuJyER {
+      max-height: 0;
+      opacity: .01
+    }
+  </style>
+  <style type="text/css">
+    ._2ky-v9d1fZT9Ml {
+      color: #17394d;
+      align-items: center;
+      border-radius: 4px;
+      bottom: 24px;
+      cursor: pointer;
+      display: flex;
+      font-size: 12px;
+      justify-content: center;
+      padding: 3px 8px 3px 3px;
+      right: 24px;
+      text-decoration: none
+    }
+
+    ._3DONpnd7Nk3q6Q {
+      font-size: 16px !important;
+      margin-right: 4px
+    }
+
+    .cxcAnlvUk6Y9q8 {
+      border: 1px solid #e2e4e6;
+      padding-bottom: 8px;
+      padding-top: 8px
+    }
+
+    .cxcAnlvUk6Y9q8:hover {
+      color: #17394d;
+      background-color: #edeff0
+    }
+
+    .cxcAnlvUk6Y9q8:active {
+      color: #17394d;
+      background-color: #d6dadc
+    }
+
+    ._2Rfc9zOhAMoJ9Z {
+      background-color: #a86cc1;
+      box-shadow: 0 1px 3px 0 rgba(235, 90, 70, .16);
+      color: #fff;
+      height: 22px;
+      padding: 5px 11px;
+      position: fixed;
+      z-index: 4
+    }
+
+    @media only screen and (max-width:711px) {
+      ._2Rfc9zOhAMoJ9Z {
+        display: none
+      }
+    }
+
+    ._2Rfc9zOhAMoJ9Z ._3DONpnd7Nk3q6Q {
+      color: #fff
+    }
+
+    ._2Rfc9zOhAMoJ9Z:hover {
+      background-color: #89609e;
+      color: #fff
+    }
+
+    ._2Rfc9zOhAMoJ9Z:active {
+      background-color: #6c547b;
+      color: #fff
+    }
+
+    ._2Rfc9zOhAMoJ9Z:focus {
+      border: 2px solid #5ba4cf;
+      color: #fff;
+      padding: 3px 9px
+    }
+  </style>
+  <style type="text/css">
+    ._3Q_OMH-nQhl_Y9 {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._2fr6TxHqEs2IIb,
+    ._3Q_OMH-nQhl_Y9 {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    .kc45O9hODGndya {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._15EQFiw267kqrV {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._1Ypk-qARQH87zR {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._3kBR_ZYfYIzQd4 {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._2mUGCoibog0uUp {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    ._15a5v4fyTT4J7u {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    ._15a5v4fyTT4J7u,
+    ._15a5v4fyTT4J7u:active,
+    ._15a5v4fyTT4J7u:focus,
+    ._15a5v4fyTT4J7u:hover {
+      background: none
+    }
+
+    .sLa3Mli4qACAme {
+      padding-bottom: 20px
+    }
+
+    ._1yPmiQ_g38_F0e {
+      display: flex;
+      flex-direction: column;
+      will-change: max-height
+    }
+
+    ._1yPmiQ_g38_F0e:not(:empty)+._1yPmiQ_g38_F0e {
+      padding-top: 16px
+    }
+
+    ._1yPmiQ_g38_F0e:last-child {
+      padding-bottom: 0
+    }
+
+    ._3Z9M4pQsnhV7Kv {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      text-decoration: underline
+    }
+
+    ._3Z9M4pQsnhV7Kv,
+    ._3Z9M4pQsnhV7Kv:active,
+    ._3Z9M4pQsnhV7Kv:focus,
+    ._3Z9M4pQsnhV7Kv:hover {
+      background: none
+    }
+
+    ._3Z9M4pQsnhV7Kv:hover {
+      color: #111
+    }
+
+    ._1B-j2mwkaHHJXT {
+      padding: 19px 0
+    }
+  </style>
+  <style type="text/css">
+    ._3JGAwCe7tdh5h3 {
+      margin: 0 auto;
+      max-width: 1250px
+    }
+
+    ._28ABbGNOo14pa- {
+      display: flex;
+      flex-direction: column
+    }
+
+    ._1YFIJWjZpn3szY {
+      box-sizing: border-box;
+      position: relative;
+      will-change: max-height
+    }
+
+    ._1YFIJWjZpn3szY+._1YFIJWjZpn3szY {
+      padding-top: 16px
+    }
+
+    ._124XlYzVWl5iX7 {
+      margin-top: -24px
+    }
+  </style>
+  <style type="text/css">
+    .-J3OJrCF0nkf0c {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    .-J3OJrCF0nkf0c,
+    ._8e-U6Jj_RW1b0J {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    ._1eECMh9sJEUG0j {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    .mBNAU_TkegUuQ_ {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._2OmXYKB4MUD95t {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._38jgFAJN9Y_xGl {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    ._2Q5wOhJ9F1bBr- {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    ._94uVwEllQkOCPJ {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    ._94uVwEllQkOCPJ,
+    ._94uVwEllQkOCPJ:active,
+    ._94uVwEllQkOCPJ:focus,
+    ._94uVwEllQkOCPJ:hover {
+      background: none
+    }
+
+    ._2tVYPE8jFl3_x4 {
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    ._2tVYPE8jFl3_x4,
+    ._3kNHQ-_4mL9Qz3 {
+      align-items: center;
+      display: flex;
+      height: 48px;
+      position: relative
+    }
+
+    ._3kNHQ-_4mL9Qz3 {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      border-radius: 4px;
+      border: 0;
+      box-sizing: border-box;
+      color: #6b808c;
+      cursor: pointer;
+      padding: 8px 40px 8px 8px;
+      text-decoration: none;
+      width: 100%;
+      transition-property: background-color, border-color, box-shadow;
+      transition-duration: 85ms;
+      transition-timing-function: ease
+    }
+
+    ._3kNHQ-_4mL9Qz3,
+    ._3kNHQ-_4mL9Qz3:active,
+    ._3kNHQ-_4mL9Qz3:focus,
+    ._3kNHQ-_4mL9Qz3:hover {
+      background: none
+    }
+
+    ._3kNHQ-_4mL9Qz3:hover {
+      background-color: rgba(9, 45, 66, .13)
+    }
+
+    ._3kNHQ-_4mL9Qz3:active {
+      background-color: rgba(9, 45, 66, .25);
+      background-image: none
+    }
+
+    ._3kNHQ-_4mL9Qz3:focus {
+      background-image: none
+    }
+
+    ._3-pqZHWoOUOMAg {
+      background-size: cover;
+      border-radius: 4px;
+      display: block;
+      flex: 0 0 auto;
+      height: 28px;
+      margin-right: 8px;
+      width: 32px
+    }
+
+    ._2h6w7j8P6f1ZPc {
+      display: block;
+      margin-right: 8px;
+      overflow: hidden
+    }
+
+    .BCNabEo0pVKpRy {
+      color: #6b808c
+    }
+
+    ._3kNHQ-_4mL9Qz3:active .BCNabEo0pVKpRy,
+    ._3kNHQ-_4mL9Qz3:hover .BCNabEo0pVKpRy {
+      color: #17394d
+    }
+
+    ._2TZbrJxKKmgBx_ {
+      color: #17394d;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 18px
+    }
+
+    ._2TZbrJxKKmgBx_,
+    .EHcBHdu2S0Sxz2 {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block
+    }
+
+    .EHcBHdu2S0Sxz2 {
+      color: #6b808c;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 14px;
+      margin-top: 1px
+    }
+
+    ._1JRAgXkTOQe0_0 {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+      border-radius: 4px;
+      border: 0;
+      cursor: pointer;
+      display: flex;
+      height: 24px;
+      justify-content: center;
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 24px
+    }
+
+    ._1JRAgXkTOQe0_0,
+    ._1JRAgXkTOQe0_0:active,
+    ._1JRAgXkTOQe0_0:focus,
+    ._1JRAgXkTOQe0_0:hover {
+      background: none
+    }
+
+    ._2tVYPE8jFl3_x4:hover ._1JRAgXkTOQe0_0:hover {
+      background-color: rgba(9, 45, 66, .13);
+      border: 0;
+      box-shadow: none
+    }
+
+    ._2tVYPE8jFl3_x4:hover ._1JRAgXkTOQe0_0:active {
+      background-color: rgba(9, 45, 66, .25);
+      border: 0;
+      box-shadow: none
+    }
+
+    ._2Xk8hpIqkjJ49i {
+      color: transparent !important;
+      transition: color .15s
+    }
+
+    ._2tVYPE8jFl3_x4:hover ._2Xk8hpIqkjJ49i._1yvgNxMUZtEUOI,
+    ._2Xk8hpIqkjJ49i._1yvgNxMUZtEUOI {
+      color: #e6c60d !important;
+      display: block
+    }
+
+    ._2tVYPE8jFl3_x4:hover ._2Xk8hpIqkjJ49i {
+      color: #959da1 !important;
+      display: block
+    }
+
+    ._1qcR9v_U6yheVw,
+    ._3uDLJTvlnBGtEP {
+      color: #798d99 !important;
+      display: flex !important;
+      height: 28px !important;
+      width: 32px !important;
+      align-items: center;
+      border-radius: 4px;
+      margin-right: 8px;
+      flex: 0 0 auto;
+      justify-content: center
+    }
+
+    ._1qcR9v_U6yheVw {
+      background-color: #dfe3e6;
+      box-shadow: 0 1px 0 0 #c2ccd1;
+      border: none;
+      transition-property: background-color, border-color, box-shadow;
+      transition-duration: 85ms;
+      transition-timing-function: ease
+    }
+
+    ._3kNHQ-_4mL9Qz3:active ._1qcR9v_U6yheVw,
+    ._3kNHQ-_4mL9Qz3:hover ._1qcR9v_U6yheVw {
+      background-color: #c2ccd1;
+      box-shadow: 0 1px 0 0 #b3bec4;
+      border: none
+    }
+  </style>
+  <style type="text/css">
+    .rUhRs5j9zqjFuL {
+      padding-bottom: 24px
+    }
+  </style>
+  <style type="text/css">
+    ._2WFinT1R_jd8qE {
+      padding-bottom: 24px
+    }
+  </style>
+  <style type="text/css">
+    ._3D94VyWzDccHxx {
+      border-radius: 3px;
+      height: 20px;
+      width: 20px
+    }
+
+    ._2gioEOml4WLb1w,
+    ._3D94VyWzDccHxx {
+      background-color: #fafcfc;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    .iQ13bUMblIugtz {
+      background-color: #ebeef0;
+      box-shadow: inset 0 0 0 2px #dfe3e6
+    }
+
+    .rW6fepNMqq3eyN {
+      background-color: #17394d;
+      box-shadow: inset 0 0 0 2px #17394d
+    }
+
+    ._2hrK_5azXLLKtR {
+      background-color: #fff;
+      box-shadow: none
+    }
+
+    ._3beTlWatEmG3Lh {
+      background-color: #ebeef0;
+      box-shadow: none
+    }
+
+    .DTwIp3w85hGhSk {
+      background-color: #c2ccd1;
+      box-shadow: none
+    }
+
+    .Phx8MQMVqqCZ0J {
+      font-weight: 400;
+      box-shadow: none;
+      margin: 0;
+      padding: 0
+    }
+
+    .Phx8MQMVqqCZ0J,
+    .Phx8MQMVqqCZ0J:active,
+    .Phx8MQMVqqCZ0J:focus,
+    .Phx8MQMVqqCZ0J:hover {
+      background: none
+    }
+
+    ._1siFqY_wpsPSG3 {
+      align-items: center;
+      color: rgba(9, 45, 66, .71);
+      display: flex;
+      margin-right: 8px;
+      padding: 0 24px 8px 12px
+    }
+
+    ._1siFqY_wpsPSG3:hover {
+      color: rgba(9, 45, 66, .77)
+    }
+
+    ._1siFqY_wpsPSG3:active {
+      color: rgba(9, 45, 66, .89)
+    }
+
+    ._1siFqY_wpsPSG3.JFnIM4cyxCW4i2 {
+      margin-bottom: -2px;
+      color: #026aa7;
+      border-bottom: 2px solid #5ba4cf
+    }
+
+    ._1siFqY_wpsPSG3:not(.JFnIM4cyxCW4i2) {
+      cursor: pointer;
+      text-decoration: none
+    }
+
+    @media only screen and (max-width:711px) {
+      ._1siFqY_wpsPSG3 {
+        width: 50%;
+        justify-content: center;
+        padding-right: 12px;
+        margin-right: 0
+      }
+    }
+
+    ._3hYkbx9cXEpKMY {
+      border-bottom: 2px solid rgba(9, 45, 66, .25);
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 20px
+    }
+
+    ._3r2K_p1t78v13f {
+      display: inline-block;
+      font-size: 14px;
+      margin-right: 2px;
+      color: #798d99
+    }
+
+    ._1siFqY_wpsPSG3:active ._3r2K_p1t78v13f,
+    ._1siFqY_wpsPSG3:hover ._3r2K_p1t78v13f {
+      color: #516b7a
+    }
+
+    ._1siFqY_wpsPSG3.JFnIM4cyxCW4i2 ._3r2K_p1t78v13f {
+      color: #0079bf
+    }
+
+    .n7c7W3-Oh51iK3 {
+      color: currentcolor !important
+    }
+  </style>
+  <style type="text/css">
+    ._1ozu8nWumEdfSO {
+      align-items: center;
+      background-color: rgba(9, 45, 66, .13);
+      border-radius: 18px;
+      color: rgba(9, 45, 66, .54);
+      display: flex;
+      font-size: 10px;
+      height: 16px;
+      justify-content: center;
+      min-width: 24px
+    }
+
+    ._30LjLtyl_xC8Nk._1ozu8nWumEdfSO,
+    button:active ._1ozu8nWumEdfSO,
+    button:hover ._1ozu8nWumEdfSO {
+      color: rgba(9, 45, 66, .71)
+    }
+
+    .jVUSRinC9UMLtG {
+      margin-top: 4px
+    }
+
+    .KgetaQ0wnnmuZ8:first-of-type .jVUSRinC9UMLtG {
+      margin-top: 0
+    }
+  </style>
+  <style type="text/css">
+    ._3gi8RFSqimzVVN {
+      background-color: #ebeef0;
+      border-radius: 4px;
+      color: #6b808c;
+      height: 24px;
+      justify-content: center;
+      padding: 8px
+    }
+
+    ._3gi8RFSqimzVVN,
+    ._32zvn7hBOkvPls {
+      align-items: center;
+      display: flex;
+      margin: -8px 8px 40px
+    }
+
+    ._32zvn7hBOkvPls {
+      border-top: 1px solid #ebeef0;
+      flex-direction: column;
+      padding: 16px
+    }
+
+    ._1XZuujGfKTmflR {
+      display: block
+    }
+
+    .WBsd9FQE6XUNNt {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 12px
+    }
+
+    ._1m0e6Cmgmi_jNr {
+      color: #6b808c
+    }
+  </style>
+  <style type="text/css">
+    ._37Ql83fSTKOPEc {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin: 0 16px 0 8px
+    }
+
+    ._12R7FIPlcbS_PP {
+      padding-bottom: 16px;
+      padding-left: 8px
+    }
+
+    ._2MnTDSwfGWAPv_ {
+      margin: -8px 0 16px
+    }
+
+    ._1iDzfp5SzeArAA {
+      flex: 0 0 auto;
+      padding-top: 40px;
+      width: 264px
+    }
+
+    @media only screen and (max-width:711px),
+    only screen and (max-width:1091px) and (min-width:712px) {
+      ._1iDzfp5SzeArAA {
+        display: none
+      }
+    }
+
+    @media only screen and (max-width:991px),
+    only screen and (max-width:1371px) and (min-width:992px) {
+      ._1iDzfp5SzeArAA._13SC-jLk3AXL-N {
+        display: none
+      }
+    }
+
+    ._3Kjkq_httzI5dw {
+      flex: 0 0 auto;
+      width: 436px
+    }
+  </style>
+  <link id="favicon" rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAD1ElEQVR4Xu1ba0hUQRT+bj5S01R0pVRqc0FCozQjIUsLy59ZWvqjB1pGQQbqD0kSzbDsTyUVRGmp5a8CXxCJFioiZGQPKInAXCWtXMX1/di1jbu6prbrveZ1nHXnwv7Ze+c7Z745M3POnDkcTD1efvfh6X8YMrkMHopROMl+w97JFlY21ibb0PBiQqPFyMA4BlSr0NViB5VShc7PpehoPmtMPe6fPxU7L8EvPBtbImjojnQ6fKoCml+lo+XN1ZmgswkIPPgN+xO9YW1jI51kipC0Gg1e3v2O9xU+Bq3+EhAU1YqIC3KK1F06VaruKNFUsokXMEmAb2gmDqWnUz+/paKEXycqrmXjS23WJAGRGTr47ZMK3jxwmmuA8iscB++teTieGw+OszIPzSXSUqebQHFSAYfQ+G6EnHSTCNa8YBoe93CIztbBN0S84j1tgPon0NsBjAyYbmfvBLh6Ac7rAfcN4vFnfrnUspprwCGhYAwyua0YDeUfnyDz9BHIPT0Q4L8ZLk5r5m1W+7oJ6sFhJN8qhHLbCTEipr8hIkulHOeQXD4Gu7WCBMSN1aDgRtaCOmH4WD04guTM6yhcLW6hJSZrtH+cQ2q1FlbW8y6A/Gi0Pn/4X52fSUJgbKKgJZCUhQntBIe0Gt28PetuR1msDyLDdy+KAL5xUWkl4ip/AW4bjWORlDWlgTABLY2oTTmAsODtiyagrvEd9t6sBhTBxrFIyhJNwNsS6KpuL7rzPIB6YAiu0WnAjijjeCRliSagvgi6+gJJCOBBuD1xAP8z9pCUxQiYZEB4DSA5KiRlMQtgFsCmAFsD2CLIdgG2DTI/QDAaJOmckJTFHCHmCDFHiDlCzBGizRGS8ESob3AYLlEXTZ8+UbkLUHkmSHJv7mlDWYxCuhPoF12CWSm6PEEAUuQF+oZGERBzXjAHQd8uMDUvF5MZ4juflJEjOgtFnQUYDot5S8hNiYeLo4M+D+ns6DDvyTSfc1B2duFy/jNRI28Ao5YAvYLd7UDfj6lMdL9pAuzXTmaiXdaZzjqZaE03AZJlI0wDMQKoCocJjPhcEcwCmAUI3Q8g6QmyKUCeAbYGCK4ByxCikrQDYQtYhhCVLgKWIUSli4BlCFGpI4BXiGSISpYAERclSYeoxAjQX5QUeVV2WikCISoxAvRXZc8Vj8PVa2XWCAkx2duhWfh1eSFQc3r/tQEcdh1TISzB3Zz0lkzXuvxuDh6KeziVd8YiS2YeJTxgRVN6c5IHpeFoTtaKLZicO2f4srmnqRlQfshhhZOzyLHo0lkDExZdPD3THCykfP4PBqb26dvM+EQAAAAASUVORK5CYII=">
+</head>
+
+<body style="">
+  <div id="root" style="display: none;"></div>
+  <div id="classic-body" class="chrome chrome-71 windows body-webkit-scrollbars body-card-label-text body-board-view"
+    style="background-color: rgb(0, 121, 191);">
+    <div id="nocss">
+      Your browser was unable to load all of Trello's resources. They may
+      have been blocked by your firewall, proxy or browser configuration.<br>
+      Press Ctrl+F5 or Ctrl+Shift+R to have your browser try again and if
+      that doesn't work, check out our{' '}
+      <a href="http://help.trello.com/article/771-loading-resources-from-trellos-cdn">
+        troubleshooting guide
+      </a>.
+      <hr>
+    </div>
+    <noscript classname="big-message">
+      <h1>To use Trello, please enable JavaScript.</h1>
+    </noscript>
+    <div id="classic">
+      <div class="_3-Xrz8XpMpyaUL">
+        <div id="boards-drawer">
+          <div class="boards-drawer">
+            <div class="boards-drawer-header">
+              <h3>Boards</h3>
+            </div>
+            <div class="board-drawer-content u-fancy-scrollbar"><input class="js-search-boards" type="text" name="search-boards"
+                placeholder="Find boards by name…">
+              <div class="js-board-drawer-boards">
+                <div>
+                  <p class="quiet u-text-align-center hide" style="margin: 6px 4px 0 0; padding: 8px 12px;">No Boards</p>
+                  <div class="starred-sidebar-boards-list js-starred-boards">
+                    <div>
+                      <div class="sidebar-section-header quiet js-sidebar-section-header bold"><span class="icon-sm icon-star sidebar-section-header-icon"></span><span
+                          class="sidebar-section-header-title">Starred Boards</span><span class="icon-sm icon-remove sidebar-section-header-toggle-icon dark-hover js-collapse-section"></span><span
+                          class="icon-sm icon-add sidebar-section-header-toggle-icon dark-hover js-expand-section hide"></span></div>
+                      <div class="js-section-content">
+                        <div class="js-starred-empty-state sidebar-starred-boards-empty-state">Star your most important
+                          boards to keep them right at your fingertips.</div>
+                        <ul class="sidebar-boards-list js-board-list hide ui-sortable" style=""></ul>
+                        <div><a class="dark-hover quiet-button js-show-all-section-boards hide" href="#"></a></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="js-recent-boards">
+                    <div>
+                      <div class="sidebar-section-header quiet js-sidebar-section-header bold"><span class="icon-sm icon-clock sidebar-section-header-icon"></span><span
+                          class="sidebar-section-header-title">Recent Boards</span><span class="icon-sm icon-remove sidebar-section-header-toggle-icon dark-hover js-collapse-section"></span><span
+                          class="icon-sm icon-add sidebar-section-header-toggle-icon dark-hover js-expand-section hide"></span></div>
+                      <div class="js-section-content">
+                        <div class="js-starred-empty-state sidebar-starred-boards-empty-state hide"></div>
+                        <ul class="sidebar-boards-list js-board-list">
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #0079BF;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/k7f08mBp/trello-folds-test-board"><span class="compact-board-tile-link-thumbnail"
+                                  style="background-color: #0079BF;"></span><span class="compact-board-tile-link-text details"><span
+                                    class="compact-board-tile-link-text-name" title="Trello Folds Test Board">Trello
+                                    Folds Test Board</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-close js-remove-board compact-board-tile-link-options-remove"
+                                    title="Click to remove this board from your recent boards."></span><span class="icon-sm icon-star compact-board-tile-link-options-star js-star-board"
+                                    title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #0079BF;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/waii4PCH/trello-folds-test-board-do-not-modify"><span class="compact-board-tile-link-thumbnail"
+                                  style="background-color: #0079BF;"></span><span class="compact-board-tile-link-text details"><span
+                                    class="compact-board-tile-link-text-name" title="Trello Folds Test Board DO NOT MODIFY">Trello
+                                    Folds Test Board DO NOT MODIFY</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-close js-remove-board compact-board-tile-link-options-remove"
+                                    title="Click to remove this board from your recent boards."></span><span class="icon-sm icon-star compact-board-tile-link-options-star js-star-board"
+                                    title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #838C91;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/8KVwbyfz/techdev"><span class="compact-board-tile-link-thumbnail" style="background-color: #838C91;"></span><span
+                                  class="compact-board-tile-link-text details"><span class="compact-board-tile-link-text-name"
+                                    title="Techdev">Techdev</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-close js-remove-board compact-board-tile-link-options-remove"
+                                    title="Click to remove this board from your recent boards."></span><span class="icon-sm icon-star compact-board-tile-link-options-star js-star-board"
+                                    title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                        </ul>
+                        <div><a class="dark-hover quiet-button js-show-all-section-boards hide" href="#">Show less
+                            active boards (0)</a></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="js-all-boards">
+                    <div>
+                      <div class="sidebar-section-header quiet js-sidebar-section-header bold"><span class="icon-sm icon-board sidebar-section-header-icon"></span><span
+                          class="sidebar-section-header-title">Personal Boards</span><span class="icon-sm icon-remove sidebar-section-header-toggle-icon dark-hover js-collapse-section"></span><span
+                          class="icon-sm icon-add sidebar-section-header-toggle-icon dark-hover js-expand-section hide"></span></div>
+                      <div class="js-section-content">
+                        <div class="js-starred-empty-state sidebar-starred-boards-empty-state hide"></div>
+                        <ul class="sidebar-boards-list js-board-list">
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #838C91;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/8KVwbyfz/techdev"><span class="compact-board-tile-link-thumbnail" style="background-color: #838C91;"></span><span
+                                  class="compact-board-tile-link-text details"><span class="compact-board-tile-link-text-name"
+                                    title="Techdev">Techdev</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-star compact-board-tile-link-options-star js-star-board" title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #0079BF;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/k7f08mBp/trello-folds-test-board"><span class="compact-board-tile-link-thumbnail"
+                                  style="background-color: #0079BF;"></span><span class="compact-board-tile-link-text details"><span
+                                    class="compact-board-tile-link-text-name" title="Trello Folds Test Board">Trello
+                                    Folds Test Board</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-star compact-board-tile-link-options-star js-star-board" title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                          <li class="compact-board-tile">
+                            <div class="compact-board-tile-wrapper"><span class="compact-board-tile-background" style="background-color: #0079BF;"></span><span
+                                class="compact-board-tile-fade"></span><a class="js-open-board compact-board-tile-link dark"
+                                href="/b/waii4PCH/trello-folds-test-board-do-not-modify"><span class="compact-board-tile-link-thumbnail"
+                                  style="background-color: #0079BF;"></span><span class="compact-board-tile-link-text details"><span
+                                    class="compact-board-tile-link-text-name" title="Trello Folds Test Board DO NOT MODIFY">Trello
+                                    Folds Test Board DO NOT MODIFY</span></span><span class="compact-board-tile-link-options"><span
+                                    class="compact-board-tile-link-options-unread js-unread" title="There is new activity on this board."></span><span
+                                    class="icon-sm icon-star compact-board-tile-link-options-star js-star-board" title="Click to star this board. It will show up at top of your boards list."></span></span></a></div>
+                          </li>
+                        </ul>
+                        <div><a class="dark-hover quiet-button js-show-all-section-boards hide" href="#">Show less
+                            active boards (0)</a></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="js-board-drawer-buttons">
+                <div><a class="quiet-button js-add-board" href="#">Create new board…</a><a class="quiet-button js-pin"
+                    href="#">Always keep this menu open.</a><a class="quiet-button hide js-unpin" href="#">Don’t keep
+                    this menu open.</a><a class="quiet-button js-open-closed-boards" href="#">See closed boards…</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="notification" style="display: none;"></p>
+        <div id="surface">
+          <div id="header"><a class="header-logo js-home-via-logo" href="/" aria-label="Trello Home"><span class="header-logo-loading"></span><span
+                class="header-logo-default"></span></a>
+            <div class="header-back-button"><a class="header-btn js-back-menu" href="/" aria-label="Back to Home"><span
+                  class="header-btn-icon icon-lg icon-house light"></span></a></div>
+            <div class="header-boards-button"><a class="header-btn header-boards js-boards-menu" href="#"><span class="header-btn-icon icon-lg icon-board light"></span><span
+                  class="header-btn-text">Boards</span></a></div>
+            <div><a class="header-btn open-search-btn js-open-search-page" href="/search" title="Search for boards, cards, members, and teams."><span
+                  class="header-btn-icon icon-lg icon-search light"></span></a>
+              <div class="header-search"><input class="header-search-input js-search-input js-disable-on-dialog" type="text"
+                  autocomplete="off" autocorrect="off" spellcheck="false" value=""><span class="header-search-icon icon-lg icon-search light js-search-icon"></span><span
+                  class="header-search-icon header-search-icon-close icon-lg icon-close light hide js-close-icon js-search-close"></span><a
+                  class="header-search-icon header-search-icon-open icon-lg icon-external-link light hide js-open-button js-open-search-page"
+                  href="#"></a></div>
+            </div>
+            <div><a class="header-btn header-woof woof-hide" href="#"><span class="taco-talk-small-icon"></span><span
+                  class="header-btn-text"><span class="left-arrow"></span><span class="js-phrase">New stuff!</span></span></a></div>
+            <div class="header-user"><a class="header-btn js-open-add-menu" href="#" aria-label="Create Board or Organization"><span
+                  class="header-btn-icon icon-lg icon-add light"></span></a><a class="header-btn header-info js-open-header-info-menu"
+                href="#" aria-label="Open Information Menu"><span class="header-btn-icon icon-lg icon-information light"></span></a><a
+                class="header-btn header-notifications js-open-header-notifications-menu other-notifications" href="#"
+                aria-label="Notifications"><span class="header-btn-icon icon-lg icon-notification light"></span></a><a
+                class="header-btn header-avatar js-open-header-member-menu" href="#" aria-label="Open Member Menu"><span
+                  class="member"><img class="member-avatar" height="30" width="30" src="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png"
+                    srcset="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png 1x, https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/50.png 2x"
+                    alt="Magnus Nord (magnusnord1)" title="Magnus Nord (magnusnord1)"><span id="539d5e1c7211ee99a8ef5b71-avatar"></span><span
+                    class="member-gold-badge" title="This member has Trello Gold."></span></span></a></div>
+          </div>
+          <div id="banners">
+            <div class="header-banner mod-warning logged-in-public-board-banner  hide"></div>
+            <div>
+              <div>
+                <div class="js-react-root">
+                  <div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="content">
+            <div class="board-wrapper">
+              <div class="board-main-content">
+                <div class="board-header u-clearfix js-board-header">
+                  <div class="board-header-btn board-header-btn-name inline-rename-board js-rename-board" href="#"><span
+                      class="js-board-editing-target board-header-btn-text" dir="auto">Trello Folds Test Board</span><input
+                      class="board-name-input js-board-name-input" aria-label="Trello Folds Test Board" spellcheck="false"
+                      dir="auto" maxlength="512" value="Trello Folds Test Board"></div><a class="board-header-btn js-star-board"
+                    href="#" title="Click to star or unstar this board. Starred boards show up at the top of your boards list."
+                    aria-label="Star or Unstar Board"><span class="icon-sm icon-star board-header-btn-icon"></span></a>
+                  <div class="board-header-btns mod-left"><a class="board-header-btn hide js-open-desc js-fill-desc"
+                      href="#"><span class="icon-sm icon-description board-header-btn-icon"></span></a><span class="board-header-btn-divider"></span><a
+                      class="board-header-btn board-header-btn-without-icon board-header-btn-text js-add-board-to-team"
+                      href="#">Personal</a><span class="board-header-btn-divider"></span><a id="permission-level" class="board-header-btn perms-btn js-change-vis"
+                      href="#" title="Only board members can see and edit this board."><span class="board-header-btn-icon icon-sm icon-private"></span><span
+                        class="board-header-btn-text">Private</span></a><span class="board-header-btn-divider js-collection-divider hide"></span><a
+                      class="board-header-btn hide js-collection" href="#"><img class="board-header-btn-icon icon-sm collection-icon-img dark-icon"
+                        src="https://a.trellocdn.com/prgb/dist/images/collections/collections-black.9dc0b9b8f7804172b734.svg"><img
+                        class="board-header-btn-icon icon-sm collection-icon-img light-icon" src="https://a.trellocdn.com/prgb/dist/images/collections/collections.0e197fd2ec35638b8d79.svg"></a></div><span
+                    class="board-header-btn-divider"></span>
+                  <div class="board-header-btns mod-left">
+                    <div class="board-header-facepile js-fill-facepile js-list-draggable-board-members">
+                      <div class="member js-member ui-draggable"><img class="member-avatar" height="30" width="30" src="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png"
+                          srcset="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png 1x, https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/50.png 2x"
+                          alt="Magnus Nord (magnusnord1)" title="Magnus Nord (magnusnord1)"><span id="539d5e1c7211ee99a8ef5b71-avatar"></span><span
+                          class="member-type admin" title="This member is an admin of this board."></span><span class="member-gold-badge"
+                          title="This member has Trello Gold."></span></div>
+                    </div>
+                    <div class="board-header-btns mod-left"><a id="member-count" class="board-header-btn board-header-btn-round pile js-open-show-all-board-members js-fill-board-member-count"
+                        href="#"></a><span id="member-count-notifications"></span></div><a class="board-header-btn board-header-btn-invite-btn-experiment board-header-btn-without-icon board-header-btn-text js-open-manage-board-members"
+                      href="#" title="Invite To Board">Share</a>
+                  </div>
+                  <div class="board-header-btns mod-left">
+                    <div class="guided-tour-tooltip guided-tour-tooltip-invite js-guided-tour-tooltip js-tool-tip-invite hide">
+                      <div class="guided-tour-tooltip-pointer"></div>
+                      <div class="guided-tour-tooltip-body">
+                        <h3>Invite Board Members</h3>Click here anytime to invite people to your board and start
+                        working together.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="board-header-btns mod-right"><a class="board-header-btn board-header-btn-filter-indicator hide js-filter-cards-indicator"
+                      href="#"><span class="icon-sm icon-filter board-header-btn-icon"></span><span class="board-header-btn-text u-text-underline">Filtering
+                        is on.</span><span class="icon-sm icon-close board-header-btn-icon-close js-filter-card-clear"></span></a><a
+                      class="board-header-btn sub-btn hide js-board-header-subscribed" href="#"><span class="icon-sm icon-subscribe board-header-btn-icon"></span><span
+                        class="board-header-btn-text u-text-underline">Watching</span></a><a class="board-header-btn calendar-btn hide js-calendar"
+                      href="#"><span class="icon-sm icon-calendar board-header-btn-icon"></span><span class="board-header-btn-text u-text-underline">Calendar</span></a><span
+                      class="js-plugin-header-btns"><span class="board-header-plugin-btns hide"></span></span><a class="board-header-btn mod-show-menu js-show-sidebar"
+                      href="#"><span class="icon-sm icon-overflow-menu-horizontal board-header-btn-icon"></span><span
+                        class="board-header-btn-text u-text-underline">Show Menu</span></a></div><span id="board-header-notification"></span>
+                </div>
+                <div class="board-warnings u-clearfix js-board-warnings hide"></div>
+                <div class="board-canvas">
+                  <div id="board" class="u-fancy-scrollbar js-no-higher-edits js-list-sortable ui-sortable">
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="list-header-name">Alpha</span></div>
+                      <div class="list js-list-content">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Alpha</h2><textarea class="list-header-name mod-list-name js-list-name-input"
+                            aria-label="Alpha" spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px;">Alpha</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"></span></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">5 cards</p>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"><a
+                            class="list-card js-member-droppable ui-droppable" href="/c/TTBPIwhN/9-a1">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"><span class="card-label card-label-green mod-card-front"
+                                  title="label1">label1</span></div><span class="list-card-title js-card-name" dir="auto"><span
+                                  class="card-short-id hide">#9</span>A1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/xAi69rCR/14-a2">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"><span class="card-label card-label-green mod-card-front"
+                                  title="label1">label1</span><span class="card-label card-label-yellow mod-card-front"
+                                  title="label2">label2</span></div><span class="list-card-title js-card-name" dir="auto"><span
+                                  class="card-short-id hide">#14</span>A2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/HgNxZAM1/15-a3">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"><span class="card-label card-label-green mod-card-front"
+                                  title="label1">label1</span><span class="card-label card-label-yellow mod-card-front"
+                                  title="label2">label2</span><span class="card-label card-label-orange mod-card-front"
+                                  title="label3">label3</span></div><span class="list-card-title js-card-name" dir="auto"><span
+                                  class="card-short-id hide">#15</span>A3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/XLPW0aIR/16-a4">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"><span class="card-label card-label-green mod-card-front"
+                                  title="label1">label1</span><span class="card-label card-label-yellow mod-card-front"
+                                  title="label2">label2</span><span class="card-label card-label-orange mod-card-front"
+                                  title="label3">label3</span><span class="card-label card-label-red mod-card-front"
+                                  title="label4">label4</span></div><span class="list-card-title js-card-name" dir="auto"><span
+                                  class="card-short-id hide">#16</span>A4</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/Gr2iipXc/17-a5">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"><span class="card-label card-label-green mod-card-front"
+                                  title="label1">label1</span><span class="card-label card-label-yellow mod-card-front"
+                                  title="label2">label2</span><span class="card-label card-label-orange mod-card-front"
+                                  title="label3">label3</span><span class="card-label card-label-red mod-card-front"
+                                  title="label4">label4</span><span class="card-label card-label-purple mod-card-front"
+                                  title="label5">label5</span></div><span class="list-card-title js-card-name" dir="auto"><span
+                                  class="card-short-id hide">#17</span>A5</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a></div><a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card hide">Add a card</span><span class="js-add-another-card">Add another
+                            card</span></a>
+                      </div>
+                      <div class="guided-tour-tooltip guided-tour-tooltip-card-front js-guided-tour-tooltip js-tool-tip-card-front hide">
+                        <div class="guided-tour-tooltip-pointer"></div>
+                        <div class="guided-tour-tooltip-body">
+                          <h3>Create your first card</h3>Click here to create a card. Keep the title short to make it
+                          easier to scan cards on your board.
+                        </div>
+                      </div>
+                      <div class="guided-tour-tooltip guided-tour-tooltip-card-back js-guided-tour-tooltip js-tool-tip-card-back hide">
+                        <div class="guided-tour-tooltip-pointer"></div>
+                        <div class="guided-tour-tooltip-body">
+                          <h3>Open a card to add details</h3>Click anywhere on a card to open it and add information to
+                          it.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="super-list-collapsed list collapsed-limit-exceeded"><span class="list-header-name"><span
+                            class="wip-limit-title"> <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">12
+                              / 3</span></span></span></div>
+                      <div class="super-list wip-limit-exceeded" style="height: 510px;"><span class="super-list-header">
+                          <div class="list-header-extras"><a class="list-header-extras-menu dark-hover" href="#"><span
+                                class="icon-sm icon-close dark-hover"></span></a></div><span class="wip-limit-title">
+                            <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">12 / 3</span></span>
+                        </span></div>
+                      <div style="display: none" class="super-list-collapsed list collapsed-limit-exceeded"><span class="list-header-name"><span
+                            class="wip-limit-title"> <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">12
+                              / 3</span></span></span></div>
+                      <div class="super-list wip-limit-exceeded" style="height: 510px;"><span class="super-list-header">
+                          <div class="list-header-extras"><a class="list-header-extras-menu dark-hover" href="#"><span
+                                class="icon-sm icon-close dark-hover"></span></a></div><span class="wip-limit-title">
+                            <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">12 / 3</span></span>
+                        </span></div>
+                      <div style="display: none" class="list-collapsed list collapsed-limit-exceeded"><span class="wip-limit-title">Bravo
+                        </span></div>
+                      <div class="list js-list-content sub-list">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Bravo [3]</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Beta [3]" spellcheck="false"
+                            dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px; display: none;">Beta [3]</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">11 cards</p><span class="wip-limit-title">Bravo
+                          </span>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"><a
+                            class="list-card js-member-droppable ui-droppable" href="/c/ive6Nwxu/5-b01">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#5</span>B0.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/NIJG8uNH/23-b02">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#23</span>B0.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/eM7oXgVS/24-b03">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#24</span>B0.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable section-card ui-droppable" href="/c/ug5pv2Md/6-beta-section-1"><span
+                              class="icon-expanded"></span><span id="section-title">Beta Section 1</span>
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto" style="display: none;"><span class="card-short-id hide">#6</span>## Beta
+                                Section 1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/ceZHssfe/7-b11">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#7</span>B1.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/McD21KSn/4-b12">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#4</span>B1.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/vPzHXvzB/22-b13">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#22</span>B1.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable section-card ui-droppable" href="/c/ra1vIWUA/18-beta-section-2"><span
+                              class="icon-expanded"></span><span id="section-title">Beta Section 2</span>
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto" style="display: none;"><span class="card-short-id hide">#18</span>## Beta
+                                Section 2 ##</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/YGeIEh9d/19-b21">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#19</span>B2.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/sAF4XO02/20-b22">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#20</span>B2.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/S2KkShTh/21-b23">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#21</span>B2.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a></div><a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card hide">Add a card</span><span class="js-add-another-card">Add another
+                            card</span></a>
+                      </div>
+                      <div class="guided-tour-tooltip guided-tour-tooltip-list js-guided-tour-tooltip js-tool-tip-list hide">
+                        <div class="guided-tour-tooltip-pointer"></div>
+                        <div class="guided-tour-tooltip-body">
+                          <h3>Make Lists Your Own</h3>Click on a list title to rename it. Or click and drag a whole
+                          list to reposition it on your board. Create as many lists as you like.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="wip-limit-title">Charlie
+                        </span></div>
+                      <div class="list js-list-content sub-list">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Charlie [3]</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Charlie [3]"
+                            spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px; display: none;">Charlie [3]</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">3 cards</p><span class="wip-limit-title">Charlie
+                          </span>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"><a
+                            class="list-card js-member-droppable blocked-card ui-droppable" href="/c/7FJmqSrp/1-c1">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name blocked-title"
+                                dir="auto"><span class="card-short-id hide">#1</span>C1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span>
+                                    <div class="badge"><span class="icon-sm icon-selection-mode blocked-badges"></span><span
+                                        class="badge-text blocked-badges">Blocked</span></div>
+                                    <div class="badge"><span class="badge-text blocked-badges">Team: Team Foo</span></div>
+                                  </span></span><span class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/U7fAWXa2/12-c2">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#12</span>C2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/QjnLbdWS/10-c3">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#10</span>C3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a></div><a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card hide">Add a card</span><span class="js-add-another-card">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list collapsed-limit-exceeded"><span class="wip-limit-title">Sub1
+                        </span></div>
+                      <div style="display: none" class="super-list-collapsed list collapsed-limit-exceeded"><span class="list-header-name"><span
+                            class="wip-limit-title">Delta <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">13
+                              / 5</span></span></span></div>
+                      <div class="super-list wip-limit-exceeded" style="height: 474px;"><span class="super-list-header">
+                          <div class="list-header-extras"><a class="list-header-extras-menu dark-hover" href="#"><span
+                                class="icon-sm icon-close dark-hover"></span></a></div><span class="wip-limit-title">Delta
+                            <span class="wip-limit-badge" style="background-color: rgb(176, 70, 50);">13 / 5</span></span>
+                        </span></div>
+                      <div class="list js-list-content sub-list">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Delta.Sub1 [5]</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Delta.Sub1 [5]"
+                            spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 50px; display: none;">Delta.Sub1 [5]</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a></div>
+                          <p class="list-header-num-cards hide js-num-cards">10 cards</p><span class="wip-limit-title">Sub1
+                          </span>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"><a
+                            class="list-card js-member-droppable ui-droppable" href="/c/Fp6dXrT2/13-ds101">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#13</span>D_S1_0.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/IsIyt5u2/8-ds102">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#8</span>D_S1_0.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable section-card ui-droppable" href="/c/weVlHFiQ/25-delta-sub1-section-1"><span
+                              class="icon-expanded"></span><span id="section-title">Delta Sub1 Section 1</span>
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto" style="display: none;"><span class="card-short-id hide">#25</span>## Delta
+                                Sub1 Section 1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/Z5N368O7/27-ds111">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#27</span>D_S1_1.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/Qo73Fnz8/28-ds112">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#28</span>D_S1_1.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/xCz4EhPX/29-ds113">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#29</span>D_S1_1.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable section-card ui-droppable" href="/c/vFEkXRrG/26-delta-sub1-section-2"><span
+                              class="icon-expanded"></span><span id="section-title">Delta Sub1 Section 2</span>
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto" style="display: none;"><span class="card-short-id hide">#26</span>#####
+                                Delta Sub1 Section 2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/oVCPYHat/30-ds121">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#30</span>D_S1_2.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/8T8v47zt/31-ds122">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#31</span>D_S1_2.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/EXTvMRZ2/32-ds123">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#32</span>D_S1_2.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a></div><a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card hide">Add a card</span><span class="js-add-another-card">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="list-header-name">Delta.Sub2</span></div>
+                      <div class="list js-list-content sub-list">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Delta.Sub2</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Delta.Sub2"
+                            spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px; display: none;">Delta.Sub2</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a></div>
+                          <p class="list-header-num-cards hide js-num-cards">6 cards</p><span class="wip-limit-title">Sub2
+                          </span>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"><a
+                            class="list-card js-member-droppable ui-droppable" href="/c/PJahpg7S/3-ds201">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#3</span>D_S2_0.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/VPcfAsYv/2-ds202">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#2</span>D_S2_0.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/2wvfNMIZ/11-ds203">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#11</span>D_S2_0.3</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable section-card ui-droppable" href="/c/ds8u0NIA/33-delta-sub2-section-1"><span
+                              class="icon-expanded"></span><span id="section-title">Delta Sub2 Section 1</span>
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto" style="display: none;"><span class="card-short-id hide">#33</span>## Delta
+                                Sub2 Section 1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/hvmeXJHy/34-ds211">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#34</span>D_S2_1.1</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a><a class="list-card js-member-droppable ui-droppable" href="/c/XiuKYr5R/35-ds212">
+                            <div class="list-card-cover js-card-cover"></div><span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                            <div class="list-card-stickers-area js-stickers-area hide">
+                              <div class="stickers js-card-stickers"></div>
+                            </div>
+                            <div class="list-card-details js-card-details">
+                              <div class="list-card-labels js-card-labels"></div><span class="list-card-title js-card-name"
+                                dir="auto"><span class="card-short-id hide">#35</span>D_S2_1.2</span>
+                              <div class="badges"><span class="js-badges"></span><span class="custom-field-front-badges js-custom-field-badges"><span></span></span><span
+                                  class="js-plugin-badges"><span></span></span></div>
+                              <div class="list-card-members js-list-card-members"></div>
+                            </div>
+                            <p class="list-card-dropzone">Drop files to upload.</p>
+                            <p class="list-card-dropzone-limited">Too many attachments.</p>
+                            <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+                          </a></div><a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card hide">Add a card</span><span class="js-add-another-card">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="list-header-name">Delta.Sub3</span></div>
+                      <div class="list js-list-content">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Delta.Sub3</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Delta.Sub3"
+                            spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px;">Delta.Sub3</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"></span></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">0 cards</p>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"></div><a
+                          class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card">Add a card</span><span class="js-add-another-card hide">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="wip-limit-title">Echo <span
+                            class="wip-limit-badge">0 / 5</span></span></div>
+                      <div class="list js-list-content">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Echo [5]</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Echo [5]" spellcheck="false"
+                            dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px; display: none;">Echo [5]</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"></span></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">0 cards</p><span class="wip-limit-title">Echo
+                            <span class="wip-limit-badge">0 / 5</span></span>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"></div><a
+                          class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card">Add a card</span><span class="js-add-another-card hide">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-list list-wrapper" style="position: relative;">
+                      <div style="display: none" class="list-collapsed list"><span class="list-header-name">Foxtrot</span></div>
+                      <div class="list js-list-content">
+                        <div class="list-header js-list-header u-clearfix is-menu-shown">
+                          <div class="list-header-target js-editing-target"></div>
+                          <h2 class="list-header-name-assist js-list-name-assist" dir="auto">Foxtrot</h2><textarea
+                            class="list-header-name mod-list-name js-list-name-input" aria-label="Foxtrot" spellcheck="false"
+                            dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 30px;">Foxtrot</textarea>
+                          <div class="list-header-extras"><span class="list-header-extras-subscribe js-list-subscribed hide"><span
+                                class="icon-lg icon-subscribe"></span></span><a class="list-header-extras-menu dark-hover js-open-list-menu icon-lg icon-overflow-menu-horizontal"
+                              href="#">
+                              <div></div>
+                            </a><a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"></span></a></div>
+                          <p class="list-header-num-cards hide js-num-cards">0 cards</p>
+                        </div>
+                        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable"></div><a
+                          class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span
+                            class="js-add-a-card">Add a card</span><span class="js-add-another-card hide">Add another
+                            card</span></a>
+                      </div>
+                    </div>
+                    <div class="js-add-list list-wrapper mod-add is-idle">
+                      <form><a class="open-add-list js-open-add-list" href="#"><span class="placeholder"><span class="icon-sm icon-add"></span>Add
+                            another list</span></a><input class="list-name-input" type="text" name="name" placeholder="Enter list title..."
+                          autocomplete="off" dir="auto" maxlength="512">
+                        <div class="list-add-controls u-clearfix"><input class="primary mod-list-add-button js-save-edit"
+                            type="submit" value="Add List"><a class="icon-lg icon-close dark-hover js-cancel-edit" href="#"></a></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="board-menu js-fill-board-menu hide">
+                <div class="board-menu-container">
+                  <div class="board-menu-tab-content">
+                    <div class="board-menu-header js-board-menu-title is-board-menu-default-view is-in-frame">
+                      <div class="board-menu-header-content"><a class="board-menu-header-back-button icon-lg icon-back js-pop-widget-view"
+                          href="#" title="Go back."></a>
+                        <h3 class="board-menu-header-title js-board-menu-title-text">Menu</h3><a class="board-menu-header-close-button icon-lg icon-close js-hide-sidebar"
+                          href="#" title="Close the board menu."></a>
+                      </div>
+                      <hr class="board-menu-header-divider">
+                    </div>
+                    <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
+                      <div class="board-menu-content-frame">
+                        <p class="error js-file-too-large" style="margin: 12px 0 6px; display:none;">File too large.
+                          10mb limit.</p>
+                        <ul class="board-menu-navigation">
+                          <li class="board-menu-navigation-item mod-background"><a class="board-menu-navigation-item-link js-change-background"
+                              href="#"><span class="board-menu-navigation-item-link-icon js-fill-background-preview"
+                                style="background-color: rgb(0, 121, 191);"></span>&nbsp;Change Background</a></li>
+                          <li class="board-menu-navigation-item"><a class="board-menu-navigation-item-link js-open-card-filter"
+                              href="#"><span class="icon-sm icon-filter board-menu-navigation-item-link-icon"></span>&nbsp;Filter
+                              Cards</a></li>
+                          <li class="board-menu-navigation-item"><a class="board-menu-navigation-item-link js-open-stickers"
+                              href="#"><span class="icon-sm icon-sticker board-menu-navigation-item-link-icon"></span>&nbsp;Stickers</a></li>
+                          <li class="board-menu-navigation-item"><a class="board-menu-navigation-item-link js-open-more"
+                              href="#"><span class="icon-sm icon-overflow-menu-horizontal board-menu-navigation-item-link-icon"></span>&nbsp;More</a></li>
+                        </ul>
+                        <hr>
+                        <ul class="board-menu-navigation">
+                          <li class="board-menu-navigation-item"><a class="board-menu-navigation-item-link js-open-power-ups"
+                              href="#"><span class="icon-sm icon-power-up board-menu-navigation-item-link-icon"></span>&nbsp;Power-Ups&nbsp;<span
+                                class="board-menu-navigation-item-link-count js-enabled-power-up-count">1</span><span
+                                class="board-menu-navigation-item-new js-power-up-new hide">New</span><span class="board-menu-navigation-item-link-warning js-power-up-disable-timer hide"></span>
+                              <div class="board-menu-navigation-item-link-summary">&nbsp;Calendar, Google Drive and
+                                more...</div>
+                            </a></li>
+                        </ul>
+                        <ul class="board-menu-navigation js-power-up-slots">
+                          <li class="board-menu-navigation-item mod-power-up-slot"><a class="board-menu-navigation-item-link mod-enabled"
+                              href="#"><span class="board-menu-navigation-item-link-icon mod-enabled" style="background-image: url(https://card-fields.trello.services/images/custom-fields-circular.svg)"></span>&nbsp;Custom
+                              Fields</a></li>
+                        </ul>
+                        <ul class="board-menu-navigation js-power-up-upsell-slots">
+                          <li class="board-menu-navigation-item mod-power-up-slot"><a class="board-menu-navigation-item-link js-power-up-slot-upsell"
+                              href="#"><span class="board-menu-navigation-item-link-icon"></span>&nbsp;Unlock more
+                              Power-Ups...</a></li>
+                        </ul>
+                        <hr><a class="board-menu-section-header js-open-activity" href="#"><span class="board-menu-section-header-icon icon-lg icon-activity"></span><span
+                            class="board-menu-section-header-title">Activity</span><span class="board-menu-section-header-count js-unread-activity-count"></span></a>
+                        <div class="js-menu-action-list">
+                          <div class="phenom mod-attachment-type">
+                            <div class="phenom-creator">
+                              <div class="member js-show-mem-menu" idmember="539d5e1c7211ee99a8ef5b71"><img class="member-avatar"
+                                  height="30" width="30" src="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png"
+                                  srcset="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png 1x, https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/50.png 2x"
+                                  alt="Magnus Nord (magnusnord1)" title="Magnus Nord (magnusnord1)"><span class="member-gold-badge"
+                                  title="This member has Trello Gold."></span></div>
+                            </div>
+                            <div class="phenom-desc"><span class="inline-member js-show-mem-menu" idmember="539d5e1c7211ee99a8ef5b71"><span
+                                  class="u-font-weight-bold">Magnus Nord</span></span> copied this board from another
+                              board</div>
+                            <div class="phenom-meta quiet"><span class="date js-hide-on-sending" dt="2019-02-10T13:46:06.105Z"
+                                href="" title="February 10, 2019 2:46 PM">36 minutes ago</span><span class="js-spinner hide"><span
+                                  class="spinner spinner--inline mod-left small"></span> Sending…&nbsp;</span></div>
+                          </div>
+                          <div class="phenom mod-attachment-type">
+                            <div class="phenom-creator">
+                              <div class="member js-show-mem-menu" idmember="539d5e1c7211ee99a8ef5b71"><img class="member-avatar"
+                                  height="30" width="30" src="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png"
+                                  srcset="https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/30.png 1x, https://trello-avatars.s3.amazonaws.com/8eb059ab05d2b32774b180838faea63a/50.png 2x"
+                                  alt="Magnus Nord (magnusnord1)" title="Magnus Nord (magnusnord1)"><span class="member-gold-badge"
+                                  title="This member has Trello Gold."></span></div>
+                            </div>
+                            <div class="phenom-desc"><span class="inline-member js-show-mem-menu" idmember="539d5e1c7211ee99a8ef5b71"><span
+                                  class="u-font-weight-bold">Magnus Nord</span></span> enabled the Custom Fields
+                              Power-Up</div>
+                            <div class="phenom-meta quiet"><span class="date js-hide-on-sending" dt="2019-02-10T13:46:06.073Z"
+                                href="" title="February 10, 2019 2:46 PM">36 minutes ago</span><span class="js-spinner hide"><span
+                                  class="spinner spinner--inline mod-left small"></span> Sending…&nbsp;</span></div>
+                          </div>
+                        </div><a class="show-more js-fill-activity-button js-open-activity" href="#">View all activity…</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="footer">
+            <div id="contact-us" style="display: none;">If you're having trouble loading Trello, <a href="http://help.trello.com/article/736-troubleshooting-browser-issues-with-trello"
+                target="support">check out our troubleshooting guide</a> or <a href="/contact?context=load-failure&amp;source=from%20in%20app%20footer"
+                target="contact">contact us</a>!</div>
+            <div id="footer-chrome" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="_12CFb1p8rKvr6X"></div>
+      <div tabindex="-1" class="SfJ6cPRUGPgPFd"></div>
+      <div class="_1cyB3mbofYLxk_"></div>
+      <div class="window-overlay">
+        <div class="window"><a class="focus-dummy" href="#"></a>
+          <div class="window-wrapper js-tab-parent"></div>
+        </div>
+      </div>
+      <div class="pop-over" style="left: 2233px; top: 367px;"></div>
+      <div class="tooltip-container"></div>
+      <div id="clipboard-container" style="display: none;"></div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    window.clientVersion = 'build-2646';
+    window.slackTrelloDomain = 'https://slack-chat.trello.services';
+    window.slackDomain = 'https://slack.com/oauth/authorize';
+    window.trelloForWebsites = 'https://p.trellocdn.com';
+    window.customFieldsId = '56d5e249a98895a9797bebb9';
+    window.firstPartyPluginsOrg = '5a999cd36066c584c097f193';
+
+    window.attachmentsDomain = "https://trello-attachments.s3.amazonaws.com";
+    window.avatarDomain = "https://trello-avatars.s3.amazonaws.com";
+    window.backgroundDomain = "https://trello-backgrounds.s3.amazonaws.com";
+    window.logoDomain = "https://trello-logos.s3.amazonaws.com";
+
+    window.oneDriveClientId = 'f7936f71-2186-4c33-8553-134e287aefdf';
+    window.googleDriveClientId = '28300235456-b801aqbc1i8luet9arr7sgll09t6eep9.apps.googleusercontent.com';
+    window.dropboxClientAppKey = '36ipz29apw2svq8';
+    window.boxClientId = 'zclwcvudmddhz0cscz3w6awtcfs8bne3';
+    window.braintreeClientToken = 'production_xv5hxtpx_p8hfn7hqkwk46fwb';
+
+    window.snowplowCloudfrontServer = 'c.trello.com';
+    window.analyticsWebClientEnv = 'PROD';
+    window.launchdarklyKey = '58f55132f1e0bb0cb6b2829e';
+    window.appcuesAccountId = '26999';
+  </script>
+  <script>
+    window.locale = 'en-US';
+  </script>
+
+
+  <script src="https://a.trellocdn.com/prgb/dist/manifest.23a43a13567a765cb0a3.js" crossorigin="anonymous" onerror="_failed(this)"></script>
+  <script>
+    TrelloPerf.startMeasurement(TrelloPerf.Keys.LTP);
+  </script>
+  <script src="https://a.trellocdn.com/prgb/dist/ltp.89441e11bf641c98c186.js" crossorigin="anonymous" onerror="_failed(this)"></script>
+  <script>
+    TrelloPerf.stopMeasurement(TrelloPerf.Keys.LTP);
+  </script>
+
+  <script src="https://a.trellocdn.com/prgb/dist/locale.en-US.943591e5b325e0e1da77.js" crossorigin="anonymous" onerror="_failed(this)"></script>
+  <script>
+    TrelloPerf.startMeasurement(TrelloPerf.Keys.APP);
+  </script>
+  <script src="https://a.trellocdn.com/prgb/dist/app.60e997b6ea797d0119e7.js" crossorigin="anonymous" onerror="_failed(this)"
+    onload="TrelloPerf.stopMeasurement(TrelloPerf.Keys.APP);"></script>
+  <script>
+    TrelloPerf.stopMeasurement(TrelloPerf.Keys.HTML);
+  </script>
+
+
+  <textarea tabindex="-1" style="position: absolute; top: -999px; left: 0px; right: auto; bottom: auto; border: 0px; padding: 0px; box-sizing: content-box; overflow-wrap: break-word; overflow: hidden; transition: none 0s ease 0s; height: 0px !important; min-height: 0px !important; width: 84px; font-family: &quot;Helvetica Neue&quot;, Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; font-style: normal; letter-spacing: 0px; text-transform: none; word-spacing: 0px; text-indent: 0px; white-space: pre-wrap; line-height: 20px;"
+    class="autosizejs" id="autosizejs"></textarea><iframe id="ssIFrame_google" sandbox="allow-scripts allow-same-origin"
+    aria-hidden="true" frame-border="0" src="https://accounts.google.com/o/oauth2/iframe#origin=https%3A%2F%2Ftrello.com&amp;rpcToken=518948849.89176685"
+    style="position: absolute; width: 1px; height: 1px; left: -9999px; top: -9999px; right: -9999px; bottom: -9999px; display: none;"></iframe>
+</body>
+
+</html>
