@@ -9,7 +9,7 @@ module.exports = function(grunt) {
         mochaTest: {
             test: {
                 options: {
-                    reporter: "min",
+                    reporter: "list",
                 },
                 src: ["test/**/*.tests.js"],
             },
@@ -26,7 +26,10 @@ module.exports = function(grunt) {
         },
     });
 
-    grunt.registerTask("test", "mochaTest");
+    //grunt.registerTask("test", "mochaTest");
+    grunt.registerTask("test", "Runs Mocha tests", function() {
+        grunt.task.run("mochaTest");
+    });
     grunt.registerTask("zip", "compress");
     grunt.registerTask("version-check", "Checks that package.json and manifest.json version matches", function() {
         let packageVer = grunt.config("pkg").version;
@@ -37,5 +40,14 @@ module.exports = function(grunt) {
         }
         grunt.log.writeln(`Versions match: ${packageVer}`);
     });
-    grunt.registerTask("build", ["version-check", "test", "zip"]);
+    grunt.registerTask("build", function() {
+        grunt.task.run("version-check");
+        let packageVersion = grunt.config("pkg").version;
+        if (grunt.file.exists(`dist/Trello-Folds-${packageVersion}.zip`)) {
+            grunt.fail.warn("File already exists");
+        }
+        grunt.option("reporter", "progress");
+        grunt.task.run("test");
+        grunt.task.run("zip");
+    });
 };
