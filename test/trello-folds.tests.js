@@ -177,4 +177,10 @@ describe('tfolds', function() {
             expect($span).to.have.text("3");
         });
     });
+
+    describe("addSuperList()", function() {
+        it("should add a DIV.super-list tag containing header elements before the left list");
+        it("should add a collapsed version of the super list");
+        it("should update super list WiP information and height");
+    });
 });
