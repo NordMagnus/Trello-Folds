@@ -972,40 +972,6 @@ const tfolds = (function (factory) {
             }
         },
 
-        // /**
-        //  *
-        //  */
-        // formatSections(attemptCount = 1) {
-        //     let $sections = tdom.getCardsByName(self.sectionIdentifier, false);
-
-        //     console.log("Formatting sections");
-
-        //     // if (!$sections.length) {
-        //     //     if (attemptCount < 3) {
-        //     //         setTimeout(() => {
-        //     //             console.log(`Trying to find sections again (attempt ${attemptCount + 1})`);
-        //     //             self.formatSections(attemptCount + 1);
-        //     //         }, 100);
-        //     //         return;
-        //     //     }
-        //     //     console.warn("No sections found");
-        //     // }
-
-        //     if (!$sections.length) {
-        //         console.info("No sections found (might simply be that there are none)");
-        //     }
-
-        //     $sections.each(function () {
-        //         // self.formatAsSection($(this));
-        //         console.log("Formatting section", this);
-        //         // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
-        //         // self.formatAsSection($(this));
-        //         setTimeout(() => {
-        //             self.formatAsSection($(this));
-        //         }, 100);
-        //     });
-        // },
-
         /**
          *
          */
