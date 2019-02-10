@@ -394,13 +394,13 @@ const tfolds = (function (factory) {
                     return;
                 }
                 $sections.each(function () {
-                    setTimeout(() => {
+                    requestAnimationFrame(() => {
                         const cardName = tdom.getCardName($(this));
                         if (sectionStates[self.getStrippedTitle(cardName)] === true) {
                             let $section = $(this).find(".icon-expanded");
                             self.toggleSection($section[0]);
                         }
-                    }, 150);
+                    });
                 });
             });
         },
@@ -950,25 +950,23 @@ const tfolds = (function (factory) {
             let cardName = tdom.getCardName($c);
             if (cardName.indexOf(self.sectionIdentifier) === 0) {
                 console.info(`CARD ${cardName} is a section`);
-                // HACK Would rather not depend on timeout here (added to draw correctly when switching board)
-                // self.formatAsSection($(this));
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     self.formatAsSection($c);
-                }, 100);
+                });
             } else if (cardName.indexOf("//") === 0) {
                 console.info(`CARD ${cardName} is a comment`);
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     $c.addClass("comment-card");
-                }, 100);
+                });
             } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
                 console.info(`CARD ${cardName} is BLOCKED`);
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     $c.addClass("blocked-card");
                     $c.find(".list-card-title").addClass("blocked-title");
                     $c.find("div.badge").children().addClass("blocked-badges");
                     // $c.find(".list-card-title").addClass("blocked-title");
                     // $c.find("div.badge").children().addClass("blocked-badges");
-                }, 100);
+                });
             }
         },
 
