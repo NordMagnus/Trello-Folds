@@ -649,13 +649,13 @@ const tdom = (function (factory) {
             $(cardEl).find("span.badge-text").each(function () {
                 let title = $(this).text();
                 let f = title.split(": ");
-                // Make sure it's a custom field
-                if (f.length !== 2) {
-                    return;
+                if (f.length === 2) {
+                    let fName = f[0];
+                    let fVal = f[1];
+                    fields[fName] = fVal;
+                } else {
+                    fields[title] = "true";
                 }
-                let fName = f[0];
-                let fVal = f[1];
-                fields[fName] = fVal;
             });
             return fields;
         },
