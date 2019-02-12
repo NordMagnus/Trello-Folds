@@ -949,23 +949,27 @@ const tfolds = (function (factory) {
             let $c = $(cardEl);
             let cardName = tdom.getCardName($c);
             if (cardName.indexOf(self.sectionIdentifier) === 0) {
-                console.info(`CARD ${cardName} is a section`);
+                if (config.debug) {
+                    console.info(`CARD ${cardName} is a section`);
+                }
                 requestAnimationFrame(() => {
                     self.formatAsSection($c);
                 });
             } else if (cardName.indexOf("//") === 0) {
-                console.info(`CARD ${cardName} is a comment`);
+                if (config.debug) {
+                    console.info(`CARD ${cardName} is a comment`);
+                }
                 requestAnimationFrame(() => {
                     $c.addClass("comment-card");
                 });
             } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
-                console.info(`CARD ${cardName} is BLOCKED`);
+                if (config.debug) {
+                    console.info(`CARD ${cardName} is blocked`);
+                }
                 requestAnimationFrame(() => {
                     $c.addClass("blocked-card");
                     $c.find(".list-card-title").addClass("blocked-title");
                     $c.find("div.badge").children().addClass("blocked-badges");
-                    // $c.find(".list-card-title").addClass("blocked-title");
-                    // $c.find("div.badge").children().addClass("blocked-badges");
                 });
             }
         },
