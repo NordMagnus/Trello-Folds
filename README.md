@@ -28,6 +28,7 @@ I'm working on this extension because I use the features myself, because it's fu
 
 | Version | Description                                                           |
 | ------- | --------------------------------------------------------------------- |
+| 0.4.0   | Added formatting of blocked cards and comment cards. Fixed bugs.      |
 | 0.3.1   | Fixed small bug related to combining lists. Fixed some timing issues. |
 | 0.3.0   | New feature: Combining lists.                                         |
 | 0.2.0   | Added option to always show card count. Other small fixes.            |
