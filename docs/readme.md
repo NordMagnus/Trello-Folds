@@ -19,32 +19,17 @@ I'm working on this extension because I use the features myself, because it's fu
 
 ## Table of Content <!-- omit in toc -->
 
-- [Version History](#version-history)
-- [Features](#features)
-  - [Collapse Lists](#collapse-lists)
-  - [List Sections](#list-sections)
-  - [WiP Limits](#wip-limits)
-  - [Always Count Cards](#always-count-cards)
-  - [Remembering Viewstates](#remembering-viewstates)
-  - [Combining Lists](#combining-lists)
-  - [Blocked Cards](#blocked-cards)
-  - [Comment Cards](#comment-cards)
+- [Collapse Lists](#collapse-lists)
+- [List Sections](#list-sections)
+- [WiP Limits](#wip-limits)
+- [Always Count Cards](#always-count-cards)
+- [Remembering Viewstates](#remembering-viewstates)
+- [Combining Lists](#combining-lists)
+- [Blocked Cards](#blocked-cards)
+- [Comment Cards](#comment-cards)
 - [Settings](#settings)
-- [Troubleshooting](#troubleshooting)
-  - [Q&A](#qa)
 
-## Version History
-
-| Version | Description                                                           |
-| ------- | --------------------------------------------------------------------- |
-| 0.3.1   | Fixed small bug related to combining lists. Fixed some timing issues. |
-| 0.3.0   | New feature: Combining lists.                                         |
-| 0.2.0   | Added option to always show card count. Other small fixes.            |
-| 0.1.0   | First release.                                                        |
-
-## Features
-
-### Collapse Lists
+## Collapse Lists
 
 With Trello Folds you can collapse lists to get more screen real estate.
 
@@ -56,7 +41,7 @@ When collapsing a list it will rotate 90 degrees. Pressing anywhere on the colla
 
 ![collapsed list](img/collapsed-list.png)
 
-### List Sections
+## List Sections
 
 List sections let you create collapsible groups inside lists. Sections are created using a special character repeated N times. The default is double hashtags (##). This can be configured in settings.
 
@@ -76,7 +61,7 @@ Sections are reformatted to hide the identifier (e.g. ##). Clicking on the arrow
 
 ![list with sections](img/list-with-sections.png)
 
-### WiP Limits
+## WiP Limits
 
 WiP (Work in Progress) is essential to create a Kanban system. To add a WiP limit to a board add the limit inside brackets after the title.
 
@@ -99,18 +84,18 @@ Collapsing a list with a WiP limit will still show the badge and top bar (if not
 ![collapsed reached](img/collapsed-with-wip-reached.png)
 ![collapsed exceeded](img/collapsed-with-wip-exceeded.png)
 
-### Always Count Cards
+## Always Count Cards
 
 Under settings you can choose to always show the card count even if the list does not have a WiP limit.
 
 ![list always count](img/list-always-count.png)
 ![collapsed always count](img/collapsed-always-count.png)
 
-### Remembering Viewstates
+## Remembering Viewstates
 
 The extension remembers the viestate of boards. This can be enabled/disabled in settings.
 
-### Combining Lists
+## Combining Lists
 
 You can combine two lists and give them a shared WiP limit by giving them the same prefix separated with a dot. 
 
@@ -126,14 +111,14 @@ You can combine two lists and give them a shared WiP limit by giving them the sa
 ![combined lists](img/combined-list-with-limit.png)
 ![combined collapsed](img/combined-list-collapsed.png)
 
-### Blocked Cards
+## Blocked Cards
 
 Using the Trello powerup *custom fields* and adding a checkbox field **Blocked** you can highlight blocked cards in the board.
 
 ![blocked custom field](img/custom-field-blocked.png)
 ![blocked card](img/blocked-card.png)
 
-### Comment Cards
+## Comment Cards
 
 You can add comments, descriptions, Defintion of Dones, etc. to the board by prefixing
 card title with //. The card will be reformatted and excluded from WiP limits.
@@ -151,19 +136,3 @@ Clicking the extension icon in the menu bar opens a popup window with settings.
 | Always count cards | Toggle if card count badge should be displayed for lists without WiP limits.                                                                                     |
 | Combining lists    | Turn combining lists on/off.                                                                                                                                     |
 | View State         | Toggle if list view states should be remembered. Here you can also dump view states to the dev console (F12) and see for how many boards view states are stored. |
-
-## Troubleshooting
-
-When filing a bug please include as much information as possible.
-
-In Chrome you can press F12 to open the JavaScript console. When the extension loads it will output some information that might give valuable clues. Please include any non-confidential information or refer to the output.
-
-![Dev console output](img/dev-console-output.png)
-
-### Q&A
-
-| Issue                                                      | Suggestion                                                                                                                   |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| I make a change but the board does not update accordingly. | First try to simply reload the page. If that does not work file a bug report here or on the support page in Chrome Web Store |
-| My view states are a mess                                  | In settings there's a button to clear view states. You can also dump the view states to the dev console (F12).               |
-
