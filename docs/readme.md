@@ -1,5 +1,3 @@
-<img style="float: left; margin-right: 10px; top: 15px; position: relative;" src="extension/icons/icon64.png"/>
-
 # Trello Folds <!-- omit in toc -->
 
 **Trello Folds** is a Chrome extension making it easier to work with big boards. It also adds features needed to use Trello for **Kanban** systems.
