@@ -1,5 +1,3 @@
-# Trello Folds <!-- omit in toc -->
-
 **Trello Folds** is a Chrome extension making it easier to work with big boards. It also adds features needed to use Trello for **Kanban** systems.
 
 **Trello Folds** works by scraping the Trello web page adding styling to the board. It does not exchange any data with the Trello server, Trello APIs or any other server.
