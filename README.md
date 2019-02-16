@@ -6,17 +6,18 @@
 
 **Trello Folds** works by scraping the Trello web page adding styling to the board. It does not exchange any data with the Trello server, Trello APIs or any other server.
 
-<div style="border-radius: 5px; font-weight: bold; border: solid 2px #808020; padding: 10px; background-color: #f0f0c0; margin-bottom: 20px;">
-Because Trello Folds relies on scraping Trello pages and applying new formatting I cannot guarantee that the extension works if Trello changes page content.
-</div>
+---
+
+**Because Trello Folds relies on scraping Trello pages and applying new formatting I cannot guarantee that the extension works if Trello changes page content.**
+
+---
+
 
 I'm working on this extension because I use the features myself, because it's fun to code, and because I like to contribute to the open source community. Feel free to use it as much as you want both for personal and commercial use.
 
-<div style="text-align: center">
-
-[<img src="img/PayPal-Donate.png">](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7G3FQTKZUSV66&currency_code=SEK&source=url)
-
-</div>
+<p align="center">
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7G3FQTKZUSV66&currency_code=SEK&source=url"><img src="img/PayPal-Donate.png"></a>
+</p>
 
 ## Table of Content <!-- omit in toc -->
 
@@ -95,19 +96,17 @@ Collapsing a list with a WiP limit will still show the badge and top bar (if not
 
 **Note!** Section and comment cards (see below) are of course excluded from WiP limits.
 
-<img style="float: left; position: relative; margin-right: 20px;" src="img/list-with-limit-reached.png"/>
-<img style="float: left; position: relative; margin-right: 20px;" src="img/list-with-limit-exceeded.png"/>
-<img style="float: left; position: relative; margin-right: 20px;" src="img/collapsed-with-wip-reached.png"/>
-<img style="" src="img/collapsed-with-wip-exceeded.png"/>
-<br/><br/>
+![list limit reached](img/list-with-limit-reached.png)
+![list limit exceeded](img/list-with-limit-exceeded.png)
+![collapsed reached](img/collapsed-with-wip-reached.png)
+![collapsed exceeded](img/collapsed-with-wip-exceeded.png)
 
 ### Always Count Cards
 
 Under settings you can choose to always show the card count even if the list does not have a WiP limit.
 
-<img style="float: left; position: relative; margin-right: 20px;" src="img/list-always-count.png"/>
-<img style="" src="img/collapsed-always-count.png"/>
-<br/><br/><br/>
+![list always count](img/list-always-count.png)
+![collapsed always count](img/collapsed-always-count.png)
 
 ### Remembering Viewstates
 
@@ -126,20 +125,15 @@ You can combine two lists and give them a shared WiP limit by giving them the sa
 
 *will be combined into one list with two columns. The WiP limit from the leftmost list is used.*
 
-<img style="float: left; position: relative; margin-right: 20px;" src="img/combined-list-with-limit.png"/>
-<img style="" src="img/combined-list-collapsed.png"/>
-<br/><br/><br/>
-<br/><br/><br/>
-<br/><br/><br/>
-<br/><br/><br/>
+![combined lists](img/combined-list-with-limit.png)
+![combined collapsed](img/combined-list-collapsed.png)
 
 ### Blocked Cards
 
 Using the Trello powerup *custom fields* and adding a checkbox field **Blocked** you can highlight blocked cards in the board.
 
-<img style="float: left; position: relative; margin-right: 20px;" src="img/custom-field-blocked.png"/>
-<img style="" src="img/blocked-card.png"/>
-<br/><br/>
+![blocked custom field](img/custom-field-blocked.png)
+![blocked card](img/blocked-card.png)
 
 ### Comment Cards
 
