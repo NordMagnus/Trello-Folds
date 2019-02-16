@@ -4,6 +4,8 @@
 
 **Trello Folds** works by scraping the Trello web page adding styling to the board. It does not exchange any data with the Trello server, Trello APIs or any other server.
 
+![Screenshot](img/screenshot.png)
+
 ---
 
 **Because Trello Folds relies on scraping Trello pages and applying new formatting I cannot guarantee that the extension works if Trello changes page content.**
