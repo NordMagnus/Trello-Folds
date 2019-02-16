@@ -1,1 +1,5 @@
 theme: jekyll-theme-slate
+title: "Trello Folds"
+description: "Kanban for Trello"
+show_downloads: "true"
+google_analytics: UA-134637333-1
