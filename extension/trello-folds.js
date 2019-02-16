@@ -189,14 +189,9 @@ const tfolds = (function (factory) {
         },
 
         /**
-         * This method is called when a list card changes. There are basically
-         * three changes that we need to handle:
-         * 1. A section card's title changed
-         * 2. A card was changed __into__ a section
-         * 3. A card was changed __from__ a section to a normal card
-         * In addition for item 2 and 3 above the list WIP has to be updated
-         *
-         * After checking all of that we still need to consider it might now be a comment card.
+         * This method is called when a list card changes.
+         * It checks if the card changed into a section or from being a section.
+         * It also checks if card is a *comment card*.
          *
          * @param {Element} cardEl The card that was modified
          * @param {String} title The new title
@@ -214,7 +209,7 @@ const tfolds = (function (factory) {
             self.checkSectionChange($c, title, oldTitle);
 
             if (!self.isSection(title)) {
-                if (title.indexOf("//") === 0) {
+                if (title.indexOf("//") !== -1) {
                     $c.addClass("comment-card");
                 }
             }
@@ -223,7 +218,12 @@ const tfolds = (function (factory) {
         },
 
         /**
-         *
+         * Checks if section state changed. There are basically
+         * three changes that we need to handle:
+         * 1. A section card's title changed
+         * 2. A card was changed __into__ a section
+         * 3. A card was changed __from__ a section to a normal card
+         * In addition for item 2 and 3 above the list WIP has to be updated
          */
         checkSectionChange($c, title, oldTitle) {
             if (!self.isSection(title) && !self.isSection(oldTitle)) {
@@ -242,11 +242,7 @@ const tfolds = (function (factory) {
              * Case 3: A card was changed from a section
              */
             if (!self.isSection(title)) {
-                console.log("CASE 2: Removing section");
-                $c.find("span.icon-expanded,span.icon-collapsed").remove();
-                $c.find("span#section-title").remove();
-                $c.find("span.list-card-title").show();
-                $c.removeClass("section-card");
+                self.removeSectionFormatting($c);
             } else {
                 /*
                  * Case 2: Was a normal card now a section
@@ -256,10 +252,21 @@ const tfolds = (function (factory) {
         },
 
         /**
+         * Removes any section formatting for the specified card.
+         *
+         * @param {jQuery} $card The card to strip
+         */
+        removeSectionFormatting($card) {
+            $card.find("span.icon-expanded,span.icon-collapsed").remove();
+            $card.find("span#section-title").remove();
+            $card.find("span.list-card-title").show();
+            $card.removeClass("section-card");
+        },
+
+        /**
          *
          */
         listTitleModified(list, title) {
-            console.log("listTitleModified()", list, title);
             let $l = $(list);
 
             if (self.isSubList($l)) {
@@ -310,7 +317,6 @@ const tfolds = (function (factory) {
          *
          */
         initStorage() {
-            // chrome.storage.sync.clear();
             boardId = tdom.getBoardIdFromUrl();
 
             chrome.storage.sync.get(["settings", boardId], result => {
@@ -321,6 +327,7 @@ const tfolds = (function (factory) {
                     }
                 }
                 if (result["settings"]) {
+                    // eslint-disable-next-line prefer-destructuring
                     settings = result["settings"];
                 }
                 storage = result[boardId] || {};
@@ -777,11 +784,10 @@ const tfolds = (function (factory) {
          */
         showWipLimit(listEl) {
             const $l = $(listEl);
-            // FIXME Exclude cards beginning with double slashes //
             let numCards = self.countWorkCards(listEl);
             let wipLimit = self.extractWipLimit(listEl);
             let subList = $l.data("subList");
-
+            self.removeWipLimit($l);
             if (subList > 0) {
                 self.addWipLimit($l, numCards);
                 self.updateSuperList($l, subList);
@@ -790,12 +796,8 @@ const tfolds = (function (factory) {
             } else if (wipLimit !== null) {
                 self.addWipLimit($l, numCards, wipLimit);
                 self.updateWipBars($l, numCards, wipLimit);
-            } else {
-                if (settings.alwaysCount === true) {
-                    self.addWipLimit($l, numCards);
-                } else {
-                    self.removeWipLimit($l);
-                }
+            } else if (settings.alwaysCount === true) {
+                self.addWipLimit($l, numCards);
             }
         },
 
