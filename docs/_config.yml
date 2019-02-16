@@ -1,5 +1,5 @@
 theme: jekyll-theme-cayman
 title: "Trello Folds"
 description: "Kanban features for Trello"
-show_downloads: false
+show_downloads: true
 google_analytics: UA-134637333-1
