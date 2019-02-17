@@ -26,6 +26,8 @@ const tfolds = (function (factory) {
         enableCombiningLists: false,
     };
 
+    let compactMode = false;
+
     let storage = {};
     let boardId;
 
@@ -86,6 +88,18 @@ const tfolds = (function (factory) {
 
         set enableCombiningLists(enableCombiningLists) {
             settings.enableCombiningLists = enableCombiningLists;
+        },
+
+        get compactMode() {
+            return compactMode;
+        },
+
+        set compactMode(status) {
+            compactMode = status;
+        },
+
+        get listWidth() {
+            return compactMode ? 200 : 272;
         },
 
         /**
@@ -369,6 +383,23 @@ const tfolds = (function (factory) {
                 self.clearViewState();
             }
             self.formatLists();
+
+            self.addBoardIcons();
+        },
+
+        /**
+         *
+         */
+        addBoardIcons() {
+            $("div.header-user").prepend(`<a id='toggle-compact-mode' class='header-btn compact-mode-disabled'>
+                                                <span class='header-btn-text'>Compact Mode</span></a>`);
+
+            $("a#toggle-compact-mode").click(function() {
+                compactMode = !compactMode;
+                $(this).toggleClass("compact-mode-enabled compact-mode-disabled");
+                $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
+                $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+            });
         },
 
         /**
@@ -934,7 +965,7 @@ const tfolds = (function (factory) {
         formatCards($canvas) {
             let $cards = tdom.getCardsByName("", false);
             if (config.debug) {
-                console.group("Formatting cards");
+                console.groupCollapsed("Formatting cards");
             }
             $cards.each(function() {
                 self.formatCard(this);
@@ -1019,7 +1050,7 @@ const tfolds = (function (factory) {
          *
          */
         expandList($list) {
-            $list.toggle().next().toggle().parent().css("width", "272px");
+            $list.toggle().next().toggle().parent().css("width", `${self.listWidth}px`);
             // TODO Instead of storing "false" remove setting(?)
             self.store(tdom.getListName($list.next()), "collapsed", false);
         },
@@ -1029,7 +1060,7 @@ const tfolds = (function (factory) {
          */
         expandSuperList($collapsedList) {
             let $superList = $collapsedList.toggle().siblings(".super-list");
-            $superList.toggle().parent().css("width", "272px").next().show();
+            $superList.toggle().parent().css("width", `${self.listWidth}px`).next().show();
             $superList.siblings(".sub-list").show();
             $superList.parent().next().find(".js-list-content").show();
             self.store(tdom.getListName($superList.siblings(".js-list-content")), "super-list-collapsed", false);
