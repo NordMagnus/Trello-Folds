@@ -576,5 +576,18 @@ describe('tfolds', () => {
         });
     });
 
+    describe("listWidth()", () => {
+        after(() => {
+            tfolds.compactMode = false;
+        });
+        it("should return 272 when compact mode disabled", () => {
+            tfolds.compactMode = true;
+            expect(tfolds.listWidth).to.equal(200);
+        });
+        it("should return 200 when compact mode enabled", () => {
+            tfolds.compactMode = false;
+            expect(tfolds.listWidth).to.equal(272);
+        });
+    });
 
 });
