@@ -146,3 +146,19 @@ span#section-title {
     position: relative;
     top: 5px;
 }
+
+.header-btn.compact-mode-enabled {
+    background-color: #539744;
+}
+
+.header-btn.compact-mode-enabled:hover {
+    background-color: #307010;    
+}
+
+.header-btn.compact-mode-disabled {
+   background-color: hsla(0,0%,100%,.3);
+}
+
+.header-btn.compact-mode-disabled:hover {
+    /* background-color: #862e28; */
+}
