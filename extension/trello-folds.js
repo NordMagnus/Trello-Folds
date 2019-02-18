@@ -34,6 +34,8 @@ const tfolds = (function (factory) {
     const LEFT_LIST = 1;
     const RIGHT_LIST = 2;
 
+    const GLOBAL_BOARD_SETTING_STRING = "trello-folds-board-settings";
+
     const self = {
 
         get config() {
@@ -385,22 +387,41 @@ const tfolds = (function (factory) {
             self.formatLists();
 
             self.addBoardIcons();
+
+            compactMode = self.retrieveGlobalBoardSetting("compactMode");
+            self.setCompactMode(compactMode);
         },
 
         /**
-         *
+         * Adds board wide buttons to the top bar.
          */
         addBoardIcons() {
             $("div.header-user").prepend(`<a id='toggle-compact-mode' class='header-btn compact-mode-disabled'>
                                                 <span class='header-btn-text'>Compact Mode</span></a>`);
-
             $("a#toggle-compact-mode").click(function() {
                 compactMode = !compactMode;
-                $(this).toggleClass("compact-mode-enabled compact-mode-disabled");
-                $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-                $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+                self.setCompactMode(compactMode);
             });
         },
+
+        /**
+         * Sets the compact mode for the current board and stores the setting.
+         *
+         * @param {boolean} enabled `true` if compact mode should be enabled, otherwise `false`
+         */
+        setCompactMode(enabled) {
+            let $btn = $("a#toggle-compact-mode");
+            if (enabled) {
+                $btn.addClass("compact-mode-enabled");
+                $btn.removeClass("compact-mode-disabled");
+            } else {
+                $btn.addClass("compact-mode-disabled");
+                $btn.removeClass("compact-mode-enabled");
+            }
+            $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
+            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+            self.storeGlobalBoardSetting("compactMode", enabled);
+    },
 
         /**
          *
@@ -413,14 +434,16 @@ const tfolds = (function (factory) {
         },
 
         /**
-         *
+         * Removes the view state for the board. Called when board is setup
+         * if the `store view state` has been disabled.
          */
         clearViewState() {
             chrome.storage.sync.remove(boardId);
         },
 
         /**
-         *
+         * Iterates section formatted cards and restores stored view states.
+         * Called at board setup.
          */
         restoreSectionsViewState() {
             const $lists = tdom.getLists();
@@ -444,12 +467,41 @@ const tfolds = (function (factory) {
         },
 
         /**
+         * Stores a board wide setting imitating a list setting for the list specified
+         * by GLOBAL_BOARD_SETTING_STRING. Of course, in the unlikely event someone has
+         * a list with that name this might fail. Implemented it like this for backward
+         * compatibility reasons.
+         *
+         * @param {String} key The preference to store
+         * @param {Object} value The new value of the preference
+         * @see #store()
+         */
+        storeGlobalBoardSetting(key, value) {
+            self.store(GLOBAL_BOARD_SETTING_STRING, key, value);
+        },
+
+        /**
+         * Retrieves a board wide setting.
+         *
+         * @param {String} key the preference to retrieve
+         * @see #storeGlobalBoardSetting()
+         * @see #retrieve()
+         */
+        retrieveGlobalBoardSetting(key) {
+            return self.retrieve(GLOBAL_BOARD_SETTING_STRING, key);
+        },
+
+        /**
          * Updates the Chrome storage with board viewstate. The chrome storage is organized as follows:
          * ```
          * boardId
          * +--+ listName
          *    +--- setting
          * ```
+         *
+         * @param {String} listName The list
+         * @param {String} key The preference to store
+         * @param {Object} value The preference new value
          */
         store(listName, key, value) {
             if (!boardId) {
@@ -470,7 +522,11 @@ const tfolds = (function (factory) {
         },
 
         /**
+         * Retrieves a list specific preference.
          *
+         * @param {String} listName The list
+         * @param {String} key The preference to retrieve
+         * @see #store()
          */
         retrieve(listName, key) {
             let value;
@@ -485,7 +541,7 @@ const tfolds = (function (factory) {
         },
 
         /**
-         *
+         * Applies extension specific formatting to all lists in the board.
          */
         formatLists() {
             self.combineLists();
@@ -518,7 +574,15 @@ const tfolds = (function (factory) {
         },
 
         /**
+         * Determines if two lists are related, i.e. have same dot separated prefix.
+         * For example
          *
+         * `listigt.sub1 listigt.sub2`
+         *
+         * will return `true`.
+         *
+         * @param {jQuery} $l1 The first list
+         * @param {jQuery} $l2 The second list
          */
         areListsRelated($l1, $l2) {
             const name1 = tdom.getListName($l1);
