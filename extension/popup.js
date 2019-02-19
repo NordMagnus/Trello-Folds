@@ -60,6 +60,17 @@ function updateSectionChar(reload = true) {
     }
 }
 
+function udpateCompactListWidth(reload = true) {
+    let width = document.getElementById("compact-list-width").value;
+
+    document.getElementById("compact-list").style.width = `${width}px`;
+
+    settings.settings.compactListWidth = width;
+    if (reload) {
+        storeAndReload(false);
+    }
+}
+
 function updateWipListBar(reload = true) {
     let enabled = document.getElementById("wip-list-bar").checked;
     settings.settings.enableTopBars = enabled;
@@ -134,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 rememberViewStates: true,
                 alwaysCount: false,
                 enableCombiningLists: false,
+                compactListWidth: 200,
             };
         }
         numOfViewStates = Object.keys(result).length - 1;
@@ -144,10 +156,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('num-view-states').innerText = numOfViewStates;
 
         document.getElementById('section-char').addEventListener('change', updateSectionChar);
-        document.getElementById('section-char').value = settings.settings.sectionChar;
+        document.getElementById('section-char').value = settings.settings.sectionChar || "#";
 
         document.getElementById('section-repeat').addEventListener('change', updateSectionChar);
-        document.getElementById('section-repeat').value = settings.settings.sectionRepeat;
+        document.getElementById('section-repeat').value = settings.settings.sectionRepeat || 2;
         updateSectionChar(false);
 
         document.getElementById('wip-list-bar').addEventListener('change', updateWipListBar);
@@ -162,11 +174,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('enable-combining-lists').checked = settings.settings.enableCombiningLists;
         updateCombiningLists(false);
 
+        document.getElementById('compact-list-width').addEventListener('change', udpateCompactListWidth);
+        document.getElementById('compact-list-width').value = settings.settings.compactListWidth || 200;
+        udpateCompactListWidth(false);
+
         document.getElementById('remember-view-states').addEventListener('change', updateRememberViewStates);
         document.getElementById('remember-view-states').checked = settings.settings.rememberViewStates;
 
         document.getElementById('clear-view-state').addEventListener('click', clearViewState);
         document.getElementById('clear-view-state').disabled = true;
+
         sendMessage("id", undefined, (boardId) => {
             if (boardId) {
                 document.getElementById('clear-view-state').disabled = false;

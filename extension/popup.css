@@ -9,6 +9,7 @@
 body {
     background: white;
 }
+
 h1 {
     font-size: 16pt;
     font-weight: bold;
@@ -34,7 +35,9 @@ h2 {
     border-bottom-right-radius: 5px;
 }
 
-.light-panel, .dark-panel, .panel {
+.light-panel,
+.dark-panel,
+.panel {
     padding: 10px;
     /* min-height: 50px; */
     color: black;
@@ -59,16 +62,24 @@ span {
     font-weight: bold;
 }
 
+.medium-field {
+    width: 40px;
+    text-align: center;
+    font-size: 9pt;
+    font-weight: bold;
+}
+
 .example-area {
     margin-top: 10px;
     margin-bottom: 10px;
     font-size: 8pt;
     color: #606060;
 }
+
 .example {
     color: #606060;
     margin-top: 10px;
-    background: rgba(128,128,128,0.3);
+    background: rgba(128, 128, 128, 0.3);
     font-family: 'Courier New', Courier, monospace;
     padding: 1px;
     padding-left: 3px;
@@ -79,4 +90,208 @@ span {
 button {
     font-weight: bold;
     font-size: 9pt;
+}
+
+.example-list-container {
+    background-color: #dee2e5;
+    box-sizing: border-box;
+    color: rgb(23, 57, 77);
+    display: inline-block;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    margin-bottom: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 0px;
+    position: relative;
+    text-size-adjust: 100%;
+    user-select: none;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 272px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+
+}
+
+.example-list {
+    background-color: rgb(223, 227, 230);
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    box-sizing: border-box;
+    color: rgb(23, 57, 77);
+    display: flex;
+    flex-direction: column;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: auto;
+    line-height: 20px;
+    max-height: 100%;
+    position: relative;
+    text-size-adjust: 100%;
+    user-select: none;
+    white-space: normal;
+}
+
+.example-list-header {
+    color: rgb(23, 57, 77);
+    display: block;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    flex-basis: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: 20px;
+    line-height: 20px;
+    min-height: 20px;
+    padding-bottom: 13px;
+    padding-left: 8px;
+    padding-right: 36px;
+    padding-top: 5px;
+    position: relative;
+    text-size-adjust: 100%;
+    user-select: none;
+    white-space: normal;
+}
+
+.example-header-name {
+    color: rgb(23, 57, 77);
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    margin-block-end: 8px;
+    margin-block-start: 0px;
+    margin-bottom: 8px;
+    margin-inline-end: 0px;
+    margin-inline-start: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    text-size-adjust: 100%;
+    unicode-bidi: isolate;
+    user-select: none;
+    white-space: normal;
+    /* width: auto */
+}
+
+.example-list-cards {
+    color: rgb(23, 57, 77);
+    display: block;
+    flex-basis: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: 40px;
+    line-height: 20px;
+    margin-bottom: 0px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 0px;
+    min-height: 0px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 0px;
+    text-size-adjust: 100%;
+    transform: matrix(1, 0, 0, 1, 0, 0);
+    user-select: none;
+    white-space: normal;
+    /* width: 256px; */
+    z-index: 1
+}
+
+.example-card {
+    background-color: rgb(255, 255, 255);
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    box-shadow: rgba(9, 45, 66, 0.25) 0px 1px 0px 0px;
+    color: rgb(23, 57, 77);
+    cursor: pointer;
+    display: block;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: 32px;
+    line-height: 20px;
+    margin-bottom: 8px;
+    /* max-width: 300px; */
+    min-height: 20px;
+    position: relative;
+    text-decoration-color: rgb(23, 57, 77);
+    text-decoration-line: none;
+    text-decoration-style: solid;
+    text-size-adjust: 100%;
+    user-select: none;
+    white-space: normal;
+    /* width: 256px; */
+    z-index: 0
+}
+
+.example-card-details {
+    color: rgb(23, 57, 77);
+    cursor: pointer;
+    display: block;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: 24px;
+    line-height: 20px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 6px;
+    position: relative;
+    text-size-adjust: 100%;
+    user-select: none;
+    white-space: normal;
+    /* width: 240px; */
+    z-index: 10
+}
+
+.example-card-title {
+    clear: both;
+    color: rgb(23, 57, 77);
+    cursor: pointer;
+    display: block;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 4px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    text-decoration-color: rgb(23, 57, 77);
+    text-decoration-line: none;
+    text-decoration-style: solid;
+    text-size-adjust: 100%;
+    unicode-bidi: isolate;
+    user-select: none;
+    white-space: normal;
+    /* width: 240px */
 }

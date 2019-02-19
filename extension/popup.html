@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,27 +9,29 @@
     <link rel="stylesheet" type="text/css" media="screen" href="popup.css" />
     <script src="popup.js"></script>
 </head>
+
 <body>
     <div class="content">
 
         <!--
             HEADING
         -->
-        <img src="icons/icon64.png" style="float: right; margin-right: 10px;"/><h1>Trello Folds</h1>
+        <img src="icons/icon64.png" style="float: right; margin-right: 10px;" />
+        <h1>Trello Folds</h1>
 
         <!--
             SECTION SETTINGS
         -->
         <div class="light-panel panel-first">
             <h2>Sections</h2>
-            <span>Use <input type="text" id="section-char" value="#" class="small-field"/> 
-                repeated <input type="text" id="section-repeat" value="2" class="small-field"/>
+            <span>Use <input type="text" id="section-char" value="#" class="small-field" />
+                repeated <input type="text" id="section-repeat" value="2" class="small-field" />
                 times to identify sections.
             </span>
 
             <div class="example-area">
-                Cards like <span id="section-example-1" class="example">## Section</span> and 
-                <span id="section-example-2" class="example">## Section ###</span> will be identified as sections. 
+                Cards like <span id="section-example-1" class="example">## Section</span> and
+                <span id="section-example-2" class="example">## Section ###</span> will be identified as sections.
             </div>
         </div>
 
@@ -38,13 +41,13 @@
         <div class="dark-panel">
             <h2>WiP Limits</h2>
             <input id="wip-list-bar" type="checkbox" name="list-bars" checked="true" />
-            <span>Add color bars at top of WiP lists to indicate work overflow</span><br/>
+            <span>Add color bars at top of WiP lists to indicate work overflow</span><br />
             <div class="example-area">
-                <span id="top-bar-example-text">Sections will get a top bar when WiP limit is exceeded.</span><br/><br/>
-                <img id="top-bar-img" src="img/List_Top_Bar.png"/>
+                <span id="top-bar-example-text">Sections will get a top bar when WiP limit is exceeded.</span><br /><br />
+                <img id="top-bar-img" src="img/List_Top_Bar.png" />
             </div>
         </div>
-        
+
         <!--
             CARD COUNT SETTINGS
         -->
@@ -53,8 +56,8 @@
             <input id="wip-always-count" type="checkbox" name="always-count" />
             <span>Show card count for lists without a WiP limit</span>
             <div class="example-area">
-                <span id="always-count-example-text">Card count will not show for lists without WiP limits.</span><br/><br/>
-                <img id="always-count-img" src="img/List_without_Count.png"/>
+                <span id="always-count-example-text">Card count will not show for lists without WiP limits.</span><br /><br />
+                <img id="always-count-img" src="img/List_without_Count.png" />
             </div>
         </div>
 
@@ -66,15 +69,43 @@
             <input id="enable-combining-lists" type="checkbox" name="list-combining" />
             <span>Enable combine list feature</span>
             <div class="example-area">
-                <span id="combining-lists-example-text">It is not possible to combine lists.</span><br/><br/>
-                <img id="combining-lists-img" src="img/Lists_not_Combined.png"/>
+                <span id="combining-lists-example-text">It is not possible to combine lists.</span><br /><br />
+                <img id="combining-lists-img" src="img/Lists_not_Combined.png" />
+            </div>
+        </div>
+
+        <!--
+            COMPACT mode
+        -->
+        <div class="light-panel">
+            <h2>Compact Mode</h2>
+            <span>Width for compact lists <input type="text" id="compact-list-width" value="200" class="medium-field" /> (list default width is 272)
+            </span>
+
+            <div class="example-area">
+                <div style="background-color: #1e79ba; padding: 5px; display: inline-block;">
+                <div id="compact-list" class="example-list-container" style="position: relative;">
+                    <div class="example-list">
+                        <div class="example-list-header">
+                            <span class="example-header-name" dir="auto">Compact List</span>
+                        </div>
+                        <div class="example-list-cards">
+                            <div class="example-card" href="">
+                                <div class="example-card-details">
+                                    <span class="example-card-title" dir="auto">Compact card</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
 
         <!--
             VIEW STATE SETTINGS
         -->
-        <div class="light-panel panel-last">
+        <div class="dark-panel panel-last">
             <h2>View State</h2>
             <input id="remember-view-states" type="checkbox" name="store-viewstate" checked="true" />
             <span>
@@ -86,18 +117,19 @@
                 i.e. expanded or collapsed, depending on how you left them.
             </div>
 
-            <span> 
+            <span>
                 <button id="clear-view-state">Clear view state</button> associated with the current board.
             </span>
-    
+
             <div class="example-area">
                 Pressing <i>Clear view state</i> removes all view state data associated
                 with the current board. The board will be reloaded and all lists and
                 sections will be expanded.
             </div>
-            <div class="example-area"> 
+            <div class="example-area">
                 View state data is stored for <span id="num-view-states">0</span> board(s).
-                <a id="dump-viewstate" href="#" style="color: #3050ff">Dump</a> the view state to the browser console. Intended
+                <a id="dump-viewstate" href="#" style="color: #3050ff">Dump</a> the view state to the browser console.
+                Intended
                 mainly for debugging purposes. (The console is accessible in the developer tools.)
             </div>
         </div>
@@ -105,11 +137,12 @@
         <!--
             FOOTER
         -->
-        <div style="margin-top: 10px; border-radius: 5px; color: white; background-color: #f26730;" class="panel example-area"> 
-                If you have a feature request or issue to report please visit the
-                extension GitHub page. Here you can also find some documentation and the code for the extension.
+        <div style="margin-top: 10px; border-radius: 5px; color: white; background-color: #f26730;" class="panel example-area">
+            If you have a feature request or issue to report please visit the
+            extension GitHub page. Here you can also find some documentation and the code for the extension.
         </div>
     </div>
 
 </body>
+
 </html>

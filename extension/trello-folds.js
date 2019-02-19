@@ -24,6 +24,7 @@ const tfolds = (function (factory) {
         rememberViewStates: true,
         alwaysCount: false,
         enableCombiningLists: false,
+        compactListWidth: 200,
     };
 
     let compactMode = false;
@@ -101,7 +102,7 @@ const tfolds = (function (factory) {
         },
 
         get listWidth() {
-            return compactMode ? 200 : 272;
+            return compactMode ? settings.compactListWidth : 272;
         },
 
         /**
