@@ -923,6 +923,23 @@ const tfolds = (function (factory) {
                     return;
                 }
             }
+            self.removeWipBar($l);
+        },
+
+        /**
+         *
+         */
+        removeWipLimit($l) {
+            $l.find("span.wip-limit-title").remove();
+            const $header = $l.find(".list-header");
+            $header.find("textarea").show();
+            self.removeWipBar($l);
+        },
+
+        /**
+         *
+         */
+        removeWipBar($l) {
             $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
             $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
         },
@@ -1013,15 +1030,6 @@ const tfolds = (function (factory) {
             }
 
             return $wipTitle;
-        },
-
-        /**
-         *
-         */
-        removeWipLimit($l) {
-            $l.find("span.wip-limit-title").remove();
-            const $header = $l.find(".list-header");
-            $header.find("textarea").show();
         },
 
         /**
