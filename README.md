@@ -6,6 +6,8 @@
 
 **Trello Folds** works by scraping the Trello web page adding styling to the board. It does not exchange any data with the Trello server, Trello APIs or any other server.
 
+![Animated GIF](img/Trello-Folds-Screencast-short.gif)
+
 Visit the [home page](https://nordmagnus.github.io/Trello-Folds/) for more information.
 
 ---
