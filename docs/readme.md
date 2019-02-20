@@ -2,7 +2,7 @@
 
 **Trello Folds** works by scraping the Trello web page adding styling to the board. It does not exchange any data with the Trello server, Trello APIs or any other server.
 
-![Screenshot](img/screenshot.png)
+![Screenshot](img/Trello-Folds-Screencast-short.gif)
 
 ---
 
@@ -13,10 +13,11 @@
 
 I'm working on this extension because I use the features myself, because it's fun to code, and because I like to contribute to the open source community. Feel free to use it as much as you want both for personal and commercial use.
 
+<!--
 <p align="center">
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7G3FQTKZUSV66&currency_code=SEK&source=url"><img src="img/PayPal-Donate.png"></a>
 </p>
-
+-->
 ## Table of Content <!-- omit in toc -->
 
 - [Collapse Lists](#collapse-lists)
