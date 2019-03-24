@@ -105,13 +105,6 @@ const tfolds = (function (factory) {
             return compactMode ? settings.compactListWidth : 272;
         },
 
-        /**
-         * Initializes the Squadification extension by adding a `MutationObserver`
-         * to the `DIV#content` element, and explicitly calling `setupBoard` in case
-         * the first board loaded is a Squadification board.
-         *
-         * @returns {MutationObserver} The instantiated observer
-         */
         initialize() {
             tdom.debug = config.debug;
             tdom.onBoardChanged(self.boardChanged);
@@ -422,7 +415,17 @@ const tfolds = (function (factory) {
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
             self.storeGlobalBoardSetting("compactMode", enabled);
-    },
+            /*
+             * Update heights of combined lists
+             */
+            let $leftSubLists = $("div.sub-list");
+            $leftSubLists.each(function() {
+                let $l = $(this);
+                if ($l.data("subList") === LEFT_LIST) {
+                    self.updateSuperListHeight($l);
+                }
+            });
+        },
 
         /**
          *
@@ -669,7 +672,7 @@ const tfolds = (function (factory) {
             if (!$l) {
                 throw new TypeError("Parameter [$l] undefined");
             }
-            return $l.data("subList");
+            return $l.data("subList") >= 1;
         },
 
         addSuperList(leftList) {
@@ -720,6 +723,46 @@ const tfolds = (function (factory) {
             }
         },
 
+        /**
+         *
+         * @param {*} listEl
+         */
+        getPairedList(listEl) {
+            if (!listEl) {
+                throw new TypeError("Parameter [$l] undefined");
+            }
+            let $l = $(listEl);
+            if (!self.isSubList($l)) {
+                throw new TypeError("Parameter [$l] not sublist");
+            }
+            let listPos = $l.data("subList");
+            if (listPos === LEFT_LIST) {
+                return tdom.getNextList(listEl);
+            }
+            return tdom.getPrevList(listEl);
+        },
+
+        /**
+         *
+         * @param {*} $subList
+         */
+        updateSuperListHeight($l) {
+            if (!$l) {
+                throw new TypeError("Parameter [$l] undefined");
+            }
+            if (!self.isSubList($l)) {
+                throw new TypeError("Parameter [$l] not sublist");
+            }
+            let pairedList = self.getPairedList($l[0]);
+            let $superList;
+            if ($l.data("subList") == 1) {
+                $superList = $l.siblings("div.super-list");
+            } else {
+                $superList = $(pairedList).siblings("div.super-list");
+            }
+            $superList.css("height", Math.max($l.height(), $(pairedList).height()));
+        },
+
         updateSuperList(subList, listPos) {
             let $superList = $(subList).siblings("div.super-list");
             let $title = $superList.find("span.super-list-header");
@@ -737,12 +780,10 @@ const tfolds = (function (factory) {
              * Get the WiP limit from the left list
              */
             let wipLimit;
-            let pairedList;
+            let pairedList = self.getPairedList(subList);
             if (listPos === LEFT_LIST) {
-                pairedList = tdom.getNextList(subList);
                 wipLimit = self.extractWipLimit(subList);
             } else {
-                pairedList = tdom.getPrevList(subList);
                 wipLimit = self.extractWipLimit(pairedList);
             }
             let totNumOfCards = self.countWorkCards(subList) + self.countWorkCards(pairedList);
@@ -756,8 +797,7 @@ const tfolds = (function (factory) {
             //     $wipTitle = $(`<span class="wip-limit-title">${title}</span>`);
             // }
             $title.append($wipTitle);
-            $superList.css("height", Math.max($(subList).height(), $(pairedList).height()));
-
+            self.updateSuperListHeight($(subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
             return $wipTitle;
@@ -1144,7 +1184,6 @@ const tfolds = (function (factory) {
          *
          */
         toggleSection(section) {
-            console.log(section);
             let $s = $(section);
             $s.toggleClass("icon-collapsed icon-expanded");
             let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
@@ -1159,6 +1198,10 @@ const tfolds = (function (factory) {
             const title = $s.next().text();
             listSections[title] = $s.hasClass("icon-collapsed");
             self.store(tdom.getListName($l), "sections", listSections);
+
+            if (self.isSubList($l)) {
+                self.updateSuperListHeight($l);
+            }
         },
 
     };
