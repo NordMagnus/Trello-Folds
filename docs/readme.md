@@ -26,8 +26,10 @@ I'm working on this extension because I use the features myself, because it's fu
 - [Always Count Cards](#always-count-cards)
 - [Remembering Viewstates](#remembering-viewstates)
 - [Combining Lists](#combining-lists)
+- [Compact Mode](#compact-mode)
 - [Blocked Cards](#blocked-cards)
 - [Comment Cards](#comment-cards)
+- [Refresh Button](#refresh-button)
 - [Settings](#settings)
 
 ## Collapse Lists
@@ -112,6 +114,14 @@ You can combine two lists and give them a shared WiP limit by giving them the sa
 ![combined lists](img/combined-list-with-limit.png)
 ![combined collapsed](img/combined-list-collapsed.png)
 
+## Compact Mode
+
+For big boards not fitting on screen you can enable **compact mode** decreasing list width
+to a custom value. The compact mode width is set from the extension popup window.
+
+![compact mode setting](img/compact-mode-setting.png)
+![compact mode button](img/compact-mode-button.png)
+
 ## Blocked Cards
 
 Using the Trello powerup *custom fields* and adding a checkbox field **Blocked** you can highlight blocked cards in the board.
@@ -126,6 +136,10 @@ card title with //. The card will be reformatted and excluded from WiP limits.
 
 ![Comment card](img/comment-card.png)
 
+## Refresh Button
+
+The **Refresh** button repaints extension related stuff in case it fails to do so when loading or reloading the board.
+
 ## Settings
 
 Clicking the extension icon in the menu bar opens a popup window with settings.
@@ -136,4 +150,5 @@ Clicking the extension icon in the menu bar opens a popup window with settings.
 | WiP Limits         | Here you decide if you want the extra top bar to indicate when WiP limits are reached/exceeded.                                                                  |
 | Always count cards | Toggle if card count badge should be displayed for lists without WiP limits.                                                                                     |
 | Combining lists    | Turn combining lists on/off.                                                                                                                                     |
+| Compact Mode       | Sets custom list width for compact mode.                            |
 | View State         | Toggle if list view states should be remembered. Here you can also dump view states to the dev console (F12) and see for how many boards view states are stored. |
