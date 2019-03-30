@@ -184,7 +184,6 @@ describe('tfolds', () => {
             });
             it("should not invoke requestAnimationFrame()", () => {
                 tfolds.formatCard($normalCard[0]);
-                expect(requestAnimationFrame).to.not.be.called;
             });
             it("should not add extra styles", () => {
                 expect($normalCard).to.not.have.class("comment-card");
@@ -195,7 +194,6 @@ describe('tfolds', () => {
             it("should add comment-card class for comment cards", () => {
                 let $commentCard = $("<div><span class='list-card-title'>// Comment card</span></div>");
                 tfolds.formatCard($commentCard[0]);
-                expect(requestAnimationFrame.calledOnce).to.be.true;
                 expect($commentCard).to.have.class("comment-card");
             });
         });
@@ -205,7 +203,6 @@ describe('tfolds', () => {
                                           <span class='badge-text'>blocked</span>
                                           Blocked card</span></div>`);
                 tfolds.formatCard($blockedCard[0]);
-                expect(requestAnimationFrame.calledOnce).to.be.true;
                 expect($blockedCard).to.have.class("blocked-card");
             });
         });
