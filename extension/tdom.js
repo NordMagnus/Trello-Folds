@@ -68,6 +68,7 @@ const tdom = (function (factory) {
     let handler = new EventHandler();
     let currentBoardId;
     let debug = false;
+    let newMutations = false;
 
     //#endregion PRIVATE MEMBERS
 
@@ -152,6 +153,25 @@ const tdom = (function (factory) {
                 console.info(`%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`, "font-weight: bold;");
             }
             self.connectObservers(boardId);
+
+            currentBoardId = boardId;
+
+            setTimeout(() => {
+                newMutations = true;
+                self.emitBoardEvent();
+            }, 100);
+        },
+
+        emitBoardEvent() {
+            if (!newMutations) {
+                console.info("Emitting BOARD_CHANGED event");
+                handler.emit(EventHandler.BOARD_CHANGED, currentBoardId);
+                return;
+            }
+            newMutations = false;
+            setTimeout(() => {
+                self.emitBoardEvent();
+            }, 50);
         },
 
         //#region EVENT MANAGEMENT
@@ -174,10 +194,6 @@ const tdom = (function (factory) {
             }
             self.connectBoardObserver($content);
             self.connectListObserver();
-
-            const oldBoardId = currentBoardId;
-            currentBoardId = boardId;
-            handler.emit(EventHandler.BOARD_CHANGED, oldBoardId, currentBoardId);
         },
 
         /**
@@ -244,6 +260,8 @@ const tdom = (function (factory) {
             }
 
             let listObserver = new MutationObserver(function (mutations) {
+                newMutations = true;
+                //console.dir(mutations);
                 mutations.forEach((m) => {
                     // console.dir(m);
                     if (m.addedNodes.length === 1 &&

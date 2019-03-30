@@ -130,7 +130,7 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        boardChanged(oldBoardId, newBoardId) {
+        boardChanged(boardId) {
             self.initStorage();
         },
 
@@ -195,6 +195,11 @@ const tfolds = (function (factory) {
                 $c.removeClass("blocked-card");
                 $c.find(".list-card-title").removeClass("blocked-title");
                 $c.find("div.badge").children().removeClass("blocked-badges");
+            }
+            let listEl = tdom.getContainingList(cardEl);
+            let $l = $(listEl);
+            if (self.isSubList($l)) {
+                self.updateSuperListHeight($l);
             }
         },
 
@@ -350,6 +355,7 @@ const tfolds = (function (factory) {
          * a new board is loaded.
          */
         setupBoard(attemptCount = 1) {
+            console.info(`setupBoard(${attemptCount})`);
             let $canvas = $("div.board-canvas");
             if (!$canvas.length) {
                 /*
@@ -373,29 +379,48 @@ const tfolds = (function (factory) {
 
             self.cleanupStorage();
             self.formatCards();
-            if (settings.rememberViewStates) {
-                self.restoreSectionsViewState();
-            } else {
-                self.clearViewState();
-            }
+
             self.formatLists();
 
             self.addBoardIcons();
 
             compactMode = self.retrieveGlobalBoardSetting("compactMode");
             self.setCompactMode(compactMode);
+
+            if (settings.rememberViewStates) {
+                setTimeout(() => {
+                    self.restoreSectionsViewState();
+                }, 200);
+            } else {
+                self.clearViewState();
+            }
+
         },
 
         /**
          * Adds board wide buttons to the top bar.
          */
         addBoardIcons() {
+            /*
+             * COMPACT MODE
+             */
             $("div.header-user").prepend(`<a id='toggle-compact-mode' class='header-btn compact-mode-disabled'>
                                                 <span class='header-btn-text'>Compact Mode</span></a>`);
             $("a#toggle-compact-mode").click(function() {
                 compactMode = !compactMode;
                 self.setCompactMode(compactMode);
             });
+
+            /*
+             * REFRESH BOARD
+             */
+            $("div.header-user").prepend(`<a id='refresh-board' class='header-btn'>
+                                                <span class='header-btn-text'>Refresh</span></a>`);
+            $("a#refresh-board").click(function() {
+                self.formatLists();
+                self.formatCards();
+            });
+
         },
 
         /**
@@ -459,13 +484,11 @@ const tfolds = (function (factory) {
                     return;
                 }
                 $sections.each(function () {
-                    requestAnimationFrame(() => {
-                        const cardName = tdom.getCardName($(this));
-                        if (sectionStates[self.getStrippedTitle(cardName)] === true) {
-                            let $section = $(this).find(".icon-expanded");
-                            self.toggleSection($section[0]);
-                        }
-                    });
+                    const cardName = tdom.getCardName($(this));
+                    if (sectionStates[self.getStrippedTitle(cardName)] === true) {
+                        let $section = $(this).find(".icon-expanded");
+                        self.toggleSection($section[0], false);
+                    }
                 });
             });
         },
@@ -800,6 +823,11 @@ const tfolds = (function (factory) {
             self.updateSuperListHeight($(subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
+            setTimeout(() => {
+                self.updateSuperListHeight($(subList));
+                $superList.css("display", "none");
+                $superList.css("display", "block");
+            }, 100);
             return $wipTitle;
         },
 
@@ -1098,25 +1126,19 @@ const tfolds = (function (factory) {
                 if (config.debug) {
                     console.info(`CARD ${cardName} is a section`);
                 }
-                requestAnimationFrame(() => {
-                    self.formatAsSection($c);
-                });
+                self.formatAsSection($c);
             } else if (cardName.indexOf("//") === 0) {
                 if (config.debug) {
                     console.info(`CARD ${cardName} is a comment`);
                 }
-                requestAnimationFrame(() => {
-                    $c.addClass("comment-card");
-                });
+                $c.addClass("comment-card");
             } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
                 if (config.debug) {
                     console.info(`CARD ${cardName} is blocked`);
                 }
-                requestAnimationFrame(() => {
-                    $c.addClass("blocked-card");
-                    $c.find(".list-card-title").addClass("blocked-title");
-                    $c.find("div.badge").children().addClass("blocked-badges");
-                });
+                $c.addClass("blocked-card");
+                $c.find(".list-card-title").addClass("blocked-title");
+                $c.find("div.badge").children().addClass("blocked-badges");
             }
         },
 
@@ -1124,6 +1146,9 @@ const tfolds = (function (factory) {
          *
          */
         formatAsSection($card) {
+            if ($card.find("#section-title").length !== 0) {
+                return;
+            }
             const $icon = $('<span class="icon-expanded"/>');
             $icon.click(function () {
                 tfolds.toggleSection(this);
@@ -1183,21 +1208,22 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        toggleSection(section) {
+        toggleSection(section, updateStorage = true) {
             let $s = $(section);
             $s.toggleClass("icon-collapsed icon-expanded");
             let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
             $cards.toggle();
 
-            // const listName = tdom.getListName(tdom.getContainingList(section));
-            const $l = $(tdom.getContainingList(section));
-            let listSections = self.retrieve(tdom.getListName($l), "sections");
-            if (!listSections) {
-                listSections = {};
+            if (updateStorage === true) {
+                const $l = $(tdom.getContainingList(section));
+                let listSections = self.retrieve(tdom.getListName($l), "sections");
+                if (!listSections) {
+                    listSections = {};
+                }
+                const title = $s.next().text();
+                listSections[title] = $s.hasClass("icon-collapsed");
+                self.store(tdom.getListName($l), "sections", listSections);
             }
-            const title = $s.next().text();
-            listSections[title] = $s.hasClass("icon-collapsed");
-            self.store(tdom.getListName($l), "sections", listSections);
 
             if (self.isSubList($l)) {
                 self.updateSuperListHeight($l);
