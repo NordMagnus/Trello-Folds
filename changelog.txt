@@ -1,23 +1,23 @@
 This extension adds foldable lists and sections to Trello boards, together with per list WiP limits turning your Trello board into a Kanban system.
 
-New in 0.5.0
+New in 0.5
 ====================
 - Bug fixes
 - Compact mode (set custom width from popup and enable using "Compact Mode" button
 - Added Refresh button (workaround for when board is not rendered correctly)
 
-New in 0.4.0
+New in 0.4
 ====================
 - Bug fixes
 - Formatting of blocked cards and comment cards
 - Added readme.md and website: https://nordmagnus.github.io/Trello-Folds/
 
-New in 0.3.1 
+New in 0.3
 ====================
 - Added ability to combine two adjacent lists by giving them same prefix ending with a dot. As an example "Develop.In Progress [4]" and "Develop.Ready" will be combined visually and given a combined WiP limit of 4. DISABLED BY DEFAULT IN THIS RELEASE - ENABLE IT IN SETTINGS
 - Fixed issue with section viewstates not being restored
 
-New in 0.2.0
+New in 0.2
 ====================
 - Added option to always show card count (even for lists without a WiP limit)
 - Minor small fixes

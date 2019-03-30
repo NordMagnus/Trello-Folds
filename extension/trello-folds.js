@@ -34,6 +34,7 @@ const tfolds = (function (factory) {
 
     const LEFT_LIST = 1;
     const RIGHT_LIST = 2;
+    const DEFAULT_COMPACT_WIDTH = 200;
 
     const GLOBAL_BOARD_SETTING_STRING = "trello-folds-board-settings";
 
@@ -102,7 +103,11 @@ const tfolds = (function (factory) {
         },
 
         get listWidth() {
-            return compactMode ? settings.compactListWidth : 272;
+            let width = 272;
+            if (compactMode) {
+                width = settings.compactListWidth || DEFAULT_COMPACT_WIDTH;
+            }
+            return width;
         },
 
         initialize() {
@@ -342,7 +347,6 @@ const tfolds = (function (factory) {
                     }
                 }
                 if (result["settings"]) {
-                    // eslint-disable-next-line prefer-destructuring
                     settings = result["settings"];
                 }
                 storage = result[boardId] || {};
@@ -355,7 +359,6 @@ const tfolds = (function (factory) {
          * a new board is loaded.
          */
         setupBoard(attemptCount = 1) {
-            console.info(`setupBoard(${attemptCount})`);
             let $canvas = $("div.board-canvas");
             if (!$canvas.length) {
                 /*
@@ -1214,8 +1217,9 @@ const tfolds = (function (factory) {
             let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
             $cards.toggle();
 
+            const $l = $(tdom.getContainingList(section));
+
             if (updateStorage === true) {
-                const $l = $(tdom.getContainingList(section));
                 let listSections = self.retrieve(tdom.getListName($l), "sections");
                 if (!listSections) {
                     listSections = {};
