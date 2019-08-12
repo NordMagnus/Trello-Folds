@@ -3,3 +3,6 @@ title: "Trello Folds"
 description: "Kanban features for Trello"
 show_downloads: true
 google_analytics: UA-134637333-1
+plugins:
+  - jekyll-seo-tag
+  
