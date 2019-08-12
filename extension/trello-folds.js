@@ -186,8 +186,10 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        cardAdded(cardEl) {
-            self.formatCard(cardEl);
+        ardAdded(cardEl) {
+            setTimeout(() => {
+                self.formatCard(cardEl);
+            }, 100);
         },
 
         cardBadgesModified(cardEl) {
@@ -407,8 +409,8 @@ const tfolds = (function (factory) {
             /*
              * COMPACT MODE
              */
-            $("div.header-user").prepend(`<a id='toggle-compact-mode' class='header-btn compact-mode-disabled'>
-                                                <span class='header-btn-text'>Compact Mode</span></a>`);
+            $("div.board-header-btns.mod-right").prepend(`<a id='toggle-compact-mode' class='board-header-btn board-header-btn-without-icon board-header-btn-text compact-mode-disabled'>
+                                                <span class=''>Compact Mode</span></a>`);
             $("a#toggle-compact-mode").click(function() {
                 compactMode = !compactMode;
                 self.setCompactMode(compactMode);
@@ -417,8 +419,8 @@ const tfolds = (function (factory) {
             /*
              * REFRESH BOARD
              */
-            $("div.header-user").prepend(`<a id='refresh-board' class='header-btn'>
-                                                <span class='header-btn-text'>Refresh</span></a>`);
+            $("div.board-header-btns.mod-right").prepend(`<a id='refresh-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
+                                                <span class=''>Refresh</span></a>`);
             $("a#refresh-board").click(function() {
                 self.formatLists();
                 self.formatCards();
@@ -1150,6 +1152,7 @@ const tfolds = (function (factory) {
          */
         formatAsSection($card) {
             if ($card.find("#section-title").length !== 0) {
+                console.log("Section title already exists");
                 return;
             }
             const $icon = $('<span class="icon-expanded"/>');
@@ -1162,6 +1165,9 @@ const tfolds = (function (factory) {
             $card.prepend($icon);
             $card.find('span.list-card-title').hide();
             $card.addClass("section-card");
+            // setTimeout(() => {
+            //     $card.hide().show(0);
+            // }, 100);
         },
 
         /**

@@ -1,5 +1,11 @@
 This extension adds foldable lists and sections to Trello boards, together with per list WiP limits turning your Trello board into a Kanban system.
 
+New in 0.6
+====================
+- Two bug fixes
+-- The first, caused by changes to Trello's DOM, caused "compact mode" and "refresh" buttons to disappear (Issue #37)
+-- The second was a timing issue causing section cards to not be drawn correctly as such when added (Issue #36)
+
 New in 0.5
 ====================
 - Bug fixes

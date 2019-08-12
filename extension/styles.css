@@ -147,18 +147,18 @@ span#section-title {
     top: 5px;
 }
 
-.header-btn.compact-mode-enabled {
-    background-color: #539744;
+.board-header-btn.compact-mode-enabled {
+    background-color: #539744 !important;
 }
 
-.header-btn.compact-mode-enabled:hover {
-    background-color: #307010;    
+.board-header-btn.compact-mode-enabled:hover {
+    background-color: #307010 !important;
 }
 
-.header-btn.compact-mode-disabled {
-   background-color: hsla(0,0%,100%,.3);
+.board-header-btn.compact-mode-disabled {
+   background-color: hsla(0,0%,100%,.3) !important;
 }
 
-.header-btn.compact-mode-disabled:hover {
+.board-header-btn.compact-mode-disabled:hover {
     /* background-color: #862e28; */
 }
