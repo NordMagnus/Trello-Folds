@@ -60,6 +60,7 @@ const tdom = (function (factory) {
     EventHandler.LIST_DRAGGED = Symbol("list_dragged");
     EventHandler.LIST_DROPPED = Symbol("list_dropped");
     EventHandler.BADGES_MODIFIED = Symbol("badges_modified");
+    EventHandler.REDRAW_BOARD_HEADER = Symbol("redraw_board_header");
 
     Object.freeze(EventHandler);
 
@@ -193,6 +194,7 @@ const tdom = (function (factory) {
                 throw ReferenceError(`DIV#board not found after ${attemptCount} attempts`);
             }
             self.connectBoardObserver($content);
+            self.connectHeaderObserver();
             self.connectListObserver();
         },
 
@@ -247,6 +249,34 @@ const tdom = (function (factory) {
             };
 
             boardObserver.observe($content[0], conf);
+        },
+
+        connectHeaderObserver() {
+            let $header = $("div.board-header");
+            if ($header.length === 0) {
+                console.error("Board header not found");
+                return;
+            }
+
+            let headerObserver = new MutationObserver(function (mutations) {
+                mutations.forEach((m) => {
+                    if (m.addedNodes.length === 1) {
+                        if ($(m.addedNodes[0]).hasClass("board-header-plugin-btns")) {
+                            // console.log(m.addedNodes);
+                            handler.emit(EventHandler.REDRAW_BOARD_HEADER);
+                        }
+                    }
+                });
+            });
+
+            let conf = {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree: true,
+            };
+
+            headerObserver.observe($header[0], conf);
         },
 
         /**
@@ -377,6 +407,10 @@ const tdom = (function (factory) {
          */
         onListTitleModified(callback) {
             handler.addListener(EventHandler.LIST_TITLE_MODIFIED, callback);
+        },
+
+        onRedrawBoardHeader(callback) {
+            handler.addListener(EventHandler.REDRAW_BOARD_HEADER, callback);
         },
 
         //#endregion EVENT MANAGEMENT

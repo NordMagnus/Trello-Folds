@@ -121,6 +121,7 @@ const tfolds = (function (factory) {
             tdom.onListDragged(self.listDragged);
             tdom.onListDropped(self.listDropped);
             tdom.onBadgesModified(self.cardBadgesModified);
+            tdom.onRedrawBoardHeader(self.addBoardIcons);
             tdom.init();
 
             /*
@@ -406,10 +407,14 @@ const tfolds = (function (factory) {
          * Adds board wide buttons to the top bar.
          */
         addBoardIcons() {
+            let $boardBtns = $("div.board-header-btns.mod-right");
+
+            $boardBtns.prepend('<span class="board-header-btn-divider"></span>');
+
             /*
              * COMPACT MODE
              */
-            $("div.board-header-btns.mod-right").prepend(`<a id='toggle-compact-mode' class='board-header-btn board-header-btn-without-icon board-header-btn-text compact-mode-disabled'>
+            $boardBtns.prepend(`<a id='toggle-compact-mode' class='board-header-btn board-header-btn-without-icon board-header-btn-text compact-mode-disabled'>
                                                 <span class=''>Compact Mode</span></a>`);
             $("a#toggle-compact-mode").click(function() {
                 compactMode = !compactMode;
@@ -419,7 +424,7 @@ const tfolds = (function (factory) {
             /*
              * REFRESH BOARD
              */
-            $("div.board-header-btns.mod-right").prepend(`<a id='refresh-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
+            $boardBtns.prepend(`<a id='refresh-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
                                                 <span class=''>Refresh</span></a>`);
             $("a#refresh-board").click(function() {
                 self.formatLists();
