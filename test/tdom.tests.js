@@ -234,15 +234,25 @@ describe('tdom', function() {
     });
 
     describe("countLabelsInList()", function() {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("getLabelColors()", function() {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("getCardsByLabels()", function() {
-        it("NO TESTS WRITTEN YET");
+        it("should return an empty array for a list without labels", function() {
+            let jList = tdom.getLists("Bravo");
+            let labels = tdom.countLabelsInList(jList);
+            expect(labels).to.be.empty;
+        });
+        it("should return an array with label counts for 'Alpha'", function() {
+            let jList = tdom.getLists("Alpha");
+            let labels = tdom.countLabelsInList(jList);
+            expect(labels).to.haveOwnProperty("label1");
+            expect(labels).to.haveOwnProperty("label2");
+            expect(labels).to.haveOwnProperty("label3");
+            expect(labels).to.haveOwnProperty("label4");
+            expect(labels).to.haveOwnProperty("label5");
+            expect(labels["label1"]).to.equal(5);
+            expect(labels["label2"]).to.equal(4);
+            expect(labels["label3"]).to.equal(3);
+            expect(labels["label4"]).to.equal(2);
+            expect(labels["label5"]).to.equal(1);
+        });
     });
 
     describe("containsAny()", function() {
