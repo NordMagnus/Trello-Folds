@@ -699,7 +699,7 @@ const tdom = (function (factory) {
                 throw new TypeError("Parameter [filter] undefined or not of type Array");
             }
 
-            let labels = [];
+            let labels = {};
 
             $(listEl).find("span.card-label").each(function () {
                 let title = $(this).attr("title");
@@ -713,35 +713,6 @@ const tdom = (function (factory) {
                 labels[title]++;
             });
             return labels;
-        },
-
-        /**
-         * Returns an associative array with label names and the color code as RGB(), e.g.
-         * ```
-         * {
-         *     "Label 1": "rgb(128,128,128)",
-         *     "Label 2": "rgb(255,128,128)"
-         * }
-         * ```
-         *
-         * @returns {Object} Associative arrow with label names as property names and color codes as values
-         */
-        getLabelColors() {
-            let labelColors = [];
-            $("div.board-canvas").find("span.card-label").each(function () {
-                let title = $(this).attr("title");
-                let bgCol = $(this).css("backgroundColor");
-                labelColors[title] = bgCol;
-            });
-            return labelColors;
-        },
-
-        /**
-         *
-         */
-        getCardsByLabels(title, filter) {
-            throw 'Not implemented'; // TODO Implement
-            // This could be used by tfolds.countTeamMembers()
         },
 
     };
