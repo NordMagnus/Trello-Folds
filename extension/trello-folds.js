@@ -186,7 +186,7 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        ardAdded(cardEl) {
+        cardAdded(cardEl) {
             setTimeout(() => {
                 self.formatCard(cardEl);
             }, 100);
