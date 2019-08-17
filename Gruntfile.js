@@ -7,11 +7,23 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON("package.json"),
         manifest: grunt.file.readJSON("extension/manifest.json"),
         mochaTest: {
-            test: {
+            all: {
                 options: {
                     reporter: "list",
                 },
                 src: ["test/**/*.tests.js"],
+            },
+            tdom: {
+                options: {
+                    reporter: "list",
+                },
+                src: ["test/**/tdom.tests.js"],
+            },
+            tfolds: {
+                options: {
+                    reporter: "list",
+                },
+                src: ["test/**/trello-folds.tests.js"],
             },
         },
         compress: {
@@ -26,10 +38,9 @@ module.exports = function(grunt) {
         },
     });
 
-    //grunt.registerTask("test", "mochaTest");
     grunt.registerTask("default", "test");
     grunt.registerTask("test", "Runs Mocha tests", function() {
-        grunt.task.run("mochaTest");
+        grunt.task.run("mochaTest:all");
     });
     grunt.registerTask("zip", "compress");
     grunt.registerTask("version-check", "Checks that package.json and manifest.json version matches", function() {
