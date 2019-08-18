@@ -116,6 +116,7 @@ const tfolds = (function (factory) {
             tdom.onListModified(self.listModified);
             tdom.onListAdded(self.listAdded);
             tdom.onCardAdded(self.cardAdded);
+            tdom.onCardRemoved(self.cardRemoved);
             tdom.onCardModified(self.cardModified);
             tdom.onListTitleModified(self.listTitleModified);
             tdom.onListDragged(self.listDragged);
@@ -191,6 +192,27 @@ const tfolds = (function (factory) {
             setTimeout(() => {
                 self.formatCard(cardEl);
             }, 100);
+        },
+
+        /**
+         * Called when a card is removed from a list. In practice this method
+         * is invoked when a card is dragged and used to expand cards when a section
+         * card is moved.
+         *
+         * @param {Element} cardEl
+         */
+        cardRemoved(cardEl) {
+            console.log(cardEl);
+            let $cardEl = $(cardEl);
+            console.log($cardEl);
+            if ($cardEl.hasClass("section-card")) {
+                $cardEl.find("div.list-card-details").css("opacity", "0.0");
+                //$cardEl.find("span#section-title").css("background-color", "#dfe3e6");
+                let $section = $cardEl.find(".icon-collapsed");
+                if ($section.length !== 0) {
+                    self.toggleSection($section[0]);
+                }
+            }
         },
 
         cardBadgesModified(cardEl) {
@@ -283,6 +305,7 @@ const tfolds = (function (factory) {
             $card.find("span.icon-expanded,span.icon-collapsed").remove();
             $card.find("span#section-title").remove();
             $card.find("span.list-card-title").show();
+            $card.find("div.list-card-details").css("opacity", "1.0");
             $card.removeClass("section-card");
         },
 
@@ -1223,12 +1246,23 @@ const tfolds = (function (factory) {
          *
          */
         toggleSection(section, updateStorage = true) {
+            let $l;
             let $s = $(section);
-            $s.toggleClass("icon-collapsed icon-expanded");
-            let $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
-            $cards.toggle();
+            let $cards;
 
-            const $l = $(tdom.getContainingList(section));
+            $s.toggleClass("icon-collapsed icon-expanded");
+
+            let $placeholder = $("a.list-card.placeholder");
+
+            if ($placeholder.length !== 0) {
+                $l = $(tdom.getContainingList($placeholder[0]));
+                $cards = $placeholder.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
+            } else {
+                $l = $(tdom.getContainingList(section));
+                $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
+            }
+
+            $cards.toggle();
 
             if (updateStorage === true) {
                 let listSections = self.retrieve(tdom.getListName($l), "sections");

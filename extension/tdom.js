@@ -307,7 +307,7 @@ const tdom = (function (factory) {
                     } else if (m.removedNodes.length > 0 &&
                         m.removedNodes[0].localName === "a" &&
                         $(m.removedNodes[0]).hasClass("list-card")) {
-                        handler.emit(EventHandler.CARD_REMOVED, m.removedNodes[0]);
+                       handler.emit(EventHandler.CARD_REMOVED, m.removedNodes[0]);
                         let $target = $(m.target);
                         if ($target.parent().length !== 0) {
                             handler.emit(EventHandler.LIST_MODIFIED, $target.closest("div.list")[0]);
@@ -385,6 +385,14 @@ const tdom = (function (factory) {
          */
         onCardAdded(callback) {
             handler.addListener(EventHandler.CARD_ADDED, callback);
+        },
+
+        /**
+         *
+         * @param {Function} callback
+         */
+        onCardRemoved(callback) {
+            handler.addListener(EventHandler.CARD_REMOVED, callback);
         },
 
         /**
@@ -532,9 +540,6 @@ const tdom = (function (factory) {
             }
             let $span = $card.find("span.list-card-title");
             if ($span.length === 0) {
-                if (self.debug === true) {
-                    console.warn("span.list-card-title element not found");
-                }
                 return;
             }
             let title = $card.find("span.list-card-title")
