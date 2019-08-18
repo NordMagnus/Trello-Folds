@@ -1169,25 +1169,19 @@ const tfolds = (function (factory) {
                 if (config.debug) {
                     console.info(`Card [${cardName}] is a section`);
                 }
-                setTimeout(() => {
-                    self.formatAsSection($c);
-                }, 10);
+                self.formatAsSection($c);
             } else if (cardName.indexOf("//") === 0) {
                 if (config.debug) {
                     console.info(`Card [${cardName}] is a comment`);
                 }
-                setTimeout(() => {
-                    $c.addClass("comment-card");
-                }, 10);
+                $c.addClass("comment-card");
             } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
                 if (config.debug) {
                     console.info(`Card [${cardName}] is blocked`);
                 }
-                setTimeout(() => {
-                    $c.addClass("blocked-card");
-                    $c.find(".list-card-title").addClass("blocked-title");
-                    $c.find("div.badge").children().addClass("blocked-badges");
-                }, 10);
+                $c.addClass("blocked-card");
+                $c.find(".list-card-title").addClass("blocked-title");
+                $c.find("div.badge").children().addClass("blocked-badges");
             }
         },
 
