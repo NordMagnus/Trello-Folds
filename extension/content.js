@@ -2,6 +2,8 @@
 
 console.info("%cRunning TRELLO FOLDS Chrome extension", "font-weight: bold; color: #0088ff;");
 
+let IS_DEV_MODE = !('update_url' in chrome.runtime.getManifest());
+
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
     if (request.msg === "dump") {
         chrome.storage.sync.get(null, function(items) {
@@ -21,6 +23,12 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
     }
 });
 
-tfolds.debug = true;
+if (IS_DEV_MODE) {
+    console.info("Running in developer mode, enabling debugging");
+    tfolds.debug = false;
+} else {
+    tfolds.debug = false;
+}
+
 tfolds.sectionCharacter = '#';
 tfolds.initialize();

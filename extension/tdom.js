@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 // eslint-disable-next-line no-unused-vars
 const tdom = (function (factory) {
     'use strict';
@@ -68,8 +69,17 @@ const tdom = (function (factory) {
 
     let handler = new EventHandler();
     let currentBoardId;
+    let oldBoardId;
     let debug = false;
     let newMutations = false;
+
+    // Mutation Observers
+    let loadObserver;
+    let boardObserver;
+    let headerObserver;
+    let listObserver;
+
+    let boardCompletelyLoaded = false;
 
     //#endregion PRIVATE MEMBERS
 
@@ -92,11 +102,7 @@ const tdom = (function (factory) {
          */
         init() {
             document.addEventListener('readystatechange', event => {
-                if (event.target.readyState === 'interactive') {
-//                    console.info("INTERACTIVE");
-                }
-                else if (event.target.readyState === 'complete') {
-//                    console.info("COMPLETE");
+                if (event.target.readyState === 'complete') {
                     self.initialize();
                 }
               });
@@ -119,15 +125,38 @@ const tdom = (function (factory) {
                 throw ReferenceError(`DIV#content not found after ${attemptCount} attempts`);
             }
 
-            // TODO Rename
             let initObserver = new MutationObserver(function (mutations) {
-                if (debug) {
+                if (self.debug) {
                     console.log("Init observer invoked");
                 }
 
                 if (mutations.length !== 0 && $(mutations[mutations.length - 1].addedNodes)) {
                     const boardId = self.getBoardIdFromUrl();
-                    console.info(`NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`);
+
+                    if (loadObserver) {
+                        if (debug) {
+                            console.log("Disconnecting load observer");
+                        }
+                        loadObserver.disconnect();
+                    }
+                    if (boardObserver) {
+                        if (debug) {
+                            console.log("Disconnecting board observer");
+                        }
+                        boardObserver.disconnect();
+                    }
+                    if (headerObserver) {
+                        if (debug) {
+                            console.log("Disconnecting header observer");
+                        }
+                        headerObserver.disconnect();
+                    }
+                    if (listObserver) {
+                        if (debug) {
+                            console.log("Disconnecting list observer");
+                        }
+                        listObserver.disconnect();
+                    }
                     if (currentBoardId !== boardId) {
                         self.boardChanged(boardId);
                     }
@@ -150,52 +179,104 @@ const tdom = (function (factory) {
          *
          */
         boardChanged(boardId) {
-            if (debug) {
-                console.info(`%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${currentBoardId})`, "font-weight: bold;");
-            }
-            self.connectObservers(boardId);
+            oldBoardId = currentBoardId;
+
+            console.info(`%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${oldBoardId})`, "font-weight: bold;");
+            self.watchForMutations(boardId);
 
             currentBoardId = boardId;
-
-            setTimeout(() => {
-                newMutations = true;
-                self.emitBoardEvent();
-            }, 100);
         },
-
-        emitBoardEvent() {
-            if (!newMutations) {
-                console.info("Emitting BOARD_CHANGED event");
-                handler.emit(EventHandler.BOARD_CHANGED, currentBoardId);
-                return;
-            }
-            newMutations = false;
-            setTimeout(() => {
-                self.emitBoardEvent();
-            }, 50);
-        },
-
-        //#region EVENT MANAGEMENT
 
         /**
          *
          */
-        connectObservers(boardId, attemptCount = 1) {
+        watchForMutations(boardId, attemptCount = 1) {
             let $content = $("DIV#board");
 
             if (!$content.length) {
                 if (attemptCount < 3) {
                     setTimeout(() => {
                         console.log(`Trying to find DIV#board again (attempt ${attemptCount + 1})`);
-                        self.connectObservers(boardId, attemptCount + 1);
+                        self.watchForMutations(boardId, attemptCount + 1);
                     }, 100);
                     return;
                 }
                 throw ReferenceError(`DIV#board not found after ${attemptCount} attempts`);
             }
-            self.connectBoardObserver($content);
-            self.connectHeaderObserver();
-            self.connectListObserver();
+
+            self.connectLoadObserver($content);
+
+            newMutations = true;
+            boardCompletelyLoaded = false;
+
+            self.connectObservers();
+        },
+
+        connectObservers(numCalls = 1) {
+            if(!newMutations && boardCompletelyLoaded) {
+                if (self.debug) {
+                    console.log(`Connecting observers - NO NEW MUTATIONS (after ${numCalls} calls)`);
+                }
+                loadObserver.disconnect();
+                self.connectBoardObserver($("DIV#board"));
+                self.connectHeaderObserver();
+                self.connectListObserver();
+
+                if (self.debug) {
+                    console.info("Emitting BOARD_CHANGED event");
+                }
+                handler.emit(EventHandler.BOARD_CHANGED, currentBoardId, oldBoardId);
+
+                return;
+            }
+            newMutations = false;
+            setTimeout(() => {
+                if (self.debug) {
+                    console.log("%cWaiting for board to load...", "font-style: italic; color: #808080;");
+                }
+                self.connectObservers(numCalls+1);
+            }, 100);
+        },
+
+        connectLoadObserver($content) {
+
+            if (debug) {
+                console.log("%c  Looking for DOM mutations during board change  ",
+                        "font-weight: bold; color: #40a022; background-color: #f0f0f0;");
+            }
+
+            loadObserver = new MutationObserver(function (mutations) {
+                newMutations = true;
+                for (let m of mutations) {
+                    if(m.addedNodes.length === 1 && m.target.className === "js-plugin-badges"
+                    && $(m.target).closest("a").next().length === 0) {
+                        let theList = $(self.getContainingList(m.target));
+                        let nextList = self.getNextList(theList);
+                        let done = true;
+                        while (nextList !== null) {
+                            if (self.countCards(nextList) !== 0) {
+                                done = false;
+                                break;
+                            }
+                            nextList = self.getNextList(nextList);
+                        }
+                        boardCompletelyLoaded = done;
+                        if (done) {
+                            console.info("%c  BOARD COMPLETELY LOADED!  ",
+                                "font-weight: bold; color: #40a022; background-color: #f0f0f0;");
+                        }
+                    }
+                }
+            });
+
+            let conf = {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree: true,
+            };
+
+            loadObserver.observe($content[0], conf);
         },
 
         /**
@@ -204,17 +285,11 @@ const tdom = (function (factory) {
          */
         connectBoardObserver($content) {
 
-            let boardObserver = new MutationObserver(function (mutations) {
+            boardObserver = new MutationObserver(function (mutations) {
                 let isDropped = false;
                 let addedList;
 
                 for (let m of mutations) {
-                    // if (m.addedNodes.length !== 0) {
-                    //     console.info(m.addedNodes);
-                    //     if ($(m.addedNodes[0]).hasClass("is-icon-only")) {
-                    //         console.error("BOARD LOADED", m.addedNodes[0]);
-                    //     }
-                    // }
                     if (m.addedNodes.length === 1 &&
                         m.addedNodes[0].localName === "div" &&
                         $(m.addedNodes).hasClass("placeholder")) {
@@ -258,7 +333,7 @@ const tdom = (function (factory) {
                 return;
             }
 
-            let headerObserver = new MutationObserver(function (mutations) {
+            headerObserver = new MutationObserver(function (mutations) {
                 mutations.forEach((m) => {
                     if (m.addedNodes.length === 1) {
                         if ($(m.addedNodes[0]).hasClass("board-header-plugin-btns")) {
@@ -285,13 +360,15 @@ const tdom = (function (factory) {
         connectListObserver() {
             let $lists = $("div.list");
 
+            if (self.debug) {
+                console.log("connectListObserver()", `# of lists: ${$lists.length}`);
+            }
+
             if ($lists.length === 0) {
                 return;
             }
 
-            let listObserver = new MutationObserver(function (mutations) {
-                newMutations = true;
-                //console.dir(mutations);
+            listObserver = new MutationObserver(function (mutations) {
                 mutations.forEach((m) => {
                     // console.dir(m);
                     if (m.addedNodes.length === 1 &&
@@ -322,6 +399,15 @@ const tdom = (function (factory) {
                         handler.emit(EventHandler.LIST_TITLE_MODIFIED, $(m.target).closest("div.list"),
                             m.addedNodes[0].textContent);
                     }
+
+                    // if (m.addedNodes.length === 1 && m.target.className === "js-plugin-badges") {
+                    //     console.info(`List name: ${self.getListName(self.getContainingList(m.target))}`);
+                    //     console.info("%cHallelujah!", "font-weight: bold; color: red;");
+                    // }
+
+                    // } else if (m.removedNodes.length !== 0) {
+                    //     console.dir(m);
+                    // }
                 });
             });
 
@@ -336,6 +422,8 @@ const tdom = (function (factory) {
                 listObserver.observe(this, conf);
             });
         },
+
+        //#region EVENT MANAGEMENT
 
         get events() {
             // ? Is this needed - should use convenience methods instead

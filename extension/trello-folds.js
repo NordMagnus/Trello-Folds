@@ -32,6 +32,8 @@ const tfolds = (function (factory) {
     let storage = {};
     let boardId;
 
+    let oldBoardId;
+
     const LEFT_LIST = 1;
     const RIGHT_LIST = 2;
     const DEFAULT_COMPACT_WIDTH = 200;
@@ -42,6 +44,10 @@ const tfolds = (function (factory) {
 
         get config() {
             return config;
+        },
+
+        get debug() {
+            return config.debug;
         },
 
         /**
@@ -137,7 +143,11 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        boardChanged(boardId) {
+        boardChanged(boardId, oldId) {
+            if (self.debug) {
+                console.log(`boardId=${boardId},oldId=${oldId}`);
+            }
+            oldBoardId = oldId;
             self.initStorage();
         },
 
@@ -202,7 +212,6 @@ const tfolds = (function (factory) {
          * @param {Element} cardEl
          */
         cardRemoved(cardEl) {
-            console.log(cardEl);
             let $cardEl = $(cardEl);
             console.log($cardEl);
             if ($cardEl.hasClass("section-card")) {
@@ -1154,24 +1163,31 @@ const tfolds = (function (factory) {
          */
         formatCard(cardEl) {
             let $c = $(cardEl);
+
             let cardName = tdom.getCardName($c);
             if (cardName.indexOf(self.sectionIdentifier) === 0) {
                 if (config.debug) {
-                    console.info(`CARD ${cardName} is a section`);
+                    console.info(`Card [${cardName}] is a section`);
                 }
-                self.formatAsSection($c);
+                setTimeout(() => {
+                    self.formatAsSection($c);
+                }, 10);
             } else if (cardName.indexOf("//") === 0) {
                 if (config.debug) {
-                    console.info(`CARD ${cardName} is a comment`);
+                    console.info(`Card [${cardName}] is a comment`);
                 }
-                $c.addClass("comment-card");
+                setTimeout(() => {
+                    $c.addClass("comment-card");
+                }, 10);
             } else if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
                 if (config.debug) {
-                    console.info(`CARD ${cardName} is blocked`);
+                    console.info(`Card [${cardName}] is blocked`);
                 }
-                $c.addClass("blocked-card");
-                $c.find(".list-card-title").addClass("blocked-title");
-                $c.find("div.badge").children().addClass("blocked-badges");
+                setTimeout(() => {
+                    $c.addClass("blocked-card");
+                    $c.find(".list-card-title").addClass("blocked-title");
+                    $c.find("div.badge").children().addClass("blocked-badges");
+                }, 10);
             }
         },
 
@@ -1179,8 +1195,13 @@ const tfolds = (function (factory) {
          *
          */
         formatAsSection($card) {
+            if (self.debug) {
+                console.log(`Formatting as section: ${tdom.getCardName($card)}`);
+            }
             if ($card.find("#section-title").length !== 0) {
-                console.log("Section title already exists");
+                if (self.debug) {
+                    console.log("Section title already exists");
+                }
                 return;
             }
             const $icon = $('<span class="icon-expanded"/>');
@@ -1189,13 +1210,11 @@ const tfolds = (function (factory) {
                 return false;
             });
             const strippedTitle = self.getStrippedTitle(tdom.getCardName($card));
+
             $card.prepend(`<span id="section-title">${strippedTitle}</span>`);
             $card.prepend($icon);
             $card.find('span.list-card-title').hide();
             $card.addClass("section-card");
-            // setTimeout(() => {
-            //     $card.hide().show(0);
-            // }, 100);
         },
 
         /**
