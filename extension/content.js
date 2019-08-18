@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
 
 if (IS_DEV_MODE) {
     console.info("Running in developer mode, enabling debugging");
-    tfolds.debug = false;
+    tfolds.debug = true;
 } else {
     tfolds.debug = false;
 }
