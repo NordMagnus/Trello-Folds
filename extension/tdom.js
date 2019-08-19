@@ -97,8 +97,26 @@ const tdom = (function (factory) {
             return currentBoardId;
         },
 
+        /* =================================================================================
+
+            DESCRIPTION OF BOARD INITIALIZATION STEPS
+
+            1. First wait for the ready state "complete"                init()
+            2. Ensure DIV#content exists otherwise retry three times    initialize()
+                    with a 100 ms wait inbetween
+            3. Connect an observer that listens to board changes        initialize()
+            4. When a board change is identified start watching         watchForMutations()
+                    for mutations to the DOM                            connectObservers()
+            5. As long as new mutations are found and until the
+                    last card is modified asynchronously keep waiting
+                    (only needed if changing board from within Trello)
+                    and call connectObservers() again every 100 ms
+            6. Finally emit BOARD_CHANGED event
+
+           ================================================================================= */
+
         /**
-         *
+         * Called by client/consumer to init library.
          */
         init() {
             document.addEventListener('readystatechange', event => {
@@ -109,7 +127,8 @@ const tdom = (function (factory) {
         },
 
         /**
-         *
+         * Initializes a mutation observer that listens to board being changed/loaded.
+         * Also disconnects other observers used to track changes within the board.
          */
         initialize(attemptCount = 0) {
             let $content = $("DIV#content");
@@ -133,31 +152,31 @@ const tdom = (function (factory) {
                 if (mutations.length !== 0 && $(mutations[mutations.length - 1].addedNodes)) {
                     const boardId = self.getBoardIdFromUrl();
 
-                    if (loadObserver) {
-                        if (debug) {
-                            console.log("Disconnecting load observer");
-                        }
-                        loadObserver.disconnect();
-                    }
-                    if (boardObserver) {
-                        if (debug) {
-                            console.log("Disconnecting board observer");
-                        }
-                        boardObserver.disconnect();
-                    }
-                    if (headerObserver) {
-                        if (debug) {
-                            console.log("Disconnecting header observer");
-                        }
-                        headerObserver.disconnect();
-                    }
-                    if (listObserver) {
-                        if (debug) {
-                            console.log("Disconnecting list observer");
-                        }
-                        listObserver.disconnect();
-                    }
                     if (currentBoardId !== boardId) {
+                        if (loadObserver) {
+                            if (debug) {
+                                console.log("Disconnecting load observer");
+                            }
+                            loadObserver.disconnect();
+                        }
+                        if (boardObserver) {
+                            if (debug) {
+                                console.log("Disconnecting board observer");
+                            }
+                            boardObserver.disconnect();
+                        }
+                        if (headerObserver) {
+                            if (debug) {
+                                console.log("Disconnecting header observer");
+                            }
+                            headerObserver.disconnect();
+                        }
+                        if (listObserver) {
+                            if (debug) {
+                                console.log("Disconnecting list observer");
+                            }
+                            listObserver.disconnect();
+                        }
                         self.boardChanged(boardId);
                     }
                 }
@@ -176,7 +195,8 @@ const tdom = (function (factory) {
         },
 
         /**
-         *
+         * Called when a board change is detected. Shows some console output and
+         * initializes the board loading process.
          */
         boardChanged(boardId) {
             oldBoardId = currentBoardId;
@@ -188,7 +208,8 @@ const tdom = (function (factory) {
         },
 
         /**
-         *
+         * Connects a mutation observer detecting when a board is fully loaded, and starts
+         * watching for mutations to the board.
          */
         watchForMutations(boardId, attemptCount = 1) {
             let $content = $("DIV#board");
@@ -206,12 +227,24 @@ const tdom = (function (factory) {
 
             self.connectLoadObserver($content);
 
+            /*
+             * Setting newMutations to true to force at least one 100 ms delay before completing.
+             */
             newMutations = true;
-            boardCompletelyLoaded = false;
-
+            /*
+             * Setting boardCompletelyLoaded to false when changing board (opposite to loading
+             * the first board)
+             */
+            boardCompletelyLoaded = (oldBoardId === undefined);
             self.connectObservers();
         },
 
+        /**
+         * Once no new mutations are detected during board load connects observers to track
+         * changes within board (e.g. to lists, cards, etc.).
+         *
+         * If changes _are_ detected it will wait for 100 ms and try again.
+         */
         connectObservers(numCalls = 1) {
             if(!newMutations && boardCompletelyLoaded) {
                 if (self.debug) {
@@ -234,9 +267,6 @@ const tdom = (function (factory) {
                 if (self.debug) {
                     console.log(`%cWaiting for board to load... (newMutations=${newMutations},boardCompletelyLoaded=${boardCompletelyLoaded})`, "font-style: italic; color: #808080;");
                 }
-                if (numCalls >= 20) {
-                    boardCompletelyLoaded = true;
-                }
                 self.connectObservers(numCalls+1);
             }, 100);
         },
@@ -250,6 +280,9 @@ const tdom = (function (factory) {
 
             loadObserver = new MutationObserver(function (mutations) {
                 newMutations = true;
+                if (boardCompletelyLoaded) {
+                    return;
+                }
                 for (let m of mutations) {
                     if(m.addedNodes.length === 1 && m.target.className === "js-plugin-badges"
                     && $(m.target).closest("a").next().length === 0) {
