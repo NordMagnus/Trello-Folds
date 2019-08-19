@@ -865,6 +865,9 @@ const tfolds = (function (factory) {
             self.updateSuperListHeight($(subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
+            $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
+            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+
             setTimeout(() => {
                 self.updateSuperListHeight($(subList));
                 $superList.css("display", "none");
