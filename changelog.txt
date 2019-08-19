@@ -1,5 +1,23 @@
 This extension adds foldable lists and sections to Trello boards, together with per list WiP limits turning your Trello board into a Kanban system.
 
+Features
+====================
+- Press ⨯ in the list top right corner to fold it. Press anywhere on the folded list to expand it again.
+- Turn cards into collapsable sections with a selected character repeated N times (defaults to double hashes, i.e. "##")
+- Add WiP limits to lists by adding it in brackets to the list title, e.g. "My List [5]"
+- Remembers view state for boards (can be disabled)
+- Select how to visualize lists where WiP limit is exceeded
+- Open the extension popup to configure it
+
+FEEDBACK AND SUGGESTIONS ARE APPRECIATED.
+
+** CHANGELOG **
+
+New in 0.8
+====================
+- Improved board load process (hopefully ;-))
+- Fixed bug causing combined lists in compact mode to redraw incorrectly (Issue #45)
+
 New in 0.7
 ====================
 MAJOR BUG FIXES!!!
@@ -36,16 +54,3 @@ New in 0.2
 ====================
 - Added option to always show card count (even for lists without a WiP limit)
 - Minor small fixes
-
-Features
-====================
-- Press ⨯ in the list top right corner to fold it. Press anywhere on the folded list to expand it again.
-- Turn cards into collapsable sections with a selected character repeated N times (defaults to double hashes, i.e. "##")
-- Add WiP limits to lists by adding it in brackets to the list title, e.g. "My List [5]"
-- Remembers view state for boards (can be disabled)
-- Select how to visualize lists where WiP limit is exceeded
-- Open the extension popup to configure it
-
-FEEDBACK AND SUGGESTIONS ARE APPRECIATED.
-
-Fold away!
