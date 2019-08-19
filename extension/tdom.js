@@ -232,7 +232,10 @@ const tdom = (function (factory) {
             newMutations = false;
             setTimeout(() => {
                 if (self.debug) {
-                    console.log("%cWaiting for board to load...", "font-style: italic; color: #808080;");
+                    console.log(`%cWaiting for board to load... (newMutations=${newMutations},boardCompletelyLoaded=${boardCompletelyLoaded})`, "font-style: italic; color: #808080;");
+                }
+                if (numCalls >= 20) {
+                    boardCompletelyLoaded = true;
                 }
                 self.connectObservers(numCalls+1);
             }, 100);
