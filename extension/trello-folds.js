@@ -937,6 +937,7 @@ const tfolds = (function (factory) {
          */
         removeFoldingButton(listEl) {
             let $l = $(listEl);
+            // ? Here the span tag is removed - in addFoldingButton() above the parent A tag is removed
             $l.find("div.list-header-extras > a > span.icon-close").remove();
         },
 
@@ -946,6 +947,16 @@ const tfolds = (function (factory) {
         addCollapsedList(listEl) {
             const $l = $(listEl);
             if ($l.hasClass("js-add-list")) {
+                return;
+            }
+            /*
+             * If list already contains an element with list-collapsed class
+             * this method is called from "refresh"
+             */
+            if ($l.find(".list-collapsed").length !== 0) {
+                if (self.debug) {
+                    console.log("There's already a list-collapsed elementish");
+                }
                 return;
             }
             $l.css({
