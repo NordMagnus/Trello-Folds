@@ -213,7 +213,6 @@ const tfolds = (function (factory) {
          */
         cardRemoved(cardEl) {
             let $cardEl = $(cardEl);
-            console.log($cardEl);
             if ($cardEl.hasClass("section-card")) {
                 $cardEl.find("div.list-card-details").css("opacity", "0.0");
                 //$cardEl.find("span#section-title").css("background-color", "#dfe3e6");
@@ -1280,13 +1279,17 @@ const tfolds = (function (factory) {
             $s.toggleClass("icon-collapsed icon-expanded");
 
             let $placeholder = $("a.list-card.placeholder");
+            let ident = self.sectionIdentifier;
 
             if ($placeholder.length !== 0) {
+                if (self.debug) {
+                    console.log("A section was just dragged");
+                }
                 $l = $(tdom.getContainingList($placeholder[0]));
-                $cards = $placeholder.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
+                $cards = $placeholder.closest("a").nextUntil(`a:contains('${ident}'),div.card-composer`);
             } else {
                 $l = $(tdom.getContainingList(section));
-                $cards = $s.closest("a").nextUntil(`a:contains('${self.sectionIdentifier}'),div.card-composer`);
+                $cards = $s.closest("a").nextUntil(`a.section-card,div.card-composer`);
             }
 
             $cards.toggle();
