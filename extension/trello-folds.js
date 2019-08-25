@@ -32,8 +32,6 @@ const tfolds = (function (factory) {
     let storage = {};
     let boardId;
 
-    let oldBoardId;
-
     const LEFT_LIST = 1;
     const RIGHT_LIST = 2;
     const DEFAULT_COMPACT_WIDTH = 200;
@@ -147,7 +145,6 @@ const tfolds = (function (factory) {
             if (self.debug) {
                 console.log(`boardId=${boardId},oldId=${oldId}`);
             }
-            oldBoardId = oldId;
             self.initStorage();
         },
 
