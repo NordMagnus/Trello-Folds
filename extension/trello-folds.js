@@ -760,16 +760,16 @@ const tfolds = (function (factory) {
 
             self.addFoldingButton($superList[0]);
 
+            $leftList.parent().prepend($superList);
+
             self.addCollapsedSuperList($superList);
 
             self.updateSuperList(leftList, LEFT_LIST);
 
             $superList.on("resized", function(event, subListEl) {
-                console.log("resized");
                 self.updateSuperListHeight($(subListEl));
             });
 
-            $leftList.parent().prepend($superList);
 
             self.attachListResizeDetector(leftList);
             self.attachListResizeDetector(self.getPairedList(leftList));
@@ -896,18 +896,20 @@ const tfolds = (function (factory) {
          * @param {Element} listEl
          */
         attachListResizeDetector(listEl) {
-            // TODO Make sure to cancelAnimationFrame too - when unloading board + split lists
-            let timeSinceLast;
+            // let timeSinceLast;
             if (self.debug) {
                 console.log("Attaching resize detector: ", listEl);
-                timeSinceLast = 0;
+                // timeSinceLast = 0;
             }
             function callback(timestamp) {
-                if (self.debug) {
-                    if (timestamp - timeSinceLast > 2000) {
-                        console.log(".");
-                        timeSinceLast = timestamp;
-                    }
+                // if (self.debug) {
+                //     if (timestamp - timeSinceLast > 5000) {
+                //         console.log($(listEl).data("subList"), $(listEl).is(":visible"));
+                //         timeSinceLast = timestamp;
+                //     }
+                // }
+                if (!$(listEl).is(":visible") || !$(listEl).data("subList")) {
+                    return;
                 }
                 if (listEl.clientHeight !== $(listEl).data("oldHeight")) {
                     $(listEl).data("oldHeight", listEl.clientHeight);
@@ -1074,7 +1076,7 @@ const tfolds = (function (factory) {
          */
         countWorkCards(listEl) {
             // TODO Replace "//" with setting
-            return tdom.countCards(listEl, [self.sectionIdentifier, "//"]);
+            return tdom.countCards(listEl, [self.sectionIdentifier, "//"], 0);
         },
 
         /**
