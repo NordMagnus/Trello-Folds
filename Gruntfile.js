@@ -42,6 +42,12 @@ module.exports = function(grunt) {
     grunt.registerTask("test", "Runs Mocha tests", function() {
         grunt.task.run("mochaTest:all");
     });
+    grunt.registerTask("tdom", "Run Mocha tests for tdom", function() {
+        grunt.task.run("mochaTest:tdom");
+    });
+    grunt.registerTask("tfolds", "Run Mocha tests for trello-folds", function() {
+        grunt.task.run("mochaTest:tfolds");
+    });
     grunt.registerTask("zip", "compress");
     grunt.registerTask("version-check", "Checks that package.json and manifest.json version matches", function() {
         let packageVer = grunt.config("pkg").version;
