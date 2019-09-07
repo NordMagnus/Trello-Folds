@@ -126,7 +126,7 @@ const tfolds = (function (factory) {
             tdom.onListDragged(self.listDragged);
             tdom.onListDropped(self.listDropped);
             tdom.onBadgesModified(self.cardBadgesModified);
-            tdom.onRedrawBoardHeader(self.addBoardIcons);
+            tdom.onRedrawBoardHeader(self.redrawHeader);
             tdom.init();
 
             /*
@@ -342,6 +342,11 @@ const tfolds = (function (factory) {
             }
         },
 
+        redrawHeader() {
+            self.addBoardIcons();
+            self.updateCompactModeButtonState(compactMode);
+        },
+
         //#endregion EVENT HANDLERS
 
         /**
@@ -467,14 +472,7 @@ const tfolds = (function (factory) {
          * @param {boolean} enabled `true` if compact mode should be enabled, otherwise `false`
          */
         setCompactMode(enabled) {
-            let $btn = $("a#toggle-compact-mode");
-            if (enabled) {
-                $btn.addClass("compact-mode-enabled");
-                $btn.removeClass("compact-mode-disabled");
-            } else {
-                $btn.addClass("compact-mode-disabled");
-                $btn.removeClass("compact-mode-enabled");
-            }
+            self.updateCompactModeButtonState(enabled);
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
             self.storeGlobalBoardSetting("compactMode", enabled);
@@ -488,6 +486,17 @@ const tfolds = (function (factory) {
                     self.updateSuperListHeight($l);
                 }
             });
+        },
+
+        updateCompactModeButtonState(enabled) {
+            let $btn = $("a#toggle-compact-mode");
+            if (enabled) {
+                $btn.addClass("compact-mode-enabled");
+                $btn.removeClass("compact-mode-disabled");
+            } else {
+                $btn.addClass("compact-mode-disabled");
+                $btn.removeClass("compact-mode-enabled");
+            }
         },
 
         /**
