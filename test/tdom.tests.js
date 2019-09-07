@@ -187,6 +187,7 @@ describe('tdom', function() {
             expect(tdom.countCards(html)).to.equal(1);
             expect(tdom.countCards(html, "hoozit")).to.equal(1);
         });
+        it("should only look at beginning if pos specified");
     });
 
     describe("countListLabels()", function() {
