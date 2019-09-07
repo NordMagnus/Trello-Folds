@@ -26,6 +26,7 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
 if (IS_DEV_MODE) {
     console.info("Running in developer mode, enabling debugging");
     tfolds.debug = true;
+    console.info(`jQuery version: ${jQuery.fn.jquery}`);
 } else {
     tfolds.debug = false;
 }
