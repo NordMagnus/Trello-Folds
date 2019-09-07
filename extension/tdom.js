@@ -720,7 +720,7 @@ const tdom = (function (factory) {
             let $cards = $(list).find("a.list-card").filter(function () {
                 const title = self.getCardName($(this));
                 if (filter && title) {
-                    return !self.containsAny(title, filter);
+                    return !self.beginsWith(title, filter);
                 }
                 return true;
             });
@@ -743,6 +743,27 @@ const tdom = (function (factory) {
             }
             for(let f of filter) {
                 if (string.includes(f)) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        /**
+         * Checks if the string starts with any of the strings in filter.
+         * 
+         * @param {String} string The string to search
+         * @param {*} filter Either a string or an array to look for
+         */
+        beginsWith(string, filter) {
+            let needle;
+            if (typeof filter === "string") {
+                needle = [].push(filter);
+            } else {
+                needle = filter;
+            }
+            for (let n of needle) {
+                if (string.startsWith(n)) {
                     return true;
                 }
             }

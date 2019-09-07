@@ -231,11 +231,11 @@ const tfolds = (function (factory) {
                 $c.find(".list-card-title").removeClass("blocked-title");
                 $c.find("div.badge").children().removeClass("blocked-badges");
             }
-            let listEl = tdom.getContainingList(cardEl);
-            let $l = $(listEl);
-            if (self.isSubList($l)) {
-                self.updateSuperListHeight($l);
-            }
+            // let listEl = tdom.getContainingList(cardEl);
+            // let $l = $(listEl);
+            // if (self.isSubList($l)) {
+            //     self.updateSuperListHeight($l);
+            // }
         },
 
         /**
@@ -248,10 +248,6 @@ const tfolds = (function (factory) {
          * @param {String} oldTitle The title before it was modified
          */
         cardModified(cardEl, title, oldTitle) {
-            if (config.debug) {
-                console.trace();
-            }
-
             let $c = $(cardEl);
 
             $c.removeClass("comment-card");
@@ -259,7 +255,7 @@ const tfolds = (function (factory) {
             self.checkSectionChange($c, title, oldTitle);
 
             if (!self.isSection(title)) {
-                if (title.indexOf("//") !== -1) {
+                if (title.indexOf("//") === 0) {
                     $c.addClass("comment-card");
                 }
             }
@@ -324,7 +320,7 @@ const tfolds = (function (factory) {
                 if (self.splitLists($l)) {
                     $l.parent().find(".super-list,.super-list-collapsed").remove();
                 } else {
-                    self.updateSuperList(list, $l.data("subList"));
+                    // self.updateSuperList(list, $l.data("subList"));
                 }
             }
 
@@ -476,16 +472,16 @@ const tfolds = (function (factory) {
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
             self.storeGlobalBoardSetting("compactMode", enabled);
-            /*
-             * Update heights of combined lists
-             */
-            let $leftSubLists = $("div.sub-list");
-            $leftSubLists.each(function() {
-                let $l = $(this);
-                if ($l.data("subList") === LEFT_LIST) {
-                    self.updateSuperListHeight($l);
-                }
-            });
+            // /*
+            //  * Update heights of combined lists
+            //  */
+            // let $leftSubLists = $("div.sub-list");
+            // $leftSubLists.each(function() {
+            //     let $l = $(this);
+            //     if ($l.data("subList") === LEFT_LIST) {
+            //         self.updateSuperListHeight($l);
+            //     }
+            // });
         },
 
         updateCompactModeButtonState(enabled) {
@@ -757,18 +753,26 @@ const tfolds = (function (factory) {
             $superList.data("superList", true);
 
             /*
-             * Make list same height as contained lists. This height is also
-             * tweaked using CSS padding.
-             */
+            * Make list same height as contained lists. This height is also
+            * tweaked using CSS padding.
+            */
             $superList.append($title);
-
-            $leftList.parent().prepend($superList);
 
             self.addFoldingButton($superList[0]);
 
             self.addCollapsedSuperList($superList);
 
             self.updateSuperList(leftList, LEFT_LIST);
+
+            $superList.on("resized", function(event, subListEl) {
+                console.log("resized");
+                self.updateSuperListHeight($(subListEl));
+            });
+
+            $leftList.parent().prepend($superList);
+
+            self.attachListResizeDetector(leftList);
+            self.attachListResizeDetector(self.getPairedList(leftList));
         },
 
         /**
@@ -824,17 +828,22 @@ const tfolds = (function (factory) {
                 throw new TypeError("Parameter [$l] not sublist");
             }
             let pairedList = self.getPairedList($l[0]);
-            let $superList;
-            if ($l.data("subList") == 1) {
-                $superList = $l.siblings("div.super-list");
-            } else {
-                $superList = $(pairedList).siblings("div.super-list");
-            }
+            let $superList = self.getMySuperList($l[0]);
             $superList.css("height", Math.max($l.height(), $(pairedList).height()));
         },
 
+        getMySuperList(subListEl) {
+            let leftListEl;
+            if ($(subListEl).data("subList") == 1) {
+                leftListEl = subListEl;
+            } else {
+                leftListEl = self.getPairedList(subListEl);
+            }
+            return $(leftListEl).siblings("div.super-list");
+        },
+
         updateSuperList(subList, listPos) {
-            let $superList = $(subList).siblings("div.super-list");
+            let $superList = self.getMySuperList(subList);
             let $title = $superList.find("span.super-list-header");
 
             /*
@@ -851,6 +860,7 @@ const tfolds = (function (factory) {
              */
             let wipLimit;
             let pairedList = self.getPairedList(subList);
+
             if (listPos === LEFT_LIST) {
                 wipLimit = self.extractWipLimit(subList);
             } else {
@@ -873,12 +883,42 @@ const tfolds = (function (factory) {
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
 
-            setTimeout(() => {
-                self.updateSuperListHeight($(subList));
-                $superList.css("display", "none");
-                $superList.css("display", "block");
-            }, 100);
+            // setTimeout(() => {
+            //     self.updateSuperListHeight($(subList));
+            //     $superList.css("display", "none");
+            //     $superList.css("display", "block");
+            // }, 100);
             return $wipTitle;
+        },
+
+        /**
+         *
+         * @param {Element} listEl
+         */
+        attachListResizeDetector(listEl) {
+            // TODO Make sure to cancelAnimationFrame too - when unloading board + split lists
+            let timeSinceLast;
+            if (self.debug) {
+                console.log("Attaching resize detector: ", listEl);
+                timeSinceLast = 0;
+            }
+            function callback(timestamp) {
+                if (self.debug) {
+                    if (timestamp - timeSinceLast > 2000) {
+                        console.log(".");
+                        timeSinceLast = timestamp;
+                    }
+                }
+                if (listEl.clientHeight !== $(listEl).data("oldHeight")) {
+                    $(listEl).data("oldHeight", listEl.clientHeight);
+                    self.getMySuperList(listEl).trigger("resized", listEl);
+                }
+                requestAnimationFrame(callback);
+            }
+
+            $(listEl).data("oldHeight", listEl.clientHeight);
+
+            requestAnimationFrame(callback);
         },
 
         /**
@@ -1310,9 +1350,9 @@ const tfolds = (function (factory) {
                 self.store(tdom.getListName($l), "sections", listSections);
             }
 
-            if (self.isSubList($l)) {
-                self.updateSuperListHeight($l);
-            }
+            // if (self.isSubList($l)) {
+            //     self.updateSuperListHeight($l);
+            // }
         },
 
     };
