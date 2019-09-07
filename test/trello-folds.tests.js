@@ -131,7 +131,9 @@ describe('tfolds', () => {
             global.tdom = requirejs("tdom");
             global.tfolds = requirejs("tfolds");
             tfolds.debug = false;
-            global.requestAnimationFrame = sinon.stub().callsArg(0);
+            /* Removed callsArg below as it causes an infinite loop in
+               tfolds.attachResizeDetector() */
+            global.requestAnimationFrame = sinon.stub();//.callsArg(0);
         });
     });
 
@@ -419,7 +421,7 @@ describe('tfolds', () => {
                 tfolds.showWipLimit.restore();
             });
 
-            it("should not add comment-card class if not containing //", () => {
+            it("should not add comment-card class if not beginning with //", () => {
                 let $c = $(normalCard);
                 tfolds.cardModified($c[0], "No Comment", "// Comment");
                 expect($c).to.not.have.class("comment-card");
@@ -431,16 +433,15 @@ describe('tfolds', () => {
                 expect($c).to.not.have.class("comment-card");
                 tfolds.cardModified($c[0], "No Comment", "// Comment");
                 expect($c).to.not.have.class("comment-card");
+                tfolds.cardModified($c[0], "Comment //", "// Comment");
+                expect($c).to.not.have.class("comment-card");
             });
 
-            it("should add comment-card class if containing //", () => {
+            it("should add comment-card class if beginning with //", () => {
                 let $c = $(commentCard);
                 expect($c).to.have.class("comment-card");
                 $c.removeClass("comment-card");
                 tfolds.cardModified($c[0], "// Comment", "Comment");
-                expect($c).to.have.class("comment-card");
-                $c.removeClass("comment-card");
-                tfolds.cardModified($c[0], "Comment //", "// Comment");
                 expect($c).to.have.class("comment-card");
                 $c.removeClass("comment-card");
                 tfolds.cardModified($c[0], "// Comment //", "// Comment");
