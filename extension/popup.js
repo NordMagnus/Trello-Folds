@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 enableTopBars: true,
                 rememberViewStates: true,
                 alwaysCount: false,
-                enableCombiningLists: false,
+                enableCombiningLists: true,
                 compactListWidth: 200,
             };
         }

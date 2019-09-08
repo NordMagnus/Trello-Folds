@@ -23,7 +23,7 @@ const tfolds = (function (factory) {
         enableTopBars: true,
         rememberViewStates: true,
         alwaysCount: false,
-        enableCombiningLists: false,
+        enableCombiningLists: true,
         compactListWidth: 200,
     };
 
