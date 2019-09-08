@@ -887,13 +887,18 @@ const tfolds = (function (factory) {
                 console.log("Attaching resize detector: ", listEl);
                 // timeSinceLast = 0;
             }
-            function callback(timestamp) {
+            function callback() { //timestamp
                 // if (self.debug) {
                 //     if (timestamp - timeSinceLast > 5000) {
                 //         console.log($(listEl).data("subList"), $(listEl).is(":visible"));
                 //         timeSinceLast = timestamp;
                 //     }
                 // }
+
+                /*
+                 * If list not visible or not a sub list anymore, stop tracking
+                 * height changes
+                 */
                 if (!$(listEl).is(":visible") || !$(listEl).data("subList")) {
                     return;
                 }
