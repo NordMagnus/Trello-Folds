@@ -231,11 +231,6 @@ const tfolds = (function (factory) {
                 $c.find(".list-card-title").removeClass("blocked-title");
                 $c.find("div.badge").children().removeClass("blocked-badges");
             }
-            // let listEl = tdom.getContainingList(cardEl);
-            // let $l = $(listEl);
-            // if (self.isSubList($l)) {
-            //     self.updateSuperListHeight($l);
-            // }
         },
 
         /**
@@ -319,8 +314,6 @@ const tfolds = (function (factory) {
             if (self.isSubList($l)) {
                 if (self.splitLists($l)) {
                     $l.parent().find(".super-list,.super-list-collapsed").remove();
-                } else {
-                    // self.updateSuperList(list, $l.data("subList"));
                 }
             }
 
@@ -350,7 +343,6 @@ const tfolds = (function (factory) {
          */
         isSection(title) {
             return title.indexOf(self.sectionIdentifier) !== -1;
-            // return title.search()
         },
 
         /**
@@ -472,16 +464,6 @@ const tfolds = (function (factory) {
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
             self.storeGlobalBoardSetting("compactMode", enabled);
-            // /*
-            //  * Update heights of combined lists
-            //  */
-            // let $leftSubLists = $("div.sub-list");
-            // $leftSubLists.each(function() {
-            //     let $l = $(this);
-            //     if ($l.data("subList") === LEFT_LIST) {
-            //         self.updateSuperListHeight($l);
-            //     }
-            // });
         },
 
         updateCompactModeButtonState(enabled) {
@@ -587,7 +569,6 @@ const tfolds = (function (factory) {
                 if (chrome.runtime.lastError) {
                     console.error(chrome.runtime.lastError);
                 }
-                // console.log(`[${key}] set to [${value}] for list [${listName}] in board ${boardId}`);
             });
         },
 
@@ -870,12 +851,8 @@ const tfolds = (function (factory) {
             let title = tdom.getListName(subList);
             title = title.substr(0, title.indexOf('.'));
             let $wipTitle;
-            // if (settings.alwaysCount || typeof wipLimit === "number") {
-                $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
-                self.updateWipBars($superList, totNumOfCards, wipLimit);
-            // } else {
-            //     $wipTitle = $(`<span class="wip-limit-title">${title}</span>`);
-            // }
+            $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
+            self.updateWipBars($superList, totNumOfCards, wipLimit);
             $title.append($wipTitle);
             self.updateSuperListHeight($(subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
@@ -883,11 +860,6 @@ const tfolds = (function (factory) {
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
             $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
 
-            // setTimeout(() => {
-            //     self.updateSuperListHeight($(subList));
-            //     $superList.css("display", "none");
-            //     $superList.css("display", "block");
-            // }, 100);
             return $wipTitle;
         },
 
