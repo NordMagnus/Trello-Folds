@@ -1,6 +1,8 @@
 /* global chrome */
 
-console.info("%cRunning TRELLO FOLDS Chrome extension", "font-weight: bold; color: #0088ff;");
+console.info("%cRunning TRELLO FOLDS Chrome extension", "font-weight: bold; color: #0088ff; background-color: #e8f8ff;");
+console.info(`%cExtension version: ${chrome.runtime.getManifest().version}`, "color: #0088ff; background-color: #e8f8ff;");
+console.info(`%cjQuery version: ${jQuery.fn.jquery}`, "color: #0088ff; background-color: #e8f8ff;");
 
 let IS_DEV_MODE = !('update_url' in chrome.runtime.getManifest());
 
@@ -24,9 +26,9 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
 });
 
 if (IS_DEV_MODE) {
-    console.info("Running in developer mode, enabling debugging");
+    console.info("%cRunning in developer mode, enabling debugging",
+            "color: #a02820; background-color: #ffe8d8;");
     tfolds.debug = true;
-    console.info(`jQuery version: ${jQuery.fn.jquery}`);
 } else {
     tfolds.debug = false;
 }
