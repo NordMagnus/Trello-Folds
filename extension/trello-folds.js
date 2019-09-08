@@ -443,11 +443,11 @@ const tfolds = (function (factory) {
             });
 
             /*
-             * REFRESH BOARD
+             * REDRAW BOARD
              */
-            $boardBtns.prepend(`<a id='refresh-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
-                                                <span class=''>Refresh</span></a>`);
-            $("a#refresh-board").click(function() {
+            $boardBtns.prepend(`<a id='redraw-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
+                                                <span class=''>Redraw</span></a>`);
+            $("a#redraw-board").click(function() {
                 self.formatLists();
                 self.formatCards();
             });
@@ -701,10 +701,24 @@ const tfolds = (function (factory) {
         },
 
         combineListWithNext(leftList, rightList) {
-            $(leftList).addClass("sub-list");
-            $(leftList).data("subList", LEFT_LIST);
-            $(rightList).addClass("sub-list");
-            $(rightList).data("subList", RIGHT_LIST);
+            let $l = $(leftList);
+            let $r = $(rightList);
+
+            if ($l.hasClass("sub-list")) {
+                if (self.debug) {
+                    console.log("Left list already combined with other list");
+                }
+                return;
+            }
+            if ($r.hasClass("sub-list")) {
+                if (self.debug) {
+                    console.log("Right list already combined with other list");
+                }
+            }
+            $l.addClass("sub-list");
+            $l.data("subList", LEFT_LIST);
+            $r.addClass("sub-list");
+            $r.data("subList", RIGHT_LIST);
             self.removeFoldingButton(leftList);
             self.removeFoldingButton(rightList);
             self.showWipLimit(leftList);
@@ -970,7 +984,7 @@ const tfolds = (function (factory) {
             }
             /*
              * If list already contains an element with list-collapsed class
-             * this method is called from "refresh"
+             * this method is called from "redraw"
              */
             if ($l.find(".list-collapsed").length !== 0) {
                 if (self.debug) {
