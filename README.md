@@ -28,14 +28,16 @@ I'm working on this extension because I use the features myself, because it's fu
 
 ## Version History
 
-| Version | Description                                                           |
-| ------- | --------------------------------------------------------------------- |
-| 0.5.0   | Added compact mode. Some rendering bug fixes. Added "Refresh" button. |
-| 0.4.0   | Added formatting of blocked cards and comment cards. Fixed bugs.      |
-| 0.3.1   | Fixed small bug related to combining lists. Fixed some timing issues. |
-| 0.3.0   | New feature: Combining lists.                                         |
-| 0.2.0   | Added option to always show card count. Other small fixes.            |
-| 0.1.0   | First release.                                                        |
+| Version | Description                                                             |
+| ------- | ----------------------------------------------------------------------- |
+| 0.8     | Further improvements to board loading process, making it more reliable. |
+| 0.7     | Major improvements to moving sections, filtering and switching boards.  |
+| 0.6     | Bug fixes caused by Trello DOM changes.                                 |
+| 0.5     | Added compact mode. Some rendering bug fixes. Added "Refresh" button.   |
+| 0.4     | Added formatting of blocked cards and comment cards. Fixed bugs.        |
+| 0.3     | New feature: Combining lists.                                           |
+| 0.2     | Added option to always show card count. Other small fixes.              |
+| 0.1     | First release.                                                          |
 
 ## Installation Instructions
 
