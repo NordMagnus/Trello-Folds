@@ -441,9 +441,7 @@ const tfolds = (function (factory) {
          */
         setCompactMode(enabled) {
             self.updateCompactModeButtonState(enabled);
-            // TODO Needed?!? If so make into method - now code is duplicated
-            // $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-            // $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+            self.updateWidths();
             self.storeGlobalBoardSetting("compactMode", enabled);
         },
 
@@ -970,12 +968,19 @@ const tfolds = (function (factory) {
             self.updateSuperListHeight($($subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
-            let width = (self.listWidth + 8) * $subList.data("numOfSubLists") - 8;
-
-            $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${width}px`);
+            self.updateWidths();
 
             return $wipTitle;
+        },
+
+        /**
+         * Updates the width of every list and super list. Ensures lists are drawn correctly in compact mode
+         * and that combined list backdrops are rendered correctly.
+         */
+        updateWidths() {
+            let width = (self.listWidth + 8) * $subList.data("numOfSubLists") - 8;
+            $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
+            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${width}px`);
         },
 
         /**
@@ -1196,7 +1201,6 @@ const tfolds = (function (factory) {
 
             $l.find("span.wip-limit-title").remove();
             const title = tdom.getListName($l[0]);
-            let isSubList = $l.data("subListIndex") > 0;
 
             if (title.indexOf('[') !== -1) {
                 strippedTitle = title.substr(0, title.indexOf('['));
@@ -1204,7 +1208,7 @@ const tfolds = (function (factory) {
                 strippedTitle = title;
             }
 
-            if (isSubList) {
+            if (self.isSubList($l)) {
                 strippedTitle = strippedTitle.substr(strippedTitle.indexOf(".") + 1);
             }
 
@@ -1341,6 +1345,7 @@ const tfolds = (function (factory) {
          * @param {jQuery} $superList
          */
         collapseSuperList($superList) {
+            // FIXME
             $superList.toggle().siblings(".super-list-collapsed").toggle().parent().css("width", "40px").next().hide();
             /*
              *  Hide sub lists
@@ -1363,6 +1368,7 @@ const tfolds = (function (factory) {
          *
          */
         expandSuperList($collapsedList) {
+            // FIXME Rewrite - .data("firstList"), don't use LEFT_LIST, etc.
             let $superList = $collapsedList.toggle().siblings(".super-list");
             $superList.toggle().parent().css("width", `${self.listWidth}px`).next().show();
             $superList.siblings(".sub-list").show();
@@ -1406,10 +1412,6 @@ const tfolds = (function (factory) {
                 listSections[title] = $s.hasClass("icon-collapsed");
                 self.store(tdom.getListName($l), "sections", listSections);
             }
-
-            // if (self.isSubList($l)) {
-            //     self.updateSuperListHeight($l);
-            // }
         },
 
     };
