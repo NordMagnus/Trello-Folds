@@ -38,7 +38,7 @@
         "no-useless-concat": "warn",
 
         "prefer-const": "off",
-        "max-statements": ["warn", 25, { "ignoreTopLevelFunctions": true }],
+        "max-statements": ["warn", 30, { "ignoreTopLevelFunctions": true }],
         "complexity": ["off", 8],
         "no-magic-numbers": ["off"]
         

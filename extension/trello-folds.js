@@ -32,9 +32,10 @@ const tfolds = (function (factory) {
     let storage = {};
     let boardId;
 
+    const LEFTMOST_SUBLIST = 0;
     const LEFT_LIST = 1;
-    const RIGHT_LIST = 2;
     const DEFAULT_COMPACT_WIDTH = 200;
+    const NORMAL_LIST_WIDTH = 272;
 
     const GLOBAL_BOARD_SETTING_STRING = "trello-folds-board-settings";
 
@@ -107,7 +108,7 @@ const tfolds = (function (factory) {
         },
 
         get listWidth() {
-            let width = 272;
+            let width = NORMAL_LIST_WIDTH;
             if (compactMode) {
                 width = settings.compactListWidth || DEFAULT_COMPACT_WIDTH;
             }
@@ -174,21 +175,18 @@ const tfolds = (function (factory) {
 
         listDragged(listEl) {
             let $list = $(listEl).find(".js-list-content");
-            let subList = self.isSubList($list);
-            if (subList) {
-                self.removeSubListProps($list);
-                if (subList === LEFT_LIST) {
-                    $list.parent().find(".super-list,.super-list-collapsed").remove();
-                    self.removeSubListProps($("div.placeholder").next().find(".js-list-content"));
-                } else {
-                    let $leftList = $("div.placeholder").prev().find(".js-list-content");
-                    self.removeSubListProps($leftList);
-                    $leftList.parent().find(".super-list,.super-list-collapsed").remove();
-                }
+            if (self.isSubList($list)) {
+                let $first = $list.data("firstList");
+                $first.parent().find(".super-list,.super-list-collapsed").remove();
+                self.restoreForward($first);
+                let $next = $("div.placeholder").next().find("div.js-list-content");
+                self.restoreForward($next);
+                self.restoreSubList($list);
             }
         },
 
         listDropped() {
+            self.splitAllCombined();
             self.combineLists();
         },
 
@@ -308,27 +306,9 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        listTitleModified(list, title) {
-            let $l = $(list);
-
-            if (self.isSubList($l)) {
-                if (self.splitLists($l)) {
-                    $l.parent().find(".super-list,.super-list-collapsed").remove();
-                }
-            }
-
-            /*
-             * Check if it should be a super list with any adjacent list.
-             */
-            let prev = tdom.getPrevList($l[0]);
-            let next = tdom.getNextList($l[0]);
-            if (next && self.areListsRelated($l, $(next))) {
-                self.combineListWithNext($l[0], next);
-            } else if (prev && self.areListsRelated($(prev), $l)) {
-                self.combineListWithNext(prev, $l[0]);
-            } else {
-                self.showWipLimit(list);
-            }
+        listTitleModified(/*list, title*/) {
+            self.splitAllCombined();
+            self.combineLists();
         },
 
         redrawHeader() {
@@ -461,8 +441,9 @@ const tfolds = (function (factory) {
          */
         setCompactMode(enabled) {
             self.updateCompactModeButtonState(enabled);
-            $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+            // TODO Needed?!? If so make into method - now code is duplicated
+            // $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
+            // $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
             self.storeGlobalBoardSetting("compactMode", enabled);
         },
 
@@ -603,7 +584,12 @@ const tfolds = (function (factory) {
         //#region COMBINED LISTS
 
         /**
+         * Assuming feature is not disabled, and the current list has same
+         * prefix as next list combines them. Does so for all subsequent lists
+         * with same prefix.
          *
+         * Also removes sub list properties for lists if they are not part of
+         * a combined set.
          */
         combineLists() {
             if (settings.enableCombiningLists === false) {
@@ -612,16 +598,113 @@ const tfolds = (function (factory) {
             let $lists = tdom.getLists();
             for (let i = 0; i < $lists.length; ++i) {
                 if (tdom.getListName($lists[i]).indexOf(".") === -1 || i === $lists.length - 1) {
-                    self.removeSubListProps($lists.eq(i));
+                    self.restoreSubList($lists.eq(i));
                     continue;
                 }
                 if (self.areListsRelated($lists[i], $lists[i + 1])) {
-                    self.combineListWithNext($lists[i], $lists[i + 1]);
-                    ++i; // Increase i again to skip one list when combining
+                    let numInSet = self.createCombinedList($lists.eq(i));
+                    i += numInSet - 1;
                 } else {
-                    self.removeSubListProps($lists.eq(i));
+                    self.restoreSubList($lists.eq(i));
                 }
             }
+        },
+
+        /**
+         * Creates a set of combined lists. The set has associated metadata
+         * identifying them as a sub list.
+         *
+         * - _subListIndex_ holds the sub list index in the set
+         * - _firstList_ holds a reference to the first list in the set, i.e the list this method
+         *   is called with. The first list holds a reference to itself for convenience purposes.
+         *
+         * @param {jQuery} $list The leftmost list in the combined set to create
+         * @returns {Number} The number of lists in the set
+         */
+        createCombinedList($list) {
+            let numOfSubLists = this.convertToSubList($list) + 1;
+            if (self.debug) {
+                console.log(`numOfSubLists=${numOfSubLists}`);
+            }
+            if (numOfSubLists < 2) {
+                if (self.debug) {
+                    console.warn("Expected number of lists to be combined to be at least two");
+                }
+                return;
+            }
+            $list.data("numOfSubLists", numOfSubLists);
+            self.addSuperList($list);
+            return numOfSubLists;
+        },
+
+        /**
+         * Called by `createCombinedList()` and then by itself recursively to
+         * convert a number of adjacent lists into a set.
+         *
+         * @param {jQuery} $list List to convert
+         * @param {Number} idx Current index
+         * @param {jQuery} $firstList Reference to first list
+         */
+        convertToSubList($list, idx = 0, $firstList) {
+            if ($list.hasClass("sub-list")) {
+                if (self.debug) {
+                    console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
+                }
+                return idx;
+            }
+            $list.addClass("sub-list");
+            $list.data("subListIndex", idx);
+            $list.data("firstList", $firstList || $list);
+            self.removeFoldingButton($list);
+            self.showWipLimit($list);
+
+            self.attachListResizeDetector($list);
+
+            let $nextList = $(tdom.getNextList($list[0]));
+            if (self.areListsRelated($list, $nextList)) {
+                return self.convertToSubList($nextList, idx + 1, $firstList || $list);
+            }
+            return idx;
+        },
+
+                /**
+         *
+         * @param {Element} listEl
+         */
+        attachListResizeDetector($list) {
+            // let timeSinceLast;
+            if (self.debug) {
+                console.log("Attaching resize detector: ", tdom.getListName($list[0]));
+                // timeSinceLast = 0;
+            }
+            function callback() { //timestamp
+                // if (self.debug) {
+                //     if (timestamp - timeSinceLast > 5000) {
+                //         console.log($(listEl).data("subListIndex"), $(listEl).is(":visible"));
+                //         timeSinceLast = timestamp;
+                //     }
+                // }
+
+                /*
+                 * If list not visible or not a sub list anymore, stop tracking
+                 * height changes
+                 */
+                if (!$list.is(":visible") || $list.data("subListIndex") === undefined) {
+                    if (self.debug) {
+                        console.log(`Detaching resize detector: [${tdom.getListName($list[0])}]`);
+                    }
+                    return;
+                }
+                if ($list.height() !== $list.data("oldHeight")) {
+                    $list.data("oldHeight", $list.height());
+                    self.getMySuperList($list).trigger("resized", $list[0]);
+                }
+                requestAnimationFrame(callback);
+            }
+
+            $list.data("oldHeight", $list.height());
+
+            requestAnimationFrame(callback);
         },
 
         /**
@@ -641,6 +724,15 @@ const tfolds = (function (factory) {
             return name1.includes(".") && (name1.substr(0, name1.indexOf(".")) === name2.substr(0, name2.indexOf(".")));
         },
 
+        splitAllCombined() {
+            let $subLists = $(".sub-list");
+            while($subLists.length > 0) {
+                console.log($subLists.length);
+                self.restoreForward($subLists.eq(0));
+                $subLists = $(".sub-list");
+            }
+        },
+
         /**
          * Splits the lists into two ordinary lists assuming they are combined
          * and no longer matches.
@@ -651,8 +743,7 @@ const tfolds = (function (factory) {
          * @return {boolean} `true` if lists split, otherwise `false`
          */
         splitLists($list) {
-            let isSubList = $list.data("subList");
-            if (!isSubList) {
+            if (!self.isSubList($list)) {
                 console.warn("Called splitLists() with a list that isn't a sublist", $list);
                 return false;
             }
@@ -660,7 +751,7 @@ const tfolds = (function (factory) {
             let $leftList;
             let $rightList;
 
-            if (isSubList === LEFT_LIST) {
+            if (self.isFirstSubList($list)) {
                 $leftList = $list;
                 $rightList = $list.parent().next().find(".js-list-content");
                 console.info($rightList);
@@ -682,63 +773,66 @@ const tfolds = (function (factory) {
                 return false;
             }
 
-            self.removeSubListProps($leftList);
-            self.removeSubListProps($rightList);
+            self.restoreSubList($leftList);
+            self.restoreSubList($rightList);
 
             return true;
         },
 
         /**
+         * Checks if the specified list is the first sub list of a set of
+         * combined lists.
          *
+         * @param {jQuery} $list The target list
+         * @returns `true` if first sub list of set otherwise `false`
          */
-        removeSubListProps($l) {
-            if ($l.data("subList") === LEFT_LIST) {
-                $l.parent().find(".super-list,.super-list-collapsed").remove();
-            }
-            $l.removeData("subList").removeClass("sub-list");
-            self.addFoldingButton($l[0]);
-            self.showWipLimit($l[0]);
-        },
-
-        combineListWithNext(leftList, rightList) {
-            let $l = $(leftList);
-            let $r = $(rightList);
-
-            if ($l.hasClass("sub-list")) {
-                if (self.debug) {
-                    console.log("Left list already combined with other list");
-                }
-                return;
-            }
-            if ($r.hasClass("sub-list")) {
-                if (self.debug) {
-                    console.log("Right list already combined with other list");
-                }
-            }
-            $l.addClass("sub-list");
-            $l.data("subList", LEFT_LIST);
-            $r.addClass("sub-list");
-            $r.data("subList", RIGHT_LIST);
-            self.removeFoldingButton(leftList);
-            self.removeFoldingButton(rightList);
-            self.showWipLimit(leftList);
-            self.showWipLimit(rightList);
-            self.addSuperList(leftList);
+        isFirstSubList($list) {
+            return ($list.data("subListIndex") === LEFTMOST_SUBLIST);
         },
 
         /**
+         * Clears sub list attributes and data, and restores the state, for the
+         * target list and all lists forward in the set.
          *
+         * @param {jQuery} $list The list to start with
+         */
+        restoreForward($list) {
+            let $l = $list;
+            do {
+                self.restoreSubList($l);
+                $l = $(tdom.getNextList($l[0]));
+            } while ($l.data("subListIndex") > 0);
+        },
+
+        /**
+         * Restores the target list to a "normal" list by removing all sub list
+         * related data and restoring the folding button and WiP limit stuff.
+         *
+         * @param {jQuery} $list The target list
+         */
+        restoreSubList($list) {
+            $list.removeData(["subListIndex", "firstList"]);
+            $list.removeClass("sub-list");
+            self.addFoldingButton($list[0]);
+            self.showWipLimit($list[0]);
+        },
+
+        /**
+         * Checks whether the target list is part of a combined list set.
+         *
+         * @param {jQuery} $l The list
+         * @returns `true` if it is a sub list otherwise `false`
          */
         isSubList($l) {
             if (!$l) {
                 throw new TypeError("Parameter [$l] undefined");
             }
-            return $l.data("subList") >= 1;
+            return $l.data("subListIndex") !== undefined;
         },
 
-        addSuperList(leftList) {
+        addSuperList($list) {
             // let $canvas = $("div#board");
-            let $leftList = $(leftList);
+            // let $leftList = $(leftList);
             let $superList = $('<div class="super-list"></div>');
             let $title = $('<span class="super-list-header"></span>');
             let $extras = $('<div class="list-header-extras"></div>');
@@ -755,19 +849,19 @@ const tfolds = (function (factory) {
 
             self.addFoldingButton($superList[0]);
 
-            $leftList.parent().prepend($superList);
+            $list.parent().prepend($superList);
 
             self.addCollapsedSuperList($superList);
 
-            self.updateSuperList(leftList, LEFT_LIST);
+            self.updateSuperList($list);
 
             $superList.on("resized", function(event, subListEl) {
                 self.updateSuperListHeight($(subListEl));
             });
 
-
-            self.attachListResizeDetector(leftList);
-            self.attachListResizeDetector(self.getPairedList(leftList));
+            // TODO Move to convertToSubList() ?
+            // self.attachListResizeDetector($list);
+            // self.attachListResizeDetector(self.getPairedList(leftList));
         },
 
         /**
@@ -794,59 +888,59 @@ const tfolds = (function (factory) {
 
         /**
          *
-         * @param {*} listEl
+         * @param {*} $subList
          */
-        getPairedList(listEl) {
-            if (!listEl) {
+        updateSuperListHeight($list) {
+            if (!$list) {
                 throw new TypeError("Parameter [$l] undefined");
             }
-            let $l = $(listEl);
-            if (!self.isSubList($l)) {
+            if (!self.isSubList($list)) {
                 throw new TypeError("Parameter [$l] not sublist");
             }
-            let listPos = $l.data("subList");
-            if (listPos === LEFT_LIST) {
-                return tdom.getNextList(listEl);
-            }
-            return tdom.getPrevList(listEl);
+            let height = self.findSuperListHeight($list);
+            let $superList = self.getMySuperList($list);
+            $superList.css("height", height);
+        },
+
+        findSuperListHeight($list) {
+            let $l = $list.data("firstList");
+            let maxHeight = 0;
+            do {
+                if ($l.height() > maxHeight) {
+                    maxHeight = $l.height();
+                }
+                $l = $(tdom.getNextList($l[0]));
+            } while ($l.data("subListIndex") > 0);
+            return maxHeight;
         },
 
         /**
+         * Finds the super list DIV associated with the sub list.
          *
-         * @param {*} $subList
+         * @param {jQuery} $subList The sub list
+         * @returns {jQuery} The super list DIV element jQuery object
          */
-        updateSuperListHeight($l) {
-            if (!$l) {
-                throw new TypeError("Parameter [$l] undefined");
-            }
-            if (!self.isSubList($l)) {
-                throw new TypeError("Parameter [$l] not sublist");
-            }
-            let pairedList = self.getPairedList($l[0]);
-            let $superList = self.getMySuperList($l[0]);
-            $superList.css("height", Math.max($l.height(), $(pairedList).height()));
-        },
-
-        getMySuperList(subListEl) {
-            let leftListEl;
-            if ($(subListEl).data("subList") == 1) {
-                leftListEl = subListEl;
+        getMySuperList($subList) {
+            let $l;
+            if ($subList.data("subListIndex") === LEFTMOST_SUBLIST) {
+                $l = $subList;
             } else {
-                leftListEl = self.getPairedList(subListEl);
+                $l = $subList.data("firstList");
             }
-            return $(leftListEl).siblings("div.super-list");
+            return $l.siblings("div.super-list");
         },
 
-        updateSuperList(subList, listPos) {
-            let $superList = self.getMySuperList(subList);
-            let $title = $superList.find("span.super-list-header");
+        // FIXME remove listPos stuff -- cleanup
+        updateSuperList($subList) {
+            console.log("updateSuperList()");
 
-            /*
-             * Only modify if the left sub list
-             */
-            if (listPos !== 1) {
+            if ($subList.data("subListIndex") !== LEFTMOST_SUBLIST) {
+                console.error("Expected updateSuperList() to be called with leftmost sub list");
                 return;
             }
+
+            let $superList = self.getMySuperList($subList);
+            let $title = $superList.find("span.super-list-header");
 
             $title.find("span.wip-limit-title").remove();
 
@@ -854,64 +948,34 @@ const tfolds = (function (factory) {
              * Get the WiP limit from the left list
              */
             let wipLimit;
-            let pairedList = self.getPairedList(subList);
+//            let pairedList = self.getPairedList($subList);
 
-            if (listPos === LEFT_LIST) {
-                wipLimit = self.extractWipLimit(subList);
-            } else {
-                wipLimit = self.extractWipLimit(pairedList);
+            wipLimit = self.extractWipLimit($subList);
+
+            // let totNumOfCards = self.countWorkCards($subList) + self.countWorkCards(pairedList);
+            let n = $subList.data("numOfSubLists");
+            let totNumOfCards = 0;
+            let listEl = $subList[0];
+            for (let i = 0; i < n; ++i) {
+                totNumOfCards += self.countWorkCards(listEl);
+                listEl = tdom.getNextList(listEl);
             }
-            let totNumOfCards = self.countWorkCards(subList) + self.countWorkCards(pairedList);
-            let title = tdom.getListName(subList);
+
+            let title = tdom.getListName($subList);
             title = title.substr(0, title.indexOf('.'));
             let $wipTitle;
             $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
             self.updateWipBars($superList, totNumOfCards, wipLimit);
             $title.append($wipTitle);
-            self.updateSuperListHeight($(subList));
+            self.updateSuperListHeight($($subList));
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
+            let width = (self.listWidth + 8) * $subList.data("numOfSubLists") - 8;
+
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth*2-8}px`);
+            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${width}px`);
 
             return $wipTitle;
-        },
-
-        /**
-         *
-         * @param {Element} listEl
-         */
-        attachListResizeDetector(listEl) {
-            // let timeSinceLast;
-            if (self.debug) {
-                console.log("Attaching resize detector: ", listEl);
-                // timeSinceLast = 0;
-            }
-            function callback() { //timestamp
-                // if (self.debug) {
-                //     if (timestamp - timeSinceLast > 5000) {
-                //         console.log($(listEl).data("subList"), $(listEl).is(":visible"));
-                //         timeSinceLast = timestamp;
-                //     }
-                // }
-
-                /*
-                 * If list not visible or not a sub list anymore, stop tracking
-                 * height changes
-                 */
-                if (!$(listEl).is(":visible") || !$(listEl).data("subList")) {
-                    return;
-                }
-                if (listEl.clientHeight !== $(listEl).data("oldHeight")) {
-                    $(listEl).data("oldHeight", listEl.clientHeight);
-                    self.getMySuperList(listEl).trigger("resized", listEl);
-                }
-                requestAnimationFrame(callback);
-            }
-
-            $(listEl).data("oldHeight", listEl.clientHeight);
-
-            requestAnimationFrame(callback);
         },
 
         /**
@@ -941,7 +1005,7 @@ const tfolds = (function (factory) {
         addFoldingButton(listEl) {
             let $l = $(listEl);
 
-            if ($l.find(".js-list-content").data("subList") > 0) {
+            if ($l.find(".js-list-content").data("subListIndex") > 0) {
                 return;
             }
 
@@ -973,10 +1037,9 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        removeFoldingButton(listEl) {
-            let $l = $(listEl);
-            // ? Here the span tag is removed - in addFoldingButton() above the parent A tag is removed
-            $l.find("div.list-header-extras > a > span.icon-close").remove();
+        removeFoldingButton($list) {
+            let $span = $list.find("div.list-header-extras > a > span.icon-close");
+            $span.parent().remove();
         },
 
         /**
@@ -1044,11 +1107,12 @@ const tfolds = (function (factory) {
             const $l = $(listEl);
             let numCards = self.countWorkCards(listEl);
             let wipLimit = self.extractWipLimit(listEl);
-            let subList = $l.data("subList");
+            let subList = $l.data("subListIndex");
             self.removeWipLimit($l);
-            if (subList > 0) {
+            if (subList !== undefined) {
                 self.addWipLimit($l, numCards);
-                self.updateSuperList($l, subList);
+                // TODO Fix this
+                //self.updateSuperList($l, subList);
                 $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
                 $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
             } else if (wipLimit !== null) {
@@ -1132,7 +1196,7 @@ const tfolds = (function (factory) {
 
             $l.find("span.wip-limit-title").remove();
             const title = tdom.getListName($l[0]);
-            let isSubList = $l.data("subList") > 0;
+            let isSubList = $l.data("subListIndex") > 0;
 
             if (title.indexOf('[') !== -1) {
                 strippedTitle = title.substr(0, title.indexOf('['));

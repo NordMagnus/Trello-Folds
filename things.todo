@@ -1,26 +1,3 @@
-Move lists and cards:
-    ✔ Move a non sub list inbetween sub lists does not work @started(19-01-13 19:51) @done(19-01-13 20:10) @lasted(19m46s)
-    ✔ Remove super list when list is grabbed @done (1/13/2019, 5:17:44 PM)
-
-Renaming lists:
-    ✔ Re-evaluate if combined when changing title name @done (1/13/2019, 12:32:07 PM)
-    ✔ Show full title after splitting (only second half shows now) @done (1/12/2019, 9:24:17 PM)
-
-Collapse lists:
-    ✔ Add super list collapse state to settings @done(19-01-24 14:28)
-    ✔ Fix collapsing super lists @done (1/12/2019, 3:02:38 PM)
-    ✔ Add WiP limit to collapsed super list @done (1/12/2019, 9:24:29 PM)
-    ✔ Collapsing super list after title change does not work @done (1/12/2019, 9:34:14 PM)
-
-Formatting:
-    ✔ Height not always accurate when adding items to super list @done(19-01-24 14:34)
-    ✔ Height not correct for super lists at all :-P @done(19-01-24 14:34)
-    ✔ Add limit bar to super lists @done (1/13/2019, 12:31:15 PM)
-    ✔ Small gfx glitch when first displayed (Fixed when collapsing --> expanding) (1/13/2019, 5:18:09 PM) @done (1/13/2019, 5:27:45 PM)
-
-Misc:
-    ✔ Add setting to enable/disable combining lists @done(19-01-13 22:00)
-    ✔ Card count always shown for sub lists even if "always count" setting off @done(19-01-13 22:38)
-    ✔ Identify list drag and drop @done (1/13/2019, 4:54:22 PM)
-    ✔ Super list title not displayed (only in collapsed state) @done (1/13/2019, 11:14:58 AM)
-    ☐ Remove setting when expanded instead of storing "false"?
+Combine multiple lists:
+    ☐ Change data subSet prop ==> subSetIndex, starting with 0
+    ☐ Make sure every check against subSetIndex is with !== undefined

@@ -329,7 +329,8 @@ const tdom = (function (factory) {
                     if (m.addedNodes.length === 1 &&
                         m.addedNodes[0].localName === "div" &&
                         $(m.addedNodes).hasClass("placeholder")) {
-                            let $draggedList = $("div#classic-body").find(".ui-sortable-helper");
+                            let $draggedList = $("body").find(".ui-sortable-helper");
+                            console.log($draggedList);
                             handler.emit(EventHandler.LIST_DRAGGED, $draggedList[0]);
                     } else if (m.removedNodes.length === 1 &&
                         m.removedNodes[0].localName === "div" &&
