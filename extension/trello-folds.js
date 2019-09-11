@@ -112,7 +112,7 @@ const tfolds = (function (factory) {
             if (compactMode) {
                 width = settings.compactListWidth || DEFAULT_COMPACT_WIDTH;
             }
-            return width;
+            return Number(width);
         },
 
         initialize() {
@@ -177,10 +177,15 @@ const tfolds = (function (factory) {
             let $list = $(listEl).find(".js-list-content");
             if (self.isSubList($list)) {
                 let $first = $list.data("firstList");
-                $first.parent().find(".super-list,.super-list-collapsed").remove();
                 self.restoreForward($first);
                 let $next = $("div.placeholder").next().find("div.js-list-content");
-                self.restoreForward($next);
+                /*
+                 * If the next list has subListIndex === 0 then it is the
+                 * first list in another superset.
+                 */
+                if ($next.data("subListIndex") !== 0) {
+                    self.restoreForward($next);
+                }
                 self.restoreSubList($list);
             }
         },
@@ -641,18 +646,21 @@ const tfolds = (function (factory) {
          *
          * @param {jQuery} $list List to convert
          * @param {Number} idx Current index
+         * @param {Number} id Unique identifier (timestamp)
          * @param {jQuery} $firstList Reference to first list
          */
-        convertToSubList($list, idx = 0, $firstList) {
+        convertToSubList($list, idx = 0, id = 0, $firstList) {
             if ($list.hasClass("sub-list")) {
                 if (self.debug) {
                     console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
                 }
                 return idx;
             }
+            let myId = id || Date.now();
             $list.addClass("sub-list");
             $list.data("subListIndex", idx);
             $list.data("firstList", $firstList || $list);
+            $list.attr("data-id", myId);
             self.removeFoldingButton($list);
             self.showWipLimit($list);
 
@@ -660,7 +668,7 @@ const tfolds = (function (factory) {
 
             let $nextList = $(tdom.getNextList($list[0]));
             if (self.areListsRelated($list, $nextList)) {
-                return self.convertToSubList($nextList, idx + 1, $firstList || $list);
+                return self.convertToSubList($nextList, idx + 1, myId, $firstList || $list);
             }
             return idx;
         },
@@ -725,7 +733,6 @@ const tfolds = (function (factory) {
         splitAllCombined() {
             let $subLists = $(".sub-list");
             while($subLists.length > 0) {
-                console.log($subLists.length);
                 self.restoreForward($subLists.eq(0));
                 $subLists = $(".sub-list");
             }
@@ -809,6 +816,9 @@ const tfolds = (function (factory) {
          * @param {jQuery} $list The target list
          */
         restoreSubList($list) {
+            if ($list.data("subListIndex") === 0) {
+                $list.parent().find(".super-list,.super-list-collapsed").remove();
+            }
             $list.removeData(["subListIndex", "firstList"]);
             $list.removeClass("sub-list");
             self.addFoldingButton($list[0]);
@@ -856,10 +866,6 @@ const tfolds = (function (factory) {
             $superList.on("resized", function(event, subListEl) {
                 self.updateSuperListHeight($(subListEl));
             });
-
-            // TODO Move to convertToSubList() ?
-            // self.attachListResizeDetector($list);
-            // self.attachListResizeDetector(self.getPairedList(leftList));
         },
 
         /**
@@ -928,16 +934,11 @@ const tfolds = (function (factory) {
             return $l.siblings("div.super-list");
         },
 
-        // FIXME remove listPos stuff -- cleanup
         updateSuperList($subList) {
-            console.log("updateSuperList()");
+            let $sl;
+            $sl = $subList.data("firstList");
 
-            if ($subList.data("subListIndex") !== LEFTMOST_SUBLIST) {
-                console.error("Expected updateSuperList() to be called with leftmost sub list");
-                return;
-            }
-
-            let $superList = self.getMySuperList($subList);
+            let $superList = self.getMySuperList($sl);
             let $title = $superList.find("span.super-list-header");
 
             $title.find("span.wip-limit-title").remove();
@@ -945,27 +946,26 @@ const tfolds = (function (factory) {
             /*
              * Get the WiP limit from the left list
              */
-            let wipLimit;
-//            let pairedList = self.getPairedList($subList);
+            let wipLimit = self.extractWipLimit($sl);
 
-            wipLimit = self.extractWipLimit($subList);
-
-            // let totNumOfCards = self.countWorkCards($subList) + self.countWorkCards(pairedList);
-            let n = $subList.data("numOfSubLists");
+            /*
+             * Calculate tot # of cards
+             */
+            let n = $sl.data("numOfSubLists");
             let totNumOfCards = 0;
-            let listEl = $subList[0];
+            let listEl = $sl[0];
             for (let i = 0; i < n; ++i) {
                 totNumOfCards += self.countWorkCards(listEl);
                 listEl = tdom.getNextList(listEl);
             }
 
-            let title = tdom.getListName($subList);
+            let title = tdom.getListName($sl);
             title = title.substr(0, title.indexOf('.'));
             let $wipTitle;
             $wipTitle = self.createWipTitle(title, totNumOfCards, wipLimit);
             self.updateWipBars($superList, totNumOfCards, wipLimit);
             $title.append($wipTitle);
-            self.updateSuperListHeight($($subList));
+            self.updateSuperListHeight($sl);
             self.updateCollapsedSuperList($superList, $wipTitle.clone());
 
             self.updateWidths();
@@ -978,9 +978,15 @@ const tfolds = (function (factory) {
          * and that combined list backdrops are rendered correctly.
          */
         updateWidths() {
-            let width = (self.listWidth + 8) * $subList.data("numOfSubLists") - 8;
             $("div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))").css("width", `${self.listWidth}px`);
-            $("div.super-list:not(:has(>div.super-list-collapsed:visible))").css("width", `${width}px`);
+
+            let $supersets = $("div.super-list");
+            for (let i = 0; i < $supersets.length; ++i) {
+                let $ss = $supersets.eq(i);
+                let n = $ss.siblings("div.js-list-content").data("numOfSubLists");
+                let w = (self.listWidth + 8) * n - 8;
+                $ss.css("width", `${w}px`);
+            }
         },
 
         /**
@@ -1116,8 +1122,7 @@ const tfolds = (function (factory) {
             self.removeWipLimit($l);
             if (subList !== undefined) {
                 self.addWipLimit($l, numCards);
-                // TODO Fix this
-                //self.updateSuperList($l, subList);
+                self.updateSuperList($l);
                 $l.removeClass("wip-limit-reached").removeClass("wip-limit-exceeded");
                 $l.prev().removeClass("collapsed-limit-reached").removeClass("collapsed-limit-exceeded");
             } else if (wipLimit !== null) {
@@ -1212,7 +1217,7 @@ const tfolds = (function (factory) {
                 strippedTitle = strippedTitle.substr(strippedTitle.indexOf(".") + 1);
             }
 
-            self.addWipListTitle($l, numCards, !isSubList ? wipLimit : null, strippedTitle);
+            self.addWipListTitle($l, numCards, !self.isSubList($l) ? wipLimit : null, strippedTitle);
         },
 
         /**
@@ -1340,6 +1345,15 @@ const tfolds = (function (factory) {
             self.store(tdom.getListName($list), "collapsed", true);
         },
 
+        getSubLists($superList) {
+            let $firstList = $superList.siblings(".sub-list");
+            let id = $firstList.data("id");
+            console.log(`id=${id}`);
+            let $sls = $(`.sub-list[data-id="${id}"]`);
+            console.log($sls);
+            return $sls;
+        },
+
         /**
          *
          * @param {jQuery} $superList
@@ -1350,8 +1364,9 @@ const tfolds = (function (factory) {
             /*
              *  Hide sub lists
              */
-            $superList.siblings(".sub-list").hide();
-            $superList.parent().next().find(".list").hide();
+            self.getSubLists($superList).hide();
+            // $superList.siblings(".sub-list").hide();
+            // $superList.parent().next().find(".list").hide();
             self.store(tdom.getListName($superList.siblings(".js-list-content")), "super-list-collapsed", true);
         },
 
