@@ -5,4 +5,5 @@ Combine multiple lists:
     ☐ Make TDOM calls take both $ and element
     ☐ Fix tests
     ☐ Add more unit tests
+    ☐ Adding and removing sub lists does not work ;(
 
