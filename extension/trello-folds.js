@@ -119,6 +119,7 @@ const tfolds = (function (factory) {
             tdom.onBoardChanged(self.boardChanged);
             tdom.onListModified(self.listModified);
             tdom.onListAdded(self.listAdded);
+            tdom.onListRemoved(self.listRemoved);
             tdom.onCardAdded(self.cardAdded);
             tdom.onCardRemoved(self.cardRemoved);
             tdom.onCardModified(self.cardModified);
@@ -159,17 +160,16 @@ const tfolds = (function (factory) {
             self.showWipLimit(listEl);
         },
 
-        // FIXME Add listRemoved and check if super list changes
-        listRemoved() {
-            // What list was removed?!?
-            self.combineLists(); // <-- New line
+        listRemoved(listEl) {
+            if (self.isSubList($(listEl))) {
+                self.redrawCombinedLists();
+            }
         },
 
         /**
          *
          */
         listAdded(listEl) {
-            // FIXME
             if (!listEl) {
                 console.log("[listEl] not defined");
                 return;
@@ -178,37 +178,24 @@ const tfolds = (function (factory) {
             self.addFoldingButton(listEl);
             self.addCollapsedList(listEl);
             self.showWipLimit($(listEl).find(".js-list-content")[0]);
-            self.combineLists(); // <-- New line
+            self.redrawCombinedLists();
         },
 
         listDragged(listEl) {
             let $list = $(listEl).find(".js-list-content");
             if (self.isSubList($list)) {
-
-                // ? Does this work
-
                 let $subs = self.getSubLists($list);
                 $subs.each(function() {
                     self.restoreSubList($(this));
                 });
-
-                // TODO Replace other "restoreForward" instances if above works
-                
-                // let $first = $list.data("firstList");
-                // self.restoreForward($first);
-                // let $next = $("div.placeholder").next().find("div.js-list-content");
-                // /*
-                //  * If the next list has subListIndex === 0 then it is the
-                //  * first list in another superset.
-                //  */
-                // if ($next.data("subListIndex") !== 0) {
-                //     self.restoreForward($next);
-                // }
-                // self.restoreSubList($list);
             }
         },
 
         listDropped() {
+            self.redrawCombinedLists();
+        },
+
+        redrawCombinedLists() {
             self.splitAllCombined();
             self.combineLists();
         },
@@ -684,9 +671,12 @@ const tfolds = (function (factory) {
 
             self.attachListResizeDetector($list);
 
-            let $nextList = $(tdom.getNextList($list[0]));
-            if (self.areListsRelated($list, $nextList)) {
-                return self.convertToSubList($nextList, idx + 1, myId, $firstList || $list);
+            let nextEl = tdom.getNextList($list);
+            if (nextEl) {
+                let $nextList = $(nextEl);
+                if ($nextList !== null && self.areListsRelated($list, $nextList)) {
+                    return self.convertToSubList($nextList, idx + 1, myId, $firstList || $list);
+                }
             }
             return idx;
         },
@@ -771,9 +761,19 @@ const tfolds = (function (factory) {
 
         splitAllCombined() {
             let $subLists = $(".sub-list");
-            while($subLists.length > 0) {
-                self.restoreForward($subLists.eq(0));
+            let n = 0;
+            while($subLists.length > 0 && n < 100) {
+                let $sls = self.getSubLists($subLists.eq(0));
+                $sls.each(function() {
+                    self.restoreSubList($(this));
+                });
                 $subLists = $(".sub-list");
+                n++;
+            }
+            if (n === 100) {
+                console.error("Something went wrong splitting sub lists");
+                console.trace();
+                console.log($subLists);
             }
         },
 
@@ -1384,13 +1384,15 @@ const tfolds = (function (factory) {
             self.store(tdom.getListName($list), "collapsed", true);
         },
 
-        getSubLists($superList) {
-            // TODO See if this can be used elsewhere replacing other ways of getting sub lists
-            let $firstList = $superList.siblings(".sub-list");
-            let id = $firstList.data("id");
-            console.log(`id=${id}`);
+        getSubLists($list) {
+            let $firstList;
+            if (!self.isSubList($list)) {
+                $firstList = $list.siblings(".sub-list");
+            } else {
+                $firstList = $list.data("firstList");
+            }
+            let id = $firstList.attr("data-id");
             let $sls = $(`.sub-list[data-id="${id}"]`);
-            console.log($sls);
             return $sls;
         },
 

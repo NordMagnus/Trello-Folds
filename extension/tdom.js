@@ -56,6 +56,7 @@ const tdom = (function (factory) {
     EventHandler.CARD_REMOVED = Symbol("card_removed");
     EventHandler.CARD_MODIFIED = Symbol("card_modified");
     EventHandler.LIST_ADDED = Symbol("list_added");
+    EventHandler.LIST_REMOVED = Symbol("list_removed");
     EventHandler.LIST_MODIFIED = Symbol("list_modified");
     EventHandler.LIST_TITLE_MODIFIED = Symbol("list_title_modified");
     EventHandler.LIST_DRAGGED = Symbol("list_dragged");
@@ -341,7 +342,8 @@ const tdom = (function (factory) {
                             addedList = m.addedNodes[0];
                     } else if (m.removedNodes.length === 1 &&
                         $(m.removedNodes[0]).hasClass("list-wrapper")) {
-                            handler.emit(EventHandler.LIST_REMOVED, m.removedNodes[0]);
+                            let $l = $(m.removedNodes[0]).find("div.js-list-content");
+                            handler.emit(EventHandler.LIST_REMOVED, $l[0]);
                     }
                 }
                 if (addedList) {
@@ -487,6 +489,10 @@ const tdom = (function (factory) {
          */
         onListAdded(callback) {
             handler.addListener(EventHandler.LIST_ADDED, callback);
+        },
+
+        onListRemoved(callback) {
+            handler.addListener(EventHandler.LIST_REMOVED, callback);
         },
 
         /**
@@ -646,7 +652,7 @@ const tdom = (function (factory) {
          */
         getNextList(listEl) {
             let $next = $(listEl).parent().next().find("div.js-list-content");
-            return $next.length ? $next[0] : null;
+            return $next.length === 1 ? $next[0] : null;
         },
 
         /**
