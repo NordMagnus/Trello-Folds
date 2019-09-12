@@ -1,9 +1,0 @@
-Combine multiple lists:
-    ✔ Change data subSet prop ==> subSetIndex, starting with 0 @done(19-09-12 08:39)
-    ✔ Make sure every check against subSetIndex is with !== undefined @done(19-09-12 08:39)
-    ✔ Detaching height detectors when hiding ==> detached when collapsing :o @done(19-09-12 22:30)
-    ☐ Make TDOM calls take both $ and element
-    ☐ Fix tests
-    ☐ Add more unit tests
-    ☐ Adding and removing sub lists does not work ;(
-
