@@ -33,7 +33,6 @@ const tfolds = (function (factory) {
     let boardId;
 
     const LEFTMOST_SUBLIST = 0;
-    const LEFT_LIST = 1;
     const DEFAULT_COMPACT_WIDTH = 200;
     const NORMAL_LIST_WIDTH = 272;
 
@@ -673,35 +672,56 @@ const tfolds = (function (factory) {
             return idx;
         },
 
-                /**
+        /**
+         * Attaches a "height change detector" to the target list. It triggers
+         * a `resized` event if a change is detected.
          *
-         * @param {Element} listEl
+         * The detector detaches itself when the list is no longer a sub list
+         * and when the list is no longer in the DOM.
+         *
+         * If the method is called several times on same list no additional
+         * detectors are added.
+         *
+         * @param {jQuery} $list The target list
          */
         attachListResizeDetector($list) {
-            // let timeSinceLast;
+            if ($list.data("hasDetector") === true) {
+                console.log("Detector already exists: ", tdom.getListName($list[0]));
+                return;
+            }
             if (self.debug) {
                 console.log("Attaching resize detector: ", tdom.getListName($list[0]));
-                // timeSinceLast = 0;
             }
+            $list.data("hasDetector", true);
+
+            // let ts = Date.now();
             function callback() { //timestamp
-                // if (self.debug) {
-                //     if (timestamp - timeSinceLast > 5000) {
-                //         console.log($(listEl).data("subListIndex"), $(listEl).is(":visible"));
-                //         timeSinceLast = timestamp;
+                // if (Date.now() - ts > 2000) {
+                //     ts = Date.now();
+                //     if (tdom.getListName($list) === "Delta.Sub2") {
+                //         console.log("Change detector invoked");
                 //     }
                 // }
-
                 /*
                  * If list not visible or not a sub list anymore, stop tracking
                  * height changes
                  */
+                if (!jQuery.contains(document, $list[0])) {
+                    if (self.debug) {
+                        console.log(`Detaching resize detector (list no longer in DOM): [${tdom.getListName($list[0])}]`);
+                    }
+                    $list.data("hasDetector", false);
+                    return;
+                }
                 if (!$list.is(":visible") || $list.data("subListIndex") === undefined) {
                     if (self.debug) {
-                        console.log(`Detaching resize detector: [${tdom.getListName($list[0])}]`);
+                        console.log(`Detaching resize detector (no longer sub list): [${tdom.getListName($list[0])}]`);
                     }
+                    $list.data("hasDetector", false);
                     return;
                 }
                 if ($list.height() !== $list.data("oldHeight")) {
+                    console.log(`HEIGHT CHANGE:${tdom.getListName($list)}`);
                     $list.data("oldHeight", $list.height());
                     self.getMySuperList($list).trigger("resized", $list[0]);
                 }
@@ -1346,6 +1366,7 @@ const tfolds = (function (factory) {
         },
 
         getSubLists($superList) {
+            // TODO See if this can be used elsewhere replacing other ways of getting sub lists
             let $firstList = $superList.siblings(".sub-list");
             let id = $firstList.data("id");
             console.log(`id=${id}`);
@@ -1355,18 +1376,16 @@ const tfolds = (function (factory) {
         },
 
         /**
+         * When collapsing a super list the first contained list's is hidden,
+         * and subsequent lists' wrappers are hidden.
          *
-         * @param {jQuery} $superList
+         * @param {jQuery} $superList The super list to collapse
          */
         collapseSuperList($superList) {
-            // FIXME
             $superList.toggle().siblings(".super-list-collapsed").toggle().parent().css("width", "40px").next().hide();
-            /*
-             *  Hide sub lists
-             */
-            self.getSubLists($superList).hide();
-            // $superList.siblings(".sub-list").hide();
-            // $superList.parent().next().find(".list").hide();
+            let $sls = self.getSubLists($superList);
+            $sls.eq(0).hide();
+            $sls.not(":eq(0)").parent().hide();
             self.store(tdom.getListName($superList.siblings(".js-list-content")), "super-list-collapsed", true);
         },
 
@@ -1383,13 +1402,14 @@ const tfolds = (function (factory) {
          *
          */
         expandSuperList($collapsedList) {
-            // FIXME Rewrite - .data("firstList"), don't use LEFT_LIST, etc.
             let $superList = $collapsedList.toggle().siblings(".super-list");
             $superList.toggle().parent().css("width", `${self.listWidth}px`).next().show();
-            $superList.siblings(".sub-list").show();
-            $superList.parent().next().find(".js-list-content").show();
+
+            let $sls = self.getSubLists($superList);
+            $sls.eq(0).show();
+            $sls.not(":eq(0)").parent().show();
             self.store(tdom.getListName($superList.siblings(".js-list-content")), "super-list-collapsed", false);
-            self.updateSuperList($superList.siblings(".sub-list")[0], LEFT_LIST);
+            self.updateSuperList($sls.eq(0));
         },
 
         /**
