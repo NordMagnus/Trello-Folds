@@ -3,4 +3,5 @@ Combine multiple lists:
     ✔ Make sure every check against subSetIndex is with !== undefined @done(19-09-12 08:39)
     ☐ Detaching height detectors when hiding ==> detached when collapsing :o
     ☐ Make TDOM calls take both $ and element
+    ☐ Adding and removing sub lists does not work ;(
 

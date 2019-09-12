@@ -159,33 +159,52 @@ const tfolds = (function (factory) {
             self.showWipLimit(listEl);
         },
 
+        // FIXME Add listRemoved and check if super list changes
+        listRemoved() {
+            // What list was removed?!?
+            self.combineLists(); // <-- New line
+        },
+
         /**
          *
          */
         listAdded(listEl) {
+            // FIXME
             if (!listEl) {
                 console.log("[listEl] not defined");
                 return;
             }
+            // TODO Make functions take $ param instead
             self.addFoldingButton(listEl);
             self.addCollapsedList(listEl);
             self.showWipLimit($(listEl).find(".js-list-content")[0]);
+            self.combineLists(); // <-- New line
         },
 
         listDragged(listEl) {
             let $list = $(listEl).find(".js-list-content");
             if (self.isSubList($list)) {
-                let $first = $list.data("firstList");
-                self.restoreForward($first);
-                let $next = $("div.placeholder").next().find("div.js-list-content");
-                /*
-                 * If the next list has subListIndex === 0 then it is the
-                 * first list in another superset.
-                 */
-                if ($next.data("subListIndex") !== 0) {
-                    self.restoreForward($next);
-                }
-                self.restoreSubList($list);
+
+                // ? Does this work
+
+                let $subs = self.getSubLists($list);
+                $subs.each(function() {
+                    self.restoreSubList($(this));
+                });
+
+                // TODO Replace other "restoreForward" instances if above works
+                
+                // let $first = $list.data("firstList");
+                // self.restoreForward($first);
+                // let $next = $("div.placeholder").next().find("div.js-list-content");
+                // /*
+                //  * If the next list has subListIndex === 0 then it is the
+                //  * first list in another superset.
+                //  */
+                // if ($next.data("subListIndex") !== 0) {
+                //     self.restoreForward($next);
+                // }
+                // self.restoreSubList($list);
             }
         },
 
