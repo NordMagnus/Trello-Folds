@@ -1,3 +1,6 @@
 Combine multiple lists:
-    ☐ Change data subSet prop ==> subSetIndex, starting with 0
-    ☐ Make sure every check against subSetIndex is with !== undefined
+    ✔ Change data subSet prop ==> subSetIndex, starting with 0 @done(19-09-12 08:39)
+    ✔ Make sure every check against subSetIndex is with !== undefined @done(19-09-12 08:39)
+    ☐ Detaching height detectors when hiding ==> detached when collapsing :o
+    ☐ Make TDOM calls take both $ and element
+
