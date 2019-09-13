@@ -122,7 +122,7 @@ describe('tfolds', () => {
 
     before(() => {
         return JSDOM.fromFile("test/trello-folds-test-board.html", {
-            url: "https://trello.com/b/aBcdEfGH/trello-folds-test-board",
+            url: "https://trello.com/b/waii4PCH/trello-folds-test-board-do-not-modify",
         }).then((dom) => {
             global.window = dom.window;
             global.jQuery = global.$ = require('jquery');
@@ -259,9 +259,9 @@ describe('tfolds', () => {
     });
 
     describe("areListsRelated()", () => {
-        it("should be three lists named Delta.xxxx in the test board", () => {
+        it("should be two lists named Delta.xxxx in the test board", () => {
             let $lists = tdom.getLists("Delta");
-            expect($lists).to.have.lengthOf(3);
+            expect($lists).to.have.lengthOf(2);
         });
         it("should return true for lists with same prefix", () => {
             let $lists = tdom.getLists("Delta");
