@@ -597,7 +597,7 @@ const tdom = (function (factory) {
             if (nameElement.length !== 1) {
                 throw new RangeError("More than one [H2.list-header-name-assist] tag found");
             }
-            return nameElement.text();
+            return nameElement.text().trim();
         },
 
         /**
@@ -860,11 +860,11 @@ const tdom = (function (factory) {
             let fields = [];
 
             $(cardEl).find("span.badge-text").each(function () {
-                let title = $(this).text();
-                let f = title.split(": ");
+                let title = $(this).text().trim();
+                let f = title.split(":");
                 if (f.length === 2) {
-                    let fName = f[0];
-                    let fVal = f[1];
+                    let fName = f[0].trim();
+                    let fVal = f[1].trim();
                     fields[fName] = fVal;
                 } else {
                     fields[title] = "true";
