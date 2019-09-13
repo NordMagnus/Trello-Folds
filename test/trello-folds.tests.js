@@ -174,6 +174,30 @@ describe('tfolds', () => {
         });
     });
 
+    describe("listModified()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("listRemoved()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("listAdded()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("listDragged()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("listDropped()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("redrawCombinedLists()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
     describe("formatCard()", () => {
         let $normalCard;
         context("[normal cards]", () => {
@@ -250,10 +274,6 @@ describe('tfolds', () => {
             expect($l2).to.have.lengthOf(1);
             expect(tfolds.areListsRelated($l1, $l2)).to.be.false;
         });
-    });
-
-    describe("splitLists()", () => {
-        it("NO TESTS WRITTEN YET");
     });
 
     describe("showWipLimit()", () => {
@@ -386,12 +406,6 @@ describe('tfolds', () => {
                 // expect($span).to.have.text("3");
             });
         });
-    });
-
-    describe("addSuperList()", () => {
-        it("should add a DIV.super-list tag containing header elements before the left list");
-        it("should add a collapsed version of the super list");
-        it("should update super list WiP information and height");
     });
 
     describe("cardBadgesModified()", () => {
@@ -576,6 +590,73 @@ describe('tfolds', () => {
             // expect(tfolds.combineListWithNext).to.be.calledOnce;
             // tfolds.combineListWithNext.restore();
         });
+
+    });
+
+    describe("createCombinedList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("convertToSubList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("attachListResizeDetector()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("splitLists()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("isFirstSubList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("restoreSubList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("isSubList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("addSuperList()", () => {
+        it("should add a DIV.super-list tag containing header elements before the left list");
+        it("should add a collapsed version of the super list");
+        it("should update super list WiP information and height");
+    });
+
+    describe("addCollapsedSuperList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("updateSuperListHeight()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("findSuperListHeight()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("getMySuperList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("updateSuperList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("updateWidths()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("updateCollapsedSuperList()", () => {
+        it("NO TESTS WRITTEN YET");
+    });
+
+    describe("makeListsFoldable()", () => {
+        it("NO TESTS WRITTEN YET");
     });
 
     describe("listWidth()", () => {

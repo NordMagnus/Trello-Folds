@@ -2,6 +2,7 @@ This extension adds foldable lists and sections to Trello boards, together with 
 
 Features
 ====================
+- Combine lists and share WiP limit between lists. E.g. "development.in progress" and "development.done" ⇒ combines to one "development" list with two sub lists
 - Press ⨯ in the list top right corner to fold it. Press anywhere on the folded list to expand it again.
 - Turn cards into collapsable sections with a selected character repeated N times (defaults to double hashes, i.e. "##")
 - Add WiP limits to lists by adding it in brackets to the list title, e.g. "My List [5]"
@@ -12,6 +13,17 @@ Features
 FEEDBACK AND SUGGESTIONS ARE APPRECIATED.
 
 ** CHANGELOG **
+
+New in 0.9
+====================
+- Support for combining multiple (more than two) lists(!!)
+- Better realtime more accurate adjustment of combined list height
+- Combined list feature on by default when installing
+- Fix when collapsing combined lists
+- Fixes related to adding and removing lists in conjunction with combined lists
+- Fix for "Compact Mode" button in wrong state after filtering
+- Fixed backgound color for super lists
+- Fix for having URL in title causing card not to count in WiP limit
 
 New in 0.8
 ====================

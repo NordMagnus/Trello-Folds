@@ -835,20 +835,6 @@ const tfolds = (function (factory) {
         },
 
         /**
-         * Clears sub list attributes and data, and restores the state, for the
-         * target list and all lists forward in the set.
-         *
-         * @param {jQuery} $list The list to start with
-         */
-        restoreForward($list) {
-            let $l = $list;
-            do {
-                self.restoreSubList($l);
-                $l = $(tdom.getNextList($l[0]));
-            } while ($l.data("subListIndex") > 0);
-        },
-
-        /**
          * Restores the target list to a "normal" list by removing all sub list
          * related data and restoring the folding button and WiP limit stuff.
          *
