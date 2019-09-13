@@ -98,32 +98,29 @@ describe('tdom', function() {
         });
         it("should return 'Alpha' when called with first js-list DIV", function() {
             let $lists = $("div.js-list-content");
-            // expect($lists).to.not.be.empty;
-            expect($lists).to.have.lengthOf(8);
             let jList = $lists[0];
-            // console.log(jList.innerHTML);
             expect(tdom.getListName(jList)).to.equal("Alpha");
         });
 
     });
 
     describe("getLists()", function() {
-        it("should return a jQuery object with length 8 without parameters", function() {
+        it("should return a jQuery object with length 9 without parameters", function() {
             let jLists = tdom.getLists();
             expect(jLists).to.be.instanceOf($);
-            expect(jLists).to.have.lengthOf(8);
+            expect(jLists).to.have.lengthOf(9);
         });
         /*
          * Test page has three lists with 'List' in title
          */
-        it("should return an object with length 3 with parameter 'Sub'", function() {
-            expect(tdom.getLists("Sub")).to.have.lengthOf(3);
+        it("should return an object with length 5 with parameter 'Sub'", function() {
+            expect(tdom.getLists("Sub")).to.have.lengthOf(5);
         });
         /*
          * The test page has one list not having 'List' in the title
          */
-        it("should return an object with length 5 with parameters '' and ['Sub']", function() {
-            expect(tdom.getLists("", ["Sub"])).to.have.lengthOf(5);
+        it("should return an object with length 4 with parameters '' and ['Sub']", function() {
+            expect(tdom.getLists("", ["Sub"])).to.have.lengthOf(4);
         });
     });
 
@@ -225,7 +222,7 @@ describe('tdom', function() {
     });
 
     describe("getCardFields()", function() {
-        it("should return Field1 => F1.Option1 for Card C1", function() {
+        it("should return Blocked and Team props Card C1", function() {
             let jCard = tdom.getCardsByName("C1");
             expect(jCard).to.be.an("object").with.lengthOf(1);
             let fields = tdom.getCardFields(jCard[0]);
