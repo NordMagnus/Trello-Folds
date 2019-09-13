@@ -1309,7 +1309,7 @@ const tfolds = (function (factory) {
         /**
          *
          */
-        formatCards($canvas) {
+        formatCards() {
             let $cards = tdom.getCardsByName("", false);
             if (config.debug) {
                 console.groupCollapsed("Formatting cards");
