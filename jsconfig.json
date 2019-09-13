@@ -6,5 +6,5 @@
     },
     "compilerOptions": {
         "target": "ES6"
-    },
+    }
 }
