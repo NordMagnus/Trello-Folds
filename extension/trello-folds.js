@@ -154,7 +154,7 @@ const tfolds = (function (factory) {
          */
         listModified(listEl) {
             if (!listEl) {
-                console.log("[listEl] not defined");
+                console.error("[listEl] not defined");
                 return;
             }
             self.showWipLimit(listEl);
@@ -171,7 +171,7 @@ const tfolds = (function (factory) {
          */
         listAdded(listEl) {
             if (!listEl) {
-                console.log("[listEl] not defined");
+                console.error("[listEl] not defined");
                 return;
             }
             // TODO Make functions take $ param instead
@@ -317,8 +317,7 @@ const tfolds = (function (factory) {
          *
          */
         listTitleModified(/*list, title*/) {
-            self.splitAllCombined();
-            self.combineLists();
+            self.redrawCombinedLists();
         },
 
         redrawHeader() {
@@ -638,7 +637,7 @@ const tfolds = (function (factory) {
                 if (self.debug) {
                     console.warn("Expected number of lists to be combined to be at least two");
                 }
-                return;
+                return null;
             }
             $list.data("numOfSubLists", numOfSubLists);
             self.addSuperList($list);
