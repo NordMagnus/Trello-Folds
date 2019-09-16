@@ -14,7 +14,7 @@ requirejs.config({
     },
 });
 
-describe('tfolds', () => {
+describe('tfolds', function() {
 
     const jsdom = require('jsdom');
     const { JSDOM } = jsdom;
@@ -120,7 +120,7 @@ describe('tfolds', () => {
 
     // #endregion CARD TEMPLATES
 
-    before(() => {
+    before(function() {
         return JSDOM.fromFile("test/trello-folds-test-board.html", {
             url: "https://trello.com/b/waii4PCH/trello-folds-test-board-do-not-modify",
         }).then((dom) => {
@@ -137,94 +137,166 @@ describe('tfolds', () => {
         });
     });
 
-    beforeEach(() => {
+    beforeEach(function() {
         tfolds.sectionCharacter = "#";
         tfolds.sectionRepeat = 2;
         // sinon.stub(console, "info");
         requestAnimationFrame.resetHistory();
     });
 
-    afterEach(() => {
+    afterEach(function() {
         // console.info.restore();
     });
 
-    describe("Verify test board HTML", () => {
-        it("should have a list named Alpha containing 5 cards", () => {
+    describe("Verify test board HTML", function() {
+        it("should have a list named Alpha containing 5 cards", function() {
             let $l = tdom.getLists("Alpha");
             expect($l).to.have.lengthOf(1);
             expect(tdom.countCards($l[0])).to.equal(5);
         });
     });
 
-    describe("sectionIdentifier", () => {
-        it("should return ## as default", () => {
+    describe("sectionIdentifier", function() {
+        it("should return ## as default", function() {
             expect(tfolds.sectionIdentifier).to.equal("##");
         });
-        it("should return whatever the character is set to twice", () => {
+        it("should return whatever the character is set to twice", function() {
             tfolds.sectionCharacter = "*";
             expect(tfolds.sectionIdentifier).to.equal("**");
         });
     });
 
-    describe("isSection()", () => {
-        it("should return true for any string with the dedicated char repeated N times", () => {
+    describe("isSection()", function() {
+        it("should return true for any string with the dedicated char repeated N times", function() {
             sections1.forEach((s) => {
                 expect(tfolds.isSection(s)).to.be.true;
             });
         });
     });
 
-    describe("listModified()", () => {
+    describe("listModified()", function() {
+
+        beforeEach(function() {
+            sinon.stub(tfolds, "showWipLimit");
+            sinon.stub(console, "error");
+        });
+
+        afterEach(function() {
+            tfolds.showWipLimit.restore();
+            console.error.restore();
+        });
+
+        it("should output error msg if parameter missing", function () {
+            tfolds.listModified();
+            expect(console.error).to.have.been.calledOnce;
+            expect(tfolds.showWipLimit).to.not.have.been.called;
+        });
+        it("should call showWipLimit if parameter is a list", function() {
+            let $l = tdom.getLists("Alpha");
+            tfolds.listModified($l[0]);
+            expect(console.error).to.not.be.called;
+            expect(tfolds.showWipLimit).to.be.calledOnce;
+        });
+    });
+
+    describe("listRemoved()", function() {
+
+        before(function() {
+            sinon.stub(tfolds, "isSubList");
+            tfolds.isSubList.onCall(0).returns(true);
+            tfolds.isSubList.returns(false);
+        });
+        beforeEach(function() {
+            sinon.stub(tfolds, "redrawCombinedLists");
+        });
+        afterEach(function() {
+            tfolds.redrawCombinedLists.restore();
+        });
+        after(function() {
+            tfolds.isSubList.restore();
+        });
+
+        it("should call redrawCombinedLists if param is sub list", function() {
+            tfolds.listRemoved(tdom.getLists("Delta.Sub2")[0]);
+            expect(tfolds.redrawCombinedLists).to.be.calledOnce;
+        });
+        it("should not call redrawCombinedLists if param is not sub list", function() {
+            tfolds.listRemoved(tdom.getLists("Delta.Sub2")[0]);
+            expect(tfolds.redrawCombinedLists).to.not.be.called;
+        });
+    });
+
+    describe("listAdded()", function() {
+
+        before(function() {
+            sinon.stub(tfolds, "addFoldingButton");
+            sinon.stub(tfolds, "addCollapsedList");
+            sinon.stub(tfolds, "showWipLimit");
+            sinon.stub(tfolds, "redrawCombinedLists");
+            sinon.stub(console, "error");
+        });
+        after(function() {
+            tfolds.addFoldingButton.restore();
+            tfolds.addCollapsedList.restore();
+            tfolds.showWipLimit.restore();
+            tfolds.redrawCombinedLists.restore();
+            console.error.restore();
+        });
+
+        it("should not call anything without no argument", function() {
+            tfolds.listAdded();
+            expect(tfolds.addFoldingButton).to.not.be.called;
+            expect(console.error).to.be.calledWith("[listEl] not defined");
+        });
+        it("should call other functions when provided a list", function() {
+            let listEl = 34;
+            tfolds.listAdded(listEl);
+            expect(tfolds.addFoldingButton).to.be.calledWith(34);
+            expect(tfolds.addCollapsedList).to.be.calledWith(34);
+            expect(tfolds.showWipLimit).to.be.calledOnce;
+            expect(tfolds.redrawCombinedLists).to.be.calledOnce;
+        });
+    });
+
+    describe("listDragged()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("listRemoved()", () => {
+    describe("listDropped()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("listAdded()", () => {
+    describe("redrawCombinedLists()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("listDragged()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("listDropped()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("redrawCombinedLists()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("formatCard()", () => {
+    describe("formatCard()", function() {
         let $normalCard;
-        context("[normal cards]", () => {
-            beforeEach(() => {
+        context("[normal cards]", function() {
+            beforeEach(function() {
                 $normalCard = $("<div><span class='list-card-title'>Normal card</span></div>");
             });
-            it("should contain a span with style list-card-title", () => {
+            it("should contain a span with style list-card-title", function() {
                 tfolds.formatCard($normalCard[0]);
                 expect($normalCard.find("span")).to.have.class("list-card-title");
             });
-            it("should not invoke requestAnimationFrame()", () => {
+            it("should not invoke requestAnimationFrame()", function() {
                 tfolds.formatCard($normalCard[0]);
             });
-            it("should not add extra styles", () => {
+            it("should not add extra styles", function() {
                 expect($normalCard).to.not.have.class("comment-card");
                 expect($normalCard).to.not.have.class("blocked-card");
             });
         });
-        context("[comment cards]", () => {
-            it("should add comment-card class for comment cards", () => {
+        context("[comment cards]", function() {
+            it("should add comment-card class for comment cards", function() {
                 let $commentCard = $("<div><span class='list-card-title'>// Comment card</span></div>");
                 tfolds.formatCard($commentCard[0]);
                 expect($commentCard).to.have.class("comment-card");
             });
         });
-        context("[blocked cards]", () => {
-            it("should add blocked-card class for blocked cards", () => {
+        context("[blocked cards]", function() {
+            it("should add blocked-card class for blocked cards", function() {
                 let $blockedCard = $(`<div><span class='list-card-title'>
                                           <span class='badge-text'>blocked</span>
                                           Blocked card</span></div>`);
@@ -234,13 +306,13 @@ describe('tfolds', () => {
         });
     });
 
-    describe("getStrippedTitle()", () => {
-        it("should return a string with all section dedicated chars removed", () => {
+    describe("getStrippedTitle()", function() {
+        it("should return a string with all section dedicated chars removed", function() {
             sections1.forEach((s) => {
                 expect(tfolds.getStrippedTitle(s)).to.equal("Section");
             });
         });
-        it("should not strip sections with too few section chars", () => {
+        it("should not strip sections with too few section chars", function() {
             /*
              * Setting sectionRepeat to 3 means
              * "## Section ##" is not stripped but "### Section ###" is.
@@ -249,7 +321,7 @@ describe('tfolds', () => {
             expect(tfolds.getStrippedTitle(sections1[2])).to.equal("Section");
             expect(tfolds.getStrippedTitle(sections1[1])).to.not.equal("Section");
         });
-        it("should return stripped titles when changing section char", () => {
+        it("should return stripped titles when changing section char", function() {
             tfolds.sectionCharacter = "*";
             tfolds.sectionRepeat = 2;
             sections2.forEach((s) => {
@@ -258,16 +330,16 @@ describe('tfolds', () => {
         });
     });
 
-    describe("areListsRelated()", () => {
-        it("should be two lists named Delta.xxxx in the test board", () => {
+    describe("areListsRelated()", function() {
+        it("should be two lists named Delta.xxxx in the test board", function() {
             let $lists = tdom.getLists("Delta");
             expect($lists).to.have.lengthOf(2);
         });
-        it("should return true for lists with same prefix", () => {
+        it("should return true for lists with same prefix", function() {
             let $lists = tdom.getLists("Delta");
             expect(tfolds.areListsRelated($lists[0], $lists[1])).to.be.true;
         });
-        it("should return false for lists not having same prefix", () => {
+        it("should return false for lists not having same prefix", function() {
             let $l1 = tdom.getLists("Alpha");
             let $l2 = tdom.getLists("Bravo");
             expect($l1).to.have.lengthOf(1);
@@ -276,10 +348,10 @@ describe('tfolds', () => {
         });
     });
 
-    describe("showWipLimit()", () => {
+    describe("showWipLimit()", function() {
 
-        context("[no wip limit]", () => {
-            it("should not add any visuals when no WiP limit", () => {
+        context("[no wip limit]", function() {
+            it("should not add any visuals when no WiP limit", function() {
                 let $l = tdom.getLists("Alpha");
                 tfolds.alwaysCount = false;
                 expect($l).to.have.lengthOf(1);
@@ -290,7 +362,7 @@ describe('tfolds', () => {
                 expect($l.find("span.wip-limit-title")).to.have.length(0);
             });
 
-            it("should show WiP limit if settings.alwaysCount is true", () => {
+            it("should show WiP limit if settings.alwaysCount is true", function() {
                 let $l = tdom.getLists("Alpha");
                 tfolds.alwaysCount = true;
                 expect($l).to.have.lengthOf(1);
@@ -303,9 +375,9 @@ describe('tfolds', () => {
             });
         });
 
-        context("[wip limit defined]", () => {
+        context("[wip limit defined]", function() {
 
-            it("should add wip-limit-reached style when num of Cards == limit", () => {
+            it("should add wip-limit-reached style when num of Cards == limit", function() {
                 let $l = tdom.getLists("Charlie");
                 expect($l).to.have.length(1);
                 tfolds.showWipLimit($l[0]);
@@ -314,7 +386,7 @@ describe('tfolds', () => {
                 expect($l.find("span.wip-limit-title")).to.have.length(1);
             });
 
-            it("should add wip-limit-exceeded style when num of cards > limit", () => {
+            it("should add wip-limit-exceeded style when num of cards > limit", function() {
                 let $l = tdom.getLists("Bravo");
                 expect($l).to.have.length(1);
                 tfolds.showWipLimit($l[0]);
@@ -325,30 +397,30 @@ describe('tfolds', () => {
         });
     });
 
-    describe("extractWipLimit()", () => {
+    describe("extractWipLimit()", function() {
 
-        it("should return 'null' if no WiP limit (i.e. no [x] in title)", () => {
+        it("should return 'null' if no WiP limit (i.e. no [x] in title)", function() {
             let $l = tdom.getLists("Alpha");
             let wipLimit = tfolds.extractWipLimit($l[0]);
             expect(wipLimit).to.be.null;
         });
 
-        it("should return an integer with the WiP limit if it exists", () => {
+        it("should return an integer with the WiP limit if it exists", function() {
             let $l = tdom.getLists("Bravo");
             let wipLimit = tfolds.extractWipLimit($l[0]);
             expect(wipLimit).to.equal(3);
         });
     });
 
-    describe("addWipLimit()", () => {
+    describe("addWipLimit()", function() {
         let $l;
         let $span;
 
-        before(() => {
+        before(function() {
             $l = tdom.getLists("Alpha");
         });
 
-        it("should contain a span.wip-limit-title with the title", () => {
+        it("should contain a span.wip-limit-title with the title", function() {
             $l.data("subList", false);
             tfolds.addWipLimit($l, 5);
             let titleEl = $l.find("span.wip-limit-title");
@@ -359,7 +431,7 @@ describe('tfolds', () => {
          * addWipLimit() is only called when a badge should be displayed
          * so a span.wip-limit-badge should always be created after calling this method.
          */
-        it("should always add a span.wip-limit-badge", () => {
+        it("should always add a span.wip-limit-badge", function() {
             $l.data("subList", false);
             tfolds.alwaysCount = true;
             tfolds.addWipLimit($l, 5);
@@ -370,7 +442,7 @@ describe('tfolds', () => {
 
         });
 
-        it("should replace existing span", () => {
+        it("should replace existing span", function() {
             tfolds.addWipLimit($l, 3, 6);
             expect($l).to.have.descendants("span.wip-limit-badge");
             $span = $l.find("span.wip-limit-badge");
@@ -378,19 +450,19 @@ describe('tfolds', () => {
             expect($span).to.have.text("3 / 6");
         });
 
-        context("[sub list]", () => {
+        context("[sub list]", function() {
 
-            before(() => {
+            before(function() {
                 tfolds.alwaysCount = true;
                 $l.data("subList", true);
             });
 
-            after(() => {
+            after(function() {
                 tfolds.alwaysCount = false;
                 $l.data("subList", false);
             });
 
-            it("should display count", () => {
+            it("should display count", function() {
                 tfolds.addWipLimit($l, 5);
                 expect($l).to.have.descendants("span.wip-limit-badge");
                 $span = $l.find("span.wip-limit-badge");
@@ -398,7 +470,7 @@ describe('tfolds', () => {
                 expect($span).to.have.text("5");
             });
 
-            it("should display count but not display limit", () => {
+            it("should display count but not display limit", function() {
                 // tfolds.addWipLimit($l, 3, 6);
                 // expect($l).to.have.descendants("span.wip-limit-badge");
                 // $span = $l.find("span.wip-limit-badge");
@@ -408,34 +480,34 @@ describe('tfolds', () => {
         });
     });
 
-    describe("cardBadgesModified()", () => {
+    describe("cardBadgesModified()", function() {
 
-        it("should add blocked-card class if blocked", () => {
+        it("should add blocked-card class if blocked", function() {
             let $c = $(blockedCard);
             tfolds.cardBadgesModified($c);
             expect($c).to.have.class("blocked-card");
         });
 
-        it("should not add blocked-card class if not blocked", () => {
+        it("should not add blocked-card class if not blocked", function() {
             let $c = $(normalCard);
             tfolds.cardBadgesModified($c);
             expect($c).to.not.have.class("blocked-card");
         });
     });
 
-    describe("cardModified()", () => {
+    describe("cardModified()", function() {
 
-        context("[comment]", () => {
+        context("[comment]", function() {
 
-            before(() => {
+            before(function() {
                 sinon.stub(tfolds, "showWipLimit");
             });
 
-            after(() => {
+            after(function() {
                 tfolds.showWipLimit.restore();
             });
 
-            it("should not add comment-card class if not beginning with //", () => {
+            it("should not add comment-card class if not beginning with //", function() {
                 let $c = $(normalCard);
                 tfolds.cardModified($c[0], "No Comment", "// Comment");
                 expect($c).to.not.have.class("comment-card");
@@ -451,7 +523,7 @@ describe('tfolds', () => {
                 expect($c).to.not.have.class("comment-card");
             });
 
-            it("should add comment-card class if beginning with //", () => {
+            it("should add comment-card class if beginning with //", function() {
                 let $c = $(commentCard);
                 expect($c).to.have.class("comment-card");
                 $c.removeClass("comment-card");
@@ -465,7 +537,7 @@ describe('tfolds', () => {
                 expect($c).to.have.class("comment-card");
             });
 
-            it("should remove comment-card class if title changed from comment", () => {
+            it("should remove comment-card class if title changed from comment", function() {
                 let $c = $(commentCard);
                 expect($c).to.have.class("comment-card");
                 let $t = $c.find("span.list-card-title");
@@ -480,25 +552,25 @@ describe('tfolds', () => {
 
     });
 
-    describe("checkSectionChange()", () => {
+    describe("checkSectionChange()", function() {
 
-        before(() => {
+        before(function() {
             sinon.spy(tfolds, "removeSectionFormatting");
             sinon.spy(tfolds, "formatAsSection");
         });
 
-        after(() => {
+        after(function() {
             tfolds.removeSectionFormatting.restore();
             tfolds.formatAsSection.restore();
         });
 
-        context("[non-section --> non-section]", () => {
+        context("[non-section --> non-section]", function() {
 
-            it("should not do anything", () => {
-                expect(() => {tfolds.checkSectionChange(null, "new", "old");}).to.not.throw;
+            it("should not do anything", function() {
+                expect(function() {tfolds.checkSectionChange(null, "new", "old");}).to.not.throw;
             });
 
-            it("should not call removeSectionFormatting() or formatAsSection()", () => {
+            it("should not call removeSectionFormatting() or formatAsSection()", function() {
                 let $c = $(normalCard);
                 tfolds.checkSectionChange($c, "new", "old");
                 expect(tfolds.removeSectionFormatting).to.not.be.called;
@@ -506,9 +578,9 @@ describe('tfolds', () => {
             });
         });
 
-        context("[section --> section]", () => {
+        context("[section --> section]", function() {
 
-            it("should contain a section-title with stripped title", () => {
+            it("should contain a section-title with stripped title", function() {
                 let $c = $(sectionCard);
                 const newTitle = "## New title";
                 tfolds.checkSectionChange($c, newTitle, "## Beta Section 1");
@@ -516,41 +588,41 @@ describe('tfolds', () => {
             });
         });
 
-        context("[section --> non-section]", () => {
+        context("[section --> non-section]", function() {
 
             let $c;
             const newTitle = "No section now baby!";
 
-            beforeEach(() => {
+            beforeEach(function() {
                 $c = $(sectionCard);
             });
 
-            it("should call removeSectionFormatting()", () => {
+            it("should call removeSectionFormatting()", function() {
                 tfolds.checkSectionChange($c, newTitle, "## Beta Section 1");
                 expect(tfolds.removeSectionFormatting).to.be.called;
             });
 
-            it("should remove section-card class", () => {
+            it("should remove section-card class", function() {
                 tfolds.checkSectionChange($c, newTitle, "## Beta Section 1");
                 expect($c).to.not.have.class("section-card");
             });
         });
 
-        context("[non-section --> section]", () => {
+        context("[non-section --> section]", function() {
 
             let $c;
             const newTitle = "## New title";
 
-            before(() => {
+            before(function() {
                 $c = $(normalCard);
             });
 
-            it("should call formatAsSection()", () => {
+            it("should call formatAsSection()", function() {
                 tfolds.checkSectionChange($c, newTitle, "old");
                 expect(tfolds.formatAsSection).to.be.called;
             });
 
-            it("should add section-card class", () => {
+            it("should add section-card class", function() {
                 tfolds.checkSectionChange($c, newTitle, "old");
                 expect($c).to.have.class("section-card");
             });
@@ -558,24 +630,24 @@ describe('tfolds', () => {
 
     });
 
-    describe("listTitleModified()", () => {
+    describe("listTitleModified()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("setupBoard()", () => {
+    describe("setupBoard()", function() {
 
-        it("should throw error if called with 3", () => {
+        it("should throw error if called with 3", function() {
             let $canvas = $("div.board-canvas");
             $canvas.removeClass("board-canvas");
-            expect(() => { tfolds.setupBoard(3); }).to.throw(ReferenceError);
+            expect(function() { tfolds.setupBoard(3); }).to.throw(ReferenceError);
             $canvas.addClass("board-canvas");
         });
 
     });
 
-    describe("combineLists()", () => {
+    describe("combineLists()", function() {
 
-        it("should not do anything when enableCombiningLists === false", () => {
+        it("should not do anything when enableCombiningLists === false", function() {
             sinon.spy(tdom, "getLists");
             tfolds.enableCombiningLists = false;
             tfolds.combineLists();
@@ -584,7 +656,7 @@ describe('tfolds', () => {
             tdom.getLists.restore();
         });
 
-        it("should call combineListWithNext() once", () => {
+        it("should call combineListWithNext() once", function() {
             // sinon.spy(tfolds, "combineListWithNext");
             // tfolds.combineLists();
             // expect(tfolds.combineListWithNext).to.be.calledOnce;
@@ -593,81 +665,127 @@ describe('tfolds', () => {
 
     });
 
-    describe("createCombinedList()", () => {
+    describe("createCombinedList()", function() {
+
+        it("should return null if list already has class 'sub-list'", function() {
+            let $l = tdom.getLists("Delta.Sub2");
+            let result = tfolds.createCombinedList($l);
+            expect(result).to.be.null;
+        });
+
+        it("should add data property numOfSubLists", function() {
+            sinon.stub(tfolds, "convertToSubList");
+            tfolds.convertToSubList.returns(2);
+            sinon.stub(tfolds, "addSuperList");
+
+            let $l = tdom.getLists("Delta.Sub2");
+            let result = tfolds.createCombinedList($l);
+
+            expect(result).to.equal(3);
+            expect($l.data("numOfSubLists")).to.equal(3);
+
+            tfolds.convertToSubList.restore();
+            tfolds.addSuperList.restore();
+        });
+    });
+
+    describe("convertToSubList()", function() {
+        it("should return 0 and output warning when called with sub list", function() {
+            let $l = tdom.getLists("Delta.Sub2");
+            expect($l.hasClass("sub-list")).to.be.true;
+            tfolds.debug = true;
+            sinon.stub(console, "warn");
+            let result = tfolds.convertToSubList($l);
+            expect(result).to.equal(0);
+            expect(console.warn).to.be.calledOnce;
+            tfolds.debug = false;
+            console.warn.restore();
+        });
+        it("should add sub-list class to target list", function() {
+            let $l = tdom.getLists("Alpha");
+            expect($l.hasClass("sub-list")).to.be.false;
+            let result = tfolds.convertToSubList($l, 0, 43);
+            expect(result).to.equal(0);
+            expect($l.hasClass("sub-list")).to.be.true;
+            expect($l.attr("data-id")).to.equal("43");
+        });
+    });
+
+    describe("attachListResizeDetector()", function() {
+        it("should only add detector once", function() {
+            let $l = tdom.getLists("Beta");
+            tfolds.attachListResizeDetector($l);
+            //?
+            // expect($l.data("hasDetector")).to.be.true;
+            expect(requestAnimationFrame).to.be.calledOnce;
+            // tfolds.attachListResizeDetector($l);
+            // expect(requestAnimationFrame).to.be.calledOnce;
+        });
+    });
+
+    describe("splitLists()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("convertToSubList()", () => {
+    describe("isFirstSubList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("attachListResizeDetector()", () => {
+    describe("restoreSubList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("splitLists()", () => {
+    describe("isSubList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("isFirstSubList()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("restoreSubList()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("isSubList()", () => {
-        it("NO TESTS WRITTEN YET");
-    });
-
-    describe("addSuperList()", () => {
+    describe("addSuperList()", function() {
         it("should add a DIV.super-list tag containing header elements before the left list");
         it("should add a collapsed version of the super list");
         it("should update super list WiP information and height");
     });
 
-    describe("addCollapsedSuperList()", () => {
+    describe("addCollapsedSuperList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("updateSuperListHeight()", () => {
+    describe("updateSuperListHeight()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("findSuperListHeight()", () => {
+    describe("findSuperListHeight()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("getMySuperList()", () => {
+    describe("getMySuperList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("updateSuperList()", () => {
+    describe("updateSuperList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("updateWidths()", () => {
+    describe("updateWidths()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("updateCollapsedSuperList()", () => {
+    describe("updateCollapsedSuperList()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("makeListsFoldable()", () => {
+    describe("makeListsFoldable()", function() {
         it("NO TESTS WRITTEN YET");
     });
 
-    describe("listWidth()", () => {
-        after(() => {
+    describe("listWidth()", function() {
+        after(function() {
             tfolds.compactMode = false;
         });
-        it("should return 272 when compact mode disabled", () => {
+        it("should return 272 when compact mode disabled", function() {
             tfolds.compactMode = true;
             expect(tfolds.listWidth).to.equal(200);
         });
-        it("should return 200 when compact mode enabled", () => {
+        it("should return 200 when compact mode enabled", function() {
             tfolds.compactMode = false;
             expect(tfolds.listWidth).to.equal(272);
         });
