@@ -5,6 +5,6 @@
         ]
     },
     "compilerOptions": {
-        "target": "ES6"
+        "target": "es2020"
     }
 }
