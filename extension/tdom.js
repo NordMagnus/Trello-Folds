@@ -128,9 +128,9 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Initializes a mutation observer that listens to board being changed/loaded.
-         * Also disconnects other observers used to track changes within the board.
-         */
+     * Initializes a mutation observer that listens to board being changed/loaded.
+     * Also disconnects other observers used to track changes within the board.
+     */
     initialize(attemptCount = 0) {
       const $content = $('DIV#content');
 
@@ -196,9 +196,9 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Called when a board change is detected. Shows some console output and
-         * initializes the board loading process.
-         */
+     * Called when a board change is detected. Shows some console output and
+     * initializes the board loading process.
+     */
     boardChanged(boardId) {
       oldBoardId = currentBoardId;
 
@@ -209,9 +209,9 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Connects a mutation observer detecting when a board is fully loaded, and starts
-         * watching for mutations to the board.
-         */
+     * Connects a mutation observer detecting when a board is fully loaded, and starts
+     * watching for mutations to the board.
+     */
     watchForMutations(boardId, attemptCount = 1) {
       const $content = $('DIV#board');
 
@@ -241,11 +241,11 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Once no new mutations are detected during board load connects observers to track
-         * changes within board (e.g. to lists, cards, etc.).
-         *
-         * If changes _are_ detected it will wait for 100 ms and try again.
-         */
+     * Once no new mutations are detected during board load connects observers to track
+     * changes within board (e.g. to lists, cards, etc.).
+     *
+     * If changes _are_ detected it will wait for 100 ms and try again.
+     */
     connectObservers(numCalls = 1) {
       if (!newMutations && boardCompletelyLoaded) {
         if (self.debug) {
@@ -316,9 +316,9 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Setting up the observer to check for added and removed lists by looking for
-         * added and removed children to `DIV#board` having the CSS class `list-wrapper`.
-         */
+     * Setting up the observer to check for added and removed lists by looking for
+     * added and removed children to `DIV#board` having the CSS class `list-wrapper`.
+     */
     connectBoardObserver($content) {
       boardObserver = new MutationObserver(((mutations) => {
         let isDropped = false;
@@ -392,8 +392,8 @@ const tdom = (function (factory) {
     },
 
     /**
-         *
-         */
+     *
+     */
     connectListObserver() {
       const $lists = $('div.list');
 
@@ -468,23 +468,23 @@ const tdom = (function (factory) {
     },
 
     /**
-         *
-         */
+     *
+     */
     onBoardChanged(callback) {
       handler.addListener(EventHandler.BOARD_CHANGED, callback);
     },
 
     /**
-         *
-         */
+     *
+     */
     onListModified(callback) {
       handler.addListener(EventHandler.LIST_MODIFIED, callback);
     },
 
     /**
-         *
-         * @param {Function} callback
-         */
+     *
+     * @param {Function} callback
+     */
     onListAdded(callback) {
       handler.addListener(EventHandler.LIST_ADDED, callback);
     },
@@ -494,54 +494,54 @@ const tdom = (function (factory) {
     },
 
     /**
-         *
-         */
+     *
+     */
     onListDragged(callback) {
       handler.addListener(EventHandler.LIST_DRAGGED, callback);
     },
 
     /**
-         *
-         * @param {Function} callback
-         */
+     *
+     * @param {Function} callback
+     */
     onListDropped(callback) {
       handler.addListener(EventHandler.LIST_DROPPED, callback);
     },
 
     /**
-         *
-         * @param {Function} callback
-         */
+     *
+     * @param {Function} callback
+     */
     onCardAdded(callback) {
       handler.addListener(EventHandler.CARD_ADDED, callback);
     },
 
     /**
-         *
-         * @param {Function} callback
-         */
+     *
+     * @param {Function} callback
+     */
     onCardRemoved(callback) {
       handler.addListener(EventHandler.CARD_REMOVED, callback);
     },
 
     /**
-         *
-         */
+     *
+     */
     onCardModified(callback) {
       handler.addListener(EventHandler.CARD_MODIFIED, callback);
     },
 
     /**
-         *
-         */
+     *
+     */
     onBadgesModified(callback) {
       handler.addListener(EventHandler.BADGES_MODIFIED, callback);
     },
 
     /**
-         *
-         * @param {*} callback
-         */
+     *
+     * @param {*} callback
+     */
     onListTitleModified(callback) {
       handler.addListener(EventHandler.LIST_TITLE_MODIFIED, callback);
     },
@@ -554,11 +554,11 @@ const tdom = (function (factory) {
 
 
     /**
-         * Extracts the board ID from the URL.
-         * Assuming the URL has the following format `https://trello.com/b/[BOARD-ID]/[BOARD-NAME]`
-         *
-         * @returns {String} Board ID
-         */
+     * Extracts the board ID from the URL.
+     * Assuming the URL has the following format `https://trello.com/b/[BOARD-ID]/[BOARD-NAME]`
+     *
+     * @returns {String} Board ID
+     */
     getBoardIdFromUrl() {
       const url = document.URL.split('/');
       if (url.length < 2) {
@@ -568,21 +568,21 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Gets the `div.list` element for the list containing the given element.
-         *
-         * @param {Element} card The card whose list to get
-         * @returns {Element} The containing list element
-         */
+     * Gets the `div.list` element for the list containing the given element.
+     *
+     * @param {Element} card The card whose list to get
+     * @returns {Element} The containing list element
+     */
     getContainingList(card) {
       return card.closest('div.list')[0];
     },
 
     /**
-         * Given a parent element, returns the name of the list.
-         *
-         * @param {Element} el Parent element
-         * @returns {String} The name of the list
-         */
+     * Given a parent element, returns the name of the list.
+     *
+     * @param {Element} el Parent element
+     * @returns {String} The name of the list
+     */
     getListName(el) {
       if (!el) {
         throw new TypeError('Parameter [el] undefined');
@@ -599,12 +599,12 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Gets all **DIV.js-list-content** elements matching the given parameters.
-         *
-         * @param {String} name String that name of list should contain
-         * @param {Array} filter Array of strings that name of list should *not* contain
-         * @returns {jQuery} A jQuery object with the elements
-         */
+     * Gets all **DIV.js-list-content** elements matching the given parameters.
+     *
+     * @param {String} name String that name of list should contain
+     * @param {Array} filter Array of strings that name of list should *not* contain
+     * @returns {jQuery} A jQuery object with the elements
+     */
     getLists(name, filter) {
       let jLists;
       if (name instanceof RegExp) {
@@ -631,34 +631,34 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Given a list element, tries to find the previous list.
-         *
-         * @param {Element} listEl List whos predecessor to get
-         * @returns {Element} List element or ``null`` if not found
-         */
+     * Given a list element, tries to find the previous list.
+     *
+     * @param {Element} listEl List whos predecessor to get
+     * @returns {Element} List element or ``null`` if not found
+     */
     getPrevList(listEl) {
       const $prev = $(listEl).parent().prev().find('div.js-list-content');
       return $prev.length ? $prev[0]: null;
     },
 
     /**
-         * Given a list element, tries to find the following list.
-         *
-         * @param {Element} listEl List whos successor to get
-         * @returns {Element} List element or ``null`` if not found
-         */
+     * Given a list element, tries to find the following list.
+     *
+     * @param {Element} listEl List whos successor to get
+     * @returns {Element} List element or ``null`` if not found
+     */
     getNextList(listEl) {
       const $next = $(listEl).parent().next().find('div.js-list-content');
       return $next.length === 1 ? $next[0] : null;
     },
 
     /**
-         * Gets the title of a card by stripping all children
-         * and returning the text inside the `span.list-card-title` element.
-         *
-         * @param {jQuery} $card A jQuery object containing a Trello card
-         * @returns {String} The card title
-         */
+     * Gets the title of a card by stripping all children
+     * and returning the text inside the `span.list-card-title` element.
+     *
+     * @param {jQuery} $card A jQuery object containing a Trello card
+     * @returns {String} The card title
+     */
     getCardName($card) {
       if (!$card) {
         throw new TypeError('Parameter [$card] undefined');
@@ -691,11 +691,11 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Gets all cards with a specific string in the title.
-         *
-         * @returns {jQuery} jQuery object with card DOM elements or <code>null</code> if no cards found
-         * @throws {TypeError} when missing parameter
-         */
+     * Gets all cards with a specific string in the title.
+     *
+     * @returns {jQuery} jQuery object with card DOM elements or <code>null</code> if no cards found
+     * @throws {TypeError} when missing parameter
+     */
     getCardsByName(name, exactMatch = false) {
       if (name === undefined) {
         throw new TypeError();
@@ -714,12 +714,12 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Count cards in list.
-         *
-         * @param {Element} list The containing list
-         * @param {String} filter Cards containing filter will be excluded
-         * @returns {Number} Number of cards found
-         */
+     * Count cards in list.
+     *
+     * @param {Element} list The containing list
+     * @param {String} filter Cards containing filter will be excluded
+     * @returns {Number} Number of cards found
+     */
     countCards(list, filter, pos) {
       const $cards = $(list).find('a.list-card').filter(function () {
         const title = self.getCardName($(this));
@@ -735,12 +735,12 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Looks for instances of one string within another.
-         *
-         * @param {String} string The string to search
-         * @param {*} filter Either a string or an array to look for
-         * @returns ``true`` if filter found in string, otherwise ``false``
-         */
+     * Looks for instances of one string within another.
+     *
+     * @param {String} string The string to search
+     * @param {*} filter Either a string or an array to look for
+     * @returns ``true`` if filter found in string, otherwise ``false``
+     */
     containsAny(string, filter) {
       if (typeof filter === 'string') {
         return string.includes(filter);
@@ -757,11 +757,11 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Checks if the string starts with any of the strings in filter.
-         *
-         * @param {String} string The string to search
-         * @param {*} filter Either a string or an array to look for
-         */
+     * Checks if the string starts with any of the strings in filter.
+     *
+     * @param {String} string The string to search
+     * @param {*} filter Either a string or an array to look for
+     */
     beginsWith(string, filter, pos) {
       let needle;
       if (typeof filter === 'string') {
@@ -778,12 +778,13 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Get a count for all labels used in a list.
-         *
-         * @param {jQuery} jLists Lists to count labels in
-         * @param {Array} filter An array with strings. Labels will be excluded if they contain any of the strings
-         * @returns {Array} An associative array with labels and their respective count
-         */
+     * Get a count for all labels used in a list.
+     *
+     * @param {jQuery} jLists Lists to count labels in
+     * @param {Array} filter Array with strings. Labels will be excluded if they contain any
+     *      of the strings
+     * @returns {Array} An associative array with labels and their respective count
+     */
     countListLabels(jLists, filter) {
       if (!jLists) {
         throw new TypeError('Parameter [jLists] not defined');
@@ -813,12 +814,13 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Get the labels for a specific card.
-         *
-         * @param {Element} el The card item
-         * @param {Array} filter An array with strings. Labels will be excluded if they contain any of the strings
-         * @returns {Array} An array with card labels
-         */
+     * Get the labels for a specific card.
+     *
+     * @param {Element} el The card item
+     * @param {Array} filter An array with strings. Labels will be excluded if they
+     *    contain any of the strings
+     * @returns {Array} An array with card labels
+     */
     getCardLabels(el, filter) {
       if (!el) {
         throw new TypeError('Parameter [el] not defined');
@@ -842,12 +844,12 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Gets an associative array with the fields for a given card, e.g.
-         * `{"fieldName": "fieldValue", ...}`
-         *
-         * @param {Element} cardEl The *DIV.list-card-details* element for the card
-         * @returns {Object} Associative array with field names and values
-         */
+     * Gets an associative array with the fields for a given card, e.g.
+     * `{"fieldName": "fieldValue", ...}`
+     *
+     * @param {Element} cardEl The *DIV.list-card-details* element for the card
+     * @returns {Object} Associative array with field names and values
+     */
     getCardFields(cardEl) {
       if (!cardEl) {
         throw new TypeError('Parameter [cardEl] not defined');
@@ -870,18 +872,18 @@ const tdom = (function (factory) {
     },
 
     /**
-         * Returns an associative array with the count for each label in that list, e.g.
-         * ```
-         * {
-         *     "Label 1": 3,
-         *     "Label 2": 2
-         * }
-         * ```
-         *
-         * @param {Element} listEl The list to check
-         * @param {Array} filter An optional filter with labels to exclude
-         * @returns {Object} Label count for the given list
-         */
+     * Returns an associative array with the count for each label in that list, e.g.
+     * ```
+     * {
+     *     "Label 1": 3,
+     *     "Label 2": 2
+     * }
+     * ```
+     *
+     * @param {Element} listEl The list to check
+     * @param {Array} filter An optional filter with labels to exclude
+     * @returns {Object} Label count for the given list
+     */
     countLabelsInList(listEl, filter) {
       if (!listEl) {
         throw new TypeError('Parameter [listEl] not defined');
@@ -904,6 +906,12 @@ const tdom = (function (factory) {
         labels[title]++;
       });
       return labels;
+    },
+
+    getListWrapperByIndex(idx) {
+      const boardEl = document.getElementById('board');
+      const listEl = boardEl.childNodes[idx];
+      return listEl;
     },
 
   };

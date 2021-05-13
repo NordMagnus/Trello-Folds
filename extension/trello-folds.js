@@ -1,8 +1,9 @@
-// eslint-disable-next-line no-unused-vars
 /* global chrome */
-import { tdom } from './tdom.js';
 
-class tfolds {
+// import { tdom } from './tdom.js';
+// import { $, jQuery } from 'jquery';
+
+class TFolds {
 
   constructor() {
     this.settings = {
@@ -14,10 +15,10 @@ class tfolds {
       enableCombiningLists: true,
       compactListWidth: 200,
     };
-    this.compactMode = false;
+    this._compactMode = false;
     this.storage = {};
-    this.boardId = undefined;
-    this.config = {
+    this._boardId = undefined;
+    this._config = {
       debug: true,
       collapsedIconUrl: null,
       expandedIconUrl: null,
@@ -25,25 +26,29 @@ class tfolds {
   }
 
   get config() {
-    return this.config;
+    return this._config;
   }
 
   get debug() {
-    return this.config.debug;
+    return this._config.debug;
   }
 
   /**
-       * Sets the debug flag. The module will output messages to the console
-       * when set to `true`.
-       *
-       * @param {boolean} debug `true` to spam console, otherwise `false`
-       */
+   * Sets the debug flag. The module will output messages to the console
+   * when set to `true`.
+   *
+   * @param {boolean} debug `true` to spam console, otherwise `false`
+   */
   set debug(debug) {
-    this.config.debug = debug;
+    this._config.debug = debug;
   }
 
   get boardId() {
-    return this.boardId;
+    return this._boardId;
+  }
+
+  set boardId(id) {
+    this._boardId = id;
   }
 
   get sectionCharacter() {
@@ -83,35 +88,60 @@ class tfolds {
   }
 
   get compactMode() {
-    return this.compactMode;
+    return this._compactMode;
   }
 
   set compactMode(status) {
-    this.compactMode = status;
+    this._compactMode = status;
   }
 
   get listWidth() {
-    let width = tfolds.NORMAL_LIST_WIDTH;
+    let width = TFolds.NORMAL_LIST_WIDTH;
     if (this.compactMode) {
-      width = this.settings.compactListWidth || tfolds.DEFAULT_COMPACT_WIDTH;
+      width = this.settings.compactListWidth || TFolds.DEFAULT_COMPACT_WIDTH;
     }
     return Number(width);
   }
 
+  // TODO Replace ...args with actual arguments?
   initialize() {
     tdom.debug = this.config.debug;
-    tdom.onBoardChanged(this.boardChanged);
-    tdom.onListModified(this.listModified);
-    tdom.onListAdded(this.listAdded);
-    tdom.onListRemoved(this.listRemoved);
-    tdom.onCardAdded(this.cardAdded);
-    tdom.onCardRemoved(this.cardRemoved);
-    tdom.onCardModified(this.cardModified);
-    tdom.onListTitleModified(this.listTitleModified);
-    tdom.onListDragged(this.listDragged);
-    tdom.onListDropped(this.listDropped);
-    tdom.onBadgesModified(this.cardBadgesModified);
-    tdom.onRedrawBoardHeader(this.redrawHeader);
+    tdom.onBoardChanged((...args) => {
+      this.boardChanged(...args);
+    });
+    tdom.onListModified((...args) => {
+      this.listModified(...args);
+    });
+    tdom.onListAdded((...args) => {
+      this.listAdded(...args);
+    });
+    tdom.onListRemoved((...args) => {
+      this.listRemoved(...args);
+    });
+    tdom.onCardAdded((...args) => {
+      this.cardAdded(...args);
+    });
+    tdom.onCardRemoved((...args) => {
+      this.cardRemoved(...args);
+    });
+    tdom.onCardModified((...args) => {
+      this.cardModified(...args);
+    });
+    tdom.onListTitleModified((...args) => {
+      this.listTitleModified(...args);
+    });
+    tdom.onListDragged((...args) => {
+      this.listDragged(...args);
+    });
+    tdom.onListDropped((...args) => {
+      this.listDropped(...args);
+    });
+    tdom.onBadgesModified((...args) => {
+      this.cardBadgesModified(...args);
+    });
+    tdom.onRedrawBoardHeader((...args) => {
+      this.redrawHeader(...args);
+    });
     tdom.init();
 
     /*
@@ -124,8 +154,8 @@ class tfolds {
   // #region EVENT HANDLERS
 
   /**
-       *
-       */
+   *
+   */
   boardChanged(boardId, oldId) {
     if (this.debug) {
       console.log(`boardId=${boardId},oldId=${oldId}`);
@@ -134,8 +164,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   listModified(listEl) {
     if (!listEl) {
       console.error('[listEl] not defined');
@@ -145,14 +175,14 @@ class tfolds {
   }
 
   listRemoved(listEl) {
-    if (this.isSubList($(listEl))) {
+    if (this.isSubList(listEl)) {
       this.redrawCombinedLists();
     }
   }
 
   /**
-       *
-       */
+   *
+   */
   listAdded(listEl) {
     if (!listEl) {
       console.error('[listEl] not defined');
@@ -166,13 +196,17 @@ class tfolds {
   }
 
   listDragged(listEl) {
-    const $list = $(listEl).find('.js-list-content');
-    if (this.isSubList($list)) {
-      const $subs = this.getSubLists($list);
+    const list = listEl.querySelector('.js-list-content');
+    if (this.isSubList(list)) {
+      const $subs = this.getSubLists(list);
+      const self = this;
       $subs.each(function () {
-        this.restoreSubList($(this));
+        self.restoreSubList($(this));
       });
     }
+    // const $list = $(listEl).find('.js-list-content');
+    // if (this.isSubList($list)) {
+    // }
   }
 
   listDropped() {
@@ -185,8 +219,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   cardAdded(cardEl) {
     setTimeout(() => {
       this.formatCard(cardEl);
@@ -194,12 +228,12 @@ class tfolds {
   }
 
   /**
-       * Called when a card is removed from a list. In practice this method
-       * is invoked when a card is dragged and used to expand cards when a section
-       * card is moved.
-       *
-       * @param {Element} cardEl
-       */
+   * Called when a card is removed from a list. In practice this method
+   * is invoked when a card is dragged and used to expand cards when a section
+   * card is moved.
+   *
+   * @param {Element} cardEl
+   */
   cardRemoved(cardEl) {
     const $cardEl = $(cardEl);
     if ($cardEl.hasClass('section-card')) {
@@ -226,14 +260,14 @@ class tfolds {
   }
 
   /**
-       * This method is called when a list card changes.
-       * It checks if the card changed into a section or from being a section.
-       * It also checks if card is a *comment card*.
-       *
-       * @param {Element} cardEl The card that was modified
-       * @param {String} title The new title
-       * @param {String} oldTitle The title before it was modified
-       */
+   * This method is called when a list card changes.
+   * It checks if the card changed into a section or from being a section.
+   * It also checks if card is a *comment card*.
+   *
+   * @param {Element} cardEl The card that was modified
+   * @param {String} title The new title
+   * @param {String} oldTitle The title before it was modified
+   */
   cardModified(cardEl, title, oldTitle) {
     const $c = $(cardEl);
 
@@ -251,44 +285,44 @@ class tfolds {
   }
 
   /**
-       * Checks if section state changed. There are basically
-       * three changes that we need to handle:
-       * 1. A section card's title changed
-       * 2. A card was changed __into__ a section
-       * 3. A card was changed __from__ a section to a normal card
-       * In addition for item 2 and 3 above the list WIP has to be updated
-       */
+   * Checks if section state changed. There are basically
+   * three changes that we need to handle:
+   * 1. A section card's title changed
+   * 2. A card was changed __into__ a section
+   * 3. A card was changed __from__ a section to a normal card
+   * In addition for item 2 and 3 above the list WIP has to be updated
+   */
   checkSectionChange($c, title, oldTitle) {
     if (!this.isSection(title) && !this.isSection(oldTitle)) {
       return;
     }
 
     /*
-            * Case 1: Only title changed (was, and still is, a section)
-            */
+     * Case 1: Only title changed (was, and still is, a section)
+     */
     if (this.isSection(title) && this.isSection(oldTitle)) {
       $c.find('#section-title').text(this.getStrippedTitle(title));
       return;
     }
 
     /*
-            * Case 3: A card was changed from a section
-            */
+     * Case 3: A card was changed from a section
+     */
     if (!this.isSection(title)) {
       this.removeSectionFormatting($c);
     } else {
       /*
-                * Case 2: Was a normal card now a section
-                */
+       * Case 2: Was a normal card now a section
+       */
       this.formatAsSection($c);
     }
   }
 
   /**
-       * Removes any section formatting for the specified card.
-       *
-       * @param {jQuery} $card The card to strip
-       */
+   * Removes any section formatting for the specified card.
+   *
+   * @param {jQuery} $card The card to strip
+   */
   removeSectionFormatting($card) {
     $card.find('span.icon-expanded,span.icon-collapsed').remove();
     $card.find('span#section-title').remove();
@@ -298,8 +332,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   listTitleModified(/* list, title*/) {
     this.redrawCombinedLists();
   }
@@ -312,15 +346,15 @@ class tfolds {
   // #endregion EVENT HANDLERS
 
   /**
-       *
-       */
+   *
+   */
   isSection(title) {
     return title.indexOf(this.sectionIdentifier) !== -1;
   }
 
   /**
-       *
-       */
+   *
+   */
   getStrippedTitle(title) {
     let ch = this.sectionCharacter;
     if (['*', '^', '$', '.', '+', '?', '|', '\\'].indexOf(ch) !== -1) {
@@ -331,8 +365,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   initStorage() {
     this.boardId = tdom.getBoardIdFromUrl();
 
@@ -352,17 +386,17 @@ class tfolds {
   }
 
   /**
-       * This method is called when the extension is first loaded and when
-       * a new board is loaded.
-       */
+   * This method is called when the extension is first loaded and when
+   * a new board is loaded.
+   */
   setupBoard(attemptCount = 1) {
     const $canvas = $('div.board-canvas');
     if (!$canvas.length) {
       /*
-                * Trying to find the board again in 100 ms if not found directly.
-                * Should not happen after changes to ``tdom.js`` but let's play it safe and
-                * keep it - changing log level to warn.
-                */
+       * Trying to find the board again in 100 ms if not found directly.
+       * Should not happen after changes to ``tdom.js`` but let's play it safe and
+       * keep it - changing log level to warn.
+       */
       if (attemptCount < 3) {
         setTimeout(() => {
           console.warn(`Trying to find DIV.board-canvas again (attempt ${attemptCount + 1})`);
@@ -385,7 +419,6 @@ class tfolds {
     this.addBoardIcons();
 
     this.compactMode = this.retrieveGlobalBoardSetting('compactMode');
-    this.setCompactMode(this.compactMode);
 
     if (this.settings.rememberViewStates) {
       setTimeout(() => {
@@ -397,8 +430,8 @@ class tfolds {
   }
 
   /**
-       * Adds board wide buttons to the top bar.
-       */
+   * Adds board wide buttons to the top bar.
+   */
   addBoardIcons() {
     const $boardBtns = $('div.board-header-btns.mod-right');
 
@@ -425,10 +458,10 @@ class tfolds {
   }
 
   /**
-       * Sets the compact mode for the current board and stores the setting.
-       *
-       * @param {boolean} enabled `true` if compact mode should be enabled, otherwise `false`
-       */
+   * Sets the compact mode for the current board and stores the setting.
+   *
+   * @param {boolean} enabled `true` if compact mode should be enabled, otherwise `false`
+   */
   setCompactMode(enabled) {
     this.updateCompactModeButtonState(enabled);
     this.updateWidths();
@@ -447,8 +480,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   cleanupStorage() {
     // console.log("cleanupStorage()", storage);
     if (this.settings.enableCombiningLists === false) {
@@ -457,73 +490,74 @@ class tfolds {
   }
 
   /**
-       * Removes the view state for the board. Called when board is setup
-       * if the `store view state` has been disabled.
-       */
+   * Removes the view state for the board. Called when board is setup
+   * if the `store view state` has been disabled.
+   */
   clearViewState() {
     chrome.storage.sync.remove(this.boardId);
   }
 
   /**
-       * Iterates section formatted cards and restores stored view states.
-       * Called at board setup.
-       */
+   * Iterates section formatted cards and restores stored view states.
+   * Called at board setup.
+   */
   restoreSectionsViewState() {
     const $lists = tdom.getLists();
+    const self = this;
     $lists.each(function () {
       const $l = $(this);
-      const $sections = tdom.getCardsInList(this, this.sectionIdentifier);
-      const sectionStates = this.retrieve(tdom.getListName($l), 'sections');
+      const $sections = tdom.getCardsInList(this, self.sectionIdentifier);
+      const sectionStates = self.retrieve(tdom.getListName($l), 'sections');
       if (!sectionStates) {
         return;
       }
       $sections.each(function () {
         const cardName = tdom.getCardName($(this));
-        if (sectionStates[this.getStrippedTitle(cardName)] === true) {
+        if (sectionStates[self.getStrippedTitle(cardName)] === true) {
           const $section = $(this).find('.icon-expanded');
-          this.toggleSection($section[0], false);
+          self.toggleSection($section[0], false);
         }
       });
     });
   }
 
   /**
-       * Stores a board wide setting imitating a list setting for the list specified
-       * by GLOBAL_BOARD_SETTING_STRING. Of course, in the unlikely event someone has
-       * a list with that name this might fail. Implemented it like this for backward
-       * compatibility reasons.
-       *
-       * @param {String} key The preference to store
-       * @param {Object} value The new value of the preference
-       * @see #store()
-       */
+   * Stores a board wide setting imitating a list setting for the list specified
+   * by GLOBAL_BOARD_SETTING_STRING. Of course, in the unlikely event someone has
+   * a list with that name this might fail. Implemented it like this for backward
+   * compatibility reasons.
+   *
+   * @param {String} key The preference to store
+   * @param {Object} value The new value of the preference
+   * @see #store()
+   */
   storeGlobalBoardSetting(key, value) {
-    this.store(tfolds.GLOBAL_BOARD_SETTING_STRING, key, value);
+    this.store(TFolds.GLOBAL_BOARD_SETTING_STRING, key, value);
   }
 
   /**
-       * Retrieves a board wide setting.
-       *
-       * @param {String} key the preference to retrieve
-       * @see #storeGlobalBoardSetting()
-       * @see #retrieve()
-       */
+   * Retrieves a board wide setting.
+   *
+   * @param {String} key the preference to retrieve
+   * @see #storeGlobalBoardSetting()
+   * @see #retrieve()
+   */
   retrieveGlobalBoardSetting(key) {
-    return this.retrieve(tfolds.GLOBAL_BOARD_SETTING_STRING, key);
+    return this.retrieve(TFolds.GLOBAL_BOARD_SETTING_STRING, key);
   }
 
   /**
-       * Updates the Chrome storage with board viewstate. The chrome storage is organized as follows:
-       * ```
-       * boardId
-       * +--+ listName
-       *    +--- setting
-       * ```
-       *
-       * @param {String} listName The list
-       * @param {String} key The preference to store
-       * @param {Object} value The preference new value
-       */
+   * Updates the Chrome storage with board viewstate. The chrome storage is organized as follows:
+   * ```
+   * boardId
+   * +--+ listName
+   *    +--- setting
+   * ```
+   *
+   * @param {String} listName The list
+   * @param {String} key The preference to store
+   * @param {Object} value The preference new value
+   */
   store(listName, key, value) {
     if (!this.boardId) {
       throw new ReferenceError('Board ID not set');
@@ -542,12 +576,12 @@ class tfolds {
   }
 
   /**
-       * Retrieves a list specific preference.
-       *
-       * @param {String} listName The list
-       * @param {String} key The preference to retrieve
-       * @see #store()
-       */
+   * Retrieves a list specific preference.
+   *
+   * @param {String} listName The list
+   * @param {String} key The preference to retrieve
+   * @see #store()
+   */
   retrieve(listName, key) {
     let value;
     try {
@@ -561,8 +595,8 @@ class tfolds {
   }
 
   /**
-       * Applies extension specific formatting to all lists in the board.
-       */
+   * Applies extension specific formatting to all lists in the board.
+   */
   formatLists() {
     this.combineLists();
     this.makeListsFoldable();
@@ -572,13 +606,13 @@ class tfolds {
   // #region COMBINED LISTS
 
   /**
-       * Assuming feature is not disabled, and the current list has same
-       * prefix as next list combines them. Does so for all subsequent lists
-       * with same prefix.
-       *
-       * Also removes sub list properties for lists if they are not part of
-       * a combined set.
-       */
+   * Assuming feature is not disabled, and the current list has same
+   * prefix as next list combines them. Does so for all subsequent lists
+   * with same prefix.
+   *
+   * Also removes sub list properties for lists if they are not part of
+   * a combined set.
+   */
   combineLists() {
     if (this.settings.enableCombiningLists === false) {
       return;
@@ -590,7 +624,7 @@ class tfolds {
         continue;
       }
       if (this.areListsRelated($lists[i], $lists[i + 1])) {
-        const numInSet = this.createCombinedList($lists.eq(i));
+        const numInSet = this.createCombinedList($lists.eq(i), i);
         i += numInSet - 1;
       } else {
         this.restoreSubList($lists.eq(i));
@@ -599,18 +633,18 @@ class tfolds {
   }
 
   /**
-       * Creates a set of combined lists. The set has associated metadata
-       * identifying them as a sub list.
-       *
-       * - _subListIndex_ holds the sub list index in the set
-       * - _firstList_ holds a reference to the first list in the set, i.e the list this method
-       *   is called with. The first list holds a reference to itthis for convenience purposes.
-       *
-       * @param {jQuery} $list The leftmost list in the combined set to create
-       * @returns {Number} The number of lists in the set
-       */
-  createCombinedList($list) {
-    const numOfSubLists = this.convertToSubList($list) + 1;
+   * Creates a set of combined lists. The set has associated metadata
+   * identifying them as a sub list.
+   *
+   * - _sublistindex_ holds the sub list index in the set
+   * - _firstList_ holds a reference to the first list in the set, i.e the list this method
+   *   is called with. The first list holds a reference to itthis for convenience purposes.
+   *
+   * @param {jQuery} $list The leftmost list in the combined set to create
+   * @returns {Number} The number of lists in the set
+   */
+  createCombinedList($list, superListIndex) {
+    const numOfSubLists = this.convertToSubList($list, superListIndex) + 1;
     if (this.debug) {
       console.log(`numOfSubLists=${numOfSubLists}`);
     }
@@ -621,31 +655,30 @@ class tfolds {
       return null;
     }
     $list.data('numOfSubLists', numOfSubLists);
-    this.addSuperList($list);
+    this.addSuperList($list[0]);
     return numOfSubLists;
   }
 
   /**
-       * Called by `createCombinedList()` and then by itthis recursively to
-       * convert a number of adjacent lists into a set.
-       *
-       * @param {jQuery} $list List to convert
-       * @param {Number} idx Current index
-       * @param {Number} id Unique identifier (timestamp)
-       * @param {jQuery} $firstList Reference to first list
-       */
-  convertToSubList($list, idx = 0, id = 0, $firstList) {
+   * Called by `createCombinedList()` and then by itthis recursively to
+   * convert a number of adjacent lists into a set.
+   *
+   * @param {jQuery} $list List to convert
+   * @param {Number} idx Current index
+   * @param {Number} id Unique identifier (timestamp)
+   * @param {jQuery} $firstList Reference to first list
+   */
+  convertToSubList($list, superListIndex, idx = 0) {
     if ($list.hasClass('sub-list')) {
       if (this.debug) {
         console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
       }
       return idx;
     }
-    const myId = id || Date.now();
+    $list[0].setAttribute('data-sublistindex', idx);
+    $list[0].setAttribute('data-super-list-index', superListIndex);
     $list.addClass('sub-list');
-    $list.data('subListIndex', idx);
-    $list.data('firstList', $firstList || $list);
-    $list.attr('data-id', myId);
+    $list.data('sublistindex', idx);
     this.removeFoldingButton($list);
     this.showWipLimit($list);
 
@@ -655,24 +688,24 @@ class tfolds {
     if (nextEl) {
       const $nextList = $(nextEl);
       if ($nextList !== null && this.areListsRelated($list, $nextList)) {
-        return this.convertToSubList($nextList, idx + 1, myId, $firstList || $list);
+        return this.convertToSubList($nextList, superListIndex, idx + 1);
       }
     }
     return idx;
   }
 
   /**
-       * Attaches a "height change detector" to the target list. It triggers
-       * a `resized` event if a change is detected.
-       *
-       * The detector detaches itthis when the list is no longer a sub list
-       * and when the list is no longer in the DOM.
-       *
-       * If the method is called several times on same list no additional
-       * detectors are added.
-       *
-       * @param {jQuery} $list The target list
-       */
+   * Attaches a "height change detector" to the target list. It triggers
+   * a `resized` event if a change is detected.
+   *
+   * The detector detaches itthis when the list is no longer a sub list
+   * and when the list is no longer in the DOM.
+   *
+   * If the method is called several times on same list no additional
+   * detectors are added.
+   *
+   * @param {jQuery} $list The target list
+   */
   attachListResizeDetector($list) {
     if ($list.data('hasDetector') === true) {
       console.log('Detector already exists: ', tdom.getListName($list[0]));
@@ -683,6 +716,7 @@ class tfolds {
     }
     $list.data('hasDetector', true);
 
+    const self = this;
     // let ts = Date.now();
     function callback() { // timestamp
       // if (Date.now() - ts > 2000) {
@@ -696,15 +730,17 @@ class tfolds {
                 * height changes
                 */
       if (!jQuery.contains(document, $list[0])) {
-        if (this.debug) {
-          console.log(`Detaching resize detector (list no longer in DOM): [${tdom.getListName($list[0])}]`);
+        if (self.debug) {
+          console.log(
+              `Detaching resize detector (list no longer in DOM): [${tdom.getListName($list[0])}]`);
         }
         $list.data('hasDetector', false);
         return;
       }
-      if (!$list.is(':visible') || $list.data('subListIndex') === undefined) {
-        if (this.debug) {
-          console.log(`Detaching resize detector (no longer sub list): [${tdom.getListName($list[0])}]`);
+      if (!$list.is(':visible') || $list.data('sublistindex') === undefined) {
+        if (self.debug) {
+          console.log(
+              `Detaching resize detector (no longer sub list): [${tdom.getListName($list[0])}]`);
         }
         $list.data('hasDetector', false);
         return;
@@ -712,7 +748,7 @@ class tfolds {
       if ($list.height() !== $list.data('oldHeight')) {
         console.log(`HEIGHT CHANGE:${tdom.getListName($list)}`);
         $list.data('oldHeight', $list.height());
-        this.getMySuperList($list).trigger('resized', $list[0]);
+        $(self.getMySuperList($list)).trigger('resized', $list[0]);
       }
       requestAnimationFrame(callback);
     }
@@ -723,16 +759,16 @@ class tfolds {
   }
 
   /**
-       * Determines if two lists are related, i.e. have same dot separated prefix.
-       * For example
-       *
-       * `listigt.sub1 listigt.sub2`
-       *
-       * will return `true`.
-       *
-       * @param {jQuery} $l1 The first list
-       * @param {jQuery} $l2 The second list
-       */
+   * Determines if two lists are related, i.e. have same dot separated prefix.
+   * For example
+   *
+   * `listigt.sub1 listigt.sub2`
+   *
+   * will return `true`.
+   *
+   * @param {jQuery} $l1 The first list
+   * @param {jQuery} $l2 The second list
+   */
   areListsRelated($l1, $l2) {
     const name1 = tdom.getListName($l1);
     const name2 = tdom.getListName($l2);
@@ -742,10 +778,11 @@ class tfolds {
   splitAllCombined() {
     let $subLists = $('.sub-list');
     let n = 0;
+    const self = this;
     while ($subLists.length > 0 && n < 100) {
-      const $sls = this.getSubLists($subLists.eq(0));
+      const $sls = self.getSubLists($subLists[0]);
       $sls.each(function () {
-        this.restoreSubList($(this));
+        self.restoreSubList($(this));
       });
       $subLists = $('.sub-list');
       n++;
@@ -758,14 +795,14 @@ class tfolds {
   }
 
   /**
-       * Splits the lists into two ordinary lists assuming they are combined
-       * and no longer matches.
-       *
-       * This would typically happen if a list is moved around or its title changed.
-       *
-       * @param {jQuery} $list The list object for the list being modified
-       * @return {boolean} `true` if lists split, otherwise `false`
-       */
+   * Splits the lists into two ordinary lists assuming they are combined
+   * and no longer matches.
+   *
+   * This would typically happen if a list is moved around or its title changed.
+   *
+   * @param {jQuery} $list The list object for the list being modified
+   * @return {boolean} `true` if lists split, otherwise `false`
+   */
   splitLists($list) {
     if (!this.isSubList($list)) {
       console.warn("Called splitLists() with a list that isn't a sublist", $list);
@@ -804,88 +841,91 @@ class tfolds {
   }
 
   /**
-       * Checks if the specified list is the first sub list of a set of
-       * combined lists.
-       *
-       * @param {jQuery} $list The target list
-       * @returns `true` if first sub list of set otherwise `false`
-       */
+   * Checks if the specified list is the first sub list of a set of
+   * combined lists.
+   *
+   * @param {jQuery} $list The target list
+   * @returns `true` if first sub list of set otherwise `false`
+   */
   isFirstSubList($list) {
-    return ($list.data('subListIndex') === tfolds.LEFTMOST_SUBLIST);
+    return ($list.data('sublistindex') === TFolds.LEFTMOST_SUBLIST);
   }
 
   /**
-       * Restores the target list to a "normal" list by removing all sub list
-       * related data and restoring the folding button and WiP limit stuff.
-       *
-       * @param {jQuery} $list The target list
-       */
+   * Restores the target list to a "normal" list by removing all sub list
+   * related data and restoring the folding button and WiP limit stuff.
+   *
+   * @param {jQuery} $list The target list
+   */
   restoreSubList($list) {
-    if ($list.data('subListIndex') === 0) {
+    if ($list.data('sublistindex') === 0) {
       $list.parent().find('.super-list,.super-list-collapsed').remove();
     }
-    $list.removeData(['subListIndex', 'firstList']);
+    $list.removeData(['sublistindex']);
     $list.removeClass('sub-list');
     this.addFoldingButton($list[0]);
     this.showWipLimit($list[0]);
   }
 
   /**
-       * Checks whether the target list is part of a combined list set.
-       *
-       * @param {jQuery} $l The list
-       * @returns `true` if it is a sub list otherwise `false`
-       */
-  isSubList($l) {
-    if (!$l) {
+   * Checks whether the target list is part of a combined list set.
+   *
+   * @param {Element} listEl The list
+   * @returns `true` if it is a sub list otherwise `false`
+   */
+  isSubList(listEl) {
+    if (!listEl) {
       throw new TypeError('Parameter [$l] undefined');
     }
-    return $l.data('subListIndex') !== undefined;
+    return listEl.dataset.sublistindex !== undefined;
   }
 
-  addSuperList($list) {
-    // let $canvas = $("div#board");
-    // let $leftList = $(leftList);
-    const $superList = $('<div class="super-list"></div>');
-    const $title = $('<span class="super-list-header"></span>');
-    const $extras = $('<div class="list-header-extras"></div>');
+  /**
+    *
+    * @param {Element} listEl
+    */
+  addSuperList(listEl) {
+    const superList = document.createElement('div');
+    superList.className = 'super-list';
+    const title = document.createElement('span');
+    title.className = 'super-list-header';
+    const extras = document.createElement('div');
+    extras.className = 'list-header-extras';
 
-    $title.append($extras);
+    title.appendChild(extras);
+    superList.dataset.superList = true;
+    superList.appendChild(title);
 
-    $superList.data('superList', true);
+    this.addFoldingButton(superList);
 
-    /*
-          * Make list same height as contained lists. This height is also
-          * tweaked using CSS padding.
-          */
-    $superList.append($title);
+    listEl.parentNode.insertBefore(superList, listEl.parentNode.firstChild);
 
-    this.addFoldingButton($superList[0]);
+    this.addCollapsedSuperList(superList);
 
-    $list.parent().prepend($superList);
+    this.updateSuperList(listEl);
 
-    this.addCollapsedSuperList($superList);
-
-    this.updateSuperList($list);
-
-    $superList.on('resized', (event, subListEl) => {
-      this.updateSuperListHeight($(subListEl));
-    });
+    // FIXME
+    // $superList.on('resized', (event, subListEl) => {
+    //   this.updateSuperListHeight($(subListEl));
+    // });
   }
 
   /**
        *
        */
-  addCollapsedSuperList($superList) {
+  addCollapsedSuperList(superList) {
+    const $superList = $(superList);
     try {
-      const $collapsedList = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
+      const $collapsedList
+        = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
       $superList.parent().prepend($collapsedList);
       $collapsedList.click(() => {
-        tfolds.expandSuperList($collapsedList);
+        this.expandSuperList($collapsedList);
         return false;
       });
       if (this.settings.rememberViewStates) {
-        const collapsed = this.retrieve(tdom.getListName($superList.siblings('.js-list-content')), 'super-list-collapsed');
+        const collapsed = this.retrieve(
+            tdom.getListName($superList.siblings('.js-list-content')), 'super-list-collapsed');
         if (collapsed === true) {
           this.collapseSuperList($superList);
         }
@@ -896,30 +936,32 @@ class tfolds {
   }
 
   /**
-       *
-       * @param {*} $subList
-       */
+   *
+   * @param {*} $subList
+   */
   updateSuperListHeight($list) {
     if (!$list) {
       throw new TypeError('Parameter [$l] undefined');
     }
-    if (!this.isSubList($list)) {
+    if (!this.isSubList($list[0])) {
       throw new TypeError('Parameter [$l] not sublist');
     }
     const height = this.findSuperListHeight($list);
-    const $superList = this.getMySuperList($list);
+    const $superList = $(this.getMySuperList($list));
     $superList.css('height', height);
   }
 
   findSuperListHeight($list) {
-    let $l = $list.data('firstList');
+    const { superListIndex } = $list[0].dataset;
+    const listWrapper = tdom.getListWrapperByIndex(superListIndex);
+    let listEl = listWrapper.querySelector(`[data-super-list-index="${superListIndex}"]`);
     let maxHeight = 0;
     do {
-      if ($l.height() > maxHeight) {
-        maxHeight = $l.height();
+      if (listEl.clientHeight > maxHeight) {
+        maxHeight = listEl.clientHeight;
       }
-      $l = $(tdom.getNextList($l[0]));
-    } while ($l.data('subListIndex') > 0);
+      listEl = tdom.getNextList(listEl);
+    } while (listEl?.dataset.sublistindex > 0);
     return maxHeight;
   }
 
@@ -930,32 +972,42 @@ class tfolds {
        * @returns {jQuery} The super list DIV element jQuery object
        */
   getMySuperList($subList) {
-    let $l;
-    if ($subList.data('subListIndex') === tfolds.LEFTMOST_SUBLIST) {
-      $l = $subList;
-    } else {
-      $l = $subList.data('firstList');
-    }
-    return $l.siblings('div.super-list');
+    // let $l;
+    const { superListIndex } = $subList[0].dataset;
+    return tdom.getListWrapperByIndex(superListIndex).querySelector('div.super-list');
+    // if ($subList.data('sublistindex') === TFolds.LEFTMOST_SUBLIST) {
+    //   $l = $subList;
+    // } else {
+    //   $l = $subList.data('firstList');
+    // }
+    // return $l.siblings('div.super-list');
   }
 
-  updateSuperList($subList) {
-    let $sl;
-    $sl = $subList.data('firstList');
-
-    const $superList = this.getMySuperList($sl);
+  /**
+   *
+   * @param {*} subList
+   * @returns
+   */
+  updateSuperList(subList) {
+    const $subList = $(subList);
+    // let $sl;
+    // $sl = $subList.data('firstList');
+    const listIndex = subList.dataset.superListIndex;
+    const wrapper = tdom.getListWrapperByIndex(listIndex);
+    const $sl = $(wrapper.querySelector(`[data-super-list-index="${listIndex}"]`));
+    const $superList = $(this.getMySuperList($subList));
     const $title = $superList.find('span.super-list-header');
 
     $title.find('span.wip-limit-title').remove();
 
     /*
-            * Get the WiP limit from the left list
-            */
+     * Get the WiP limit from the left list
+     */
     const wipLimit = this.extractWipLimit($sl);
 
     /*
-            * Calculate tot # of cards
-            */
+     * Calculate tot # of cards
+     */
     const n = $sl.data('numOfSubLists');
     let totNumOfCards = 0;
     let listEl = $sl[0];
@@ -1009,37 +1061,39 @@ class tfolds {
        */
   makeListsFoldable() {
     const $lists = $('div.list-wrapper');
+    const self = this;
     $lists.each(function () {
-      this.addFoldingButton(this);
-      this.addCollapsedList(this);
+      self.addFoldingButton(this);
+      self.addCollapsedList(this);
     });
   }
 
   /**
-       *
-       */
+   *
+   */
   addFoldingButton(listEl) {
     const $l = $(listEl);
 
-    if ($l.find('.js-list-content').data('subListIndex') > 0) {
-      return;
-    }
+    if (listEl.find)
+      if ($l.find('.js-list-content').data('sublistindex') > 0) {
+        return;
+      }
 
     const $header = $l.find('div.list-header-extras');
     $header.find('.icon-close').parent().remove();
     const $foldIcon = this.createFoldIcon();
 
+    const self = this;
     $foldIcon.click(function () {
-      // console.log($(this).closest(".list"));
       const $l = $(this).closest('.list');
       if ($l.length === 1) {
-        this.collapseList($l);
+        self.collapseList($l);
       } else {
         if ($l.length !== 0) {
           console.error('Expected to find ONE list or super list');
           return;
         }
-        this.collapseSuperList($(this).closest('.super-list'));
+        self.collapseSuperList($(this).closest('.super-list'));
       }
       return false;
     });
@@ -1102,8 +1156,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   addWipLimits() {
     let $wipLists;
     if (this.settings.alwaysCount === true) {
@@ -1111,23 +1165,32 @@ class tfolds {
     } else {
       $wipLists = tdom.getLists(/\[([0-9]*?)\]/);
     }
+    const self = this;
     $wipLists.each(function () {
-      this.showWipLimit(this);
+      self.showWipLimit(this);
     });
   }
 
   /**
-       *
-       */
+   *
+   */
   showWipLimit(listEl) {
-    const $l = $(listEl);
-    const numCards = this.countWorkCards(listEl);
-    const wipLimit = this.extractWipLimit(listEl);
-    const subList = $l.data('subListIndex');
+    let $l;
+    let lEl;
+    if (listEl instanceof jQuery) {
+      $l = listEl;
+      lEl = listEl[0];
+    } else {
+      $l = $(listEl);
+      lEl = listEl;
+    }
+    const numCards = this.countWorkCards(lEl);
+    const wipLimit = this.extractWipLimit(lEl);
+    const subList = $l.data('sublistindex');
     this.removeWipLimit($l);
     if (subList !== undefined) {
       this.addWipLimit($l, numCards);
-      this.updateSuperList($l);
+      this.updateSuperList(lEl);
       $l.removeClass('wip-limit-reached').removeClass('wip-limit-exceeded');
       $l.prev().removeClass('collapsed-limit-reached').removeClass('collapsed-limit-exceeded');
     } else if (wipLimit !== null) {
@@ -1139,19 +1202,19 @@ class tfolds {
   }
 
   /**
-       * Counts cards representing work in the specified list.
-       * In other words, count all cards except those representing sections or notes.
-       *
-       * @param {Element} listEl The list for which to count cards
-       */
+   * Counts cards representing work in the specified list.
+   * In other words, count all cards except those representing sections or notes.
+   *
+   * @param {Element} listEl The list for which to count cards
+   */
   countWorkCards(listEl) {
     // TODO Replace "//" with setting
     return tdom.countCards(listEl, [this.sectionIdentifier, '//'], 0);
   }
 
   /**
-       *
-       */
+   *
+   */
   updateWipBars($l, numCards, wipLimit) {
     if (typeof wipLimit === 'number' && this.settings.enableTopBars) {
       if (numCards === wipLimit) {
@@ -1168,8 +1231,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   removeWipLimit($l) {
     $l.find('span.wip-limit-title').remove();
     const $header = $l.find('.list-header');
@@ -1178,17 +1241,17 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   removeWipBar($l) {
     $l.removeClass('wip-limit-reached').removeClass('wip-limit-exceeded');
     $l.prev().removeClass('collapsed-limit-reached').removeClass('collapsed-limit-exceeded');
   }
 
   /**
-       *
-       * @param {*} listEl
-       */
+   *
+   * @param {*} listEl
+   */
   extractWipLimit(listEl) {
     const title = tdom.getListName(listEl);
     const matches = title.match(/\[([0-9]*?)\]/);
@@ -1201,11 +1264,11 @@ class tfolds {
   }
 
   /**
-       *
-       * @param {*} $l
-       * @param {*} numCards
-       * @param {*} wipLimit
-       */
+   *
+   * @param {*} $l
+   * @param {*} numCards
+   * @param {*} wipLimit
+   */
   addWipLimit($l, numCards, wipLimit) {
     let strippedTitle;
 
@@ -1218,20 +1281,20 @@ class tfolds {
       strippedTitle = title;
     }
 
-    if (this.isSubList($l)) {
+    if (this.isSubList($l[0])) {
       strippedTitle = strippedTitle.substr(strippedTitle.indexOf('.') + 1);
     }
 
-    this.addWipListTitle($l, numCards, !this.isSubList($l) ? wipLimit : null, strippedTitle);
+    this.addWipListTitle($l, numCards, !this.isSubList($l[0]) ? wipLimit : null, strippedTitle);
   }
 
   /**
-       *
-       * @param {*} $l
-       * @param {*} numCards
-       * @param {*} wipLimit
-       * @param {*} strippedTitle
-       */
+   *
+   * @param {*} $l
+   * @param {*} numCards
+   * @param {*} wipLimit
+   * @param {*} strippedTitle
+   */
   addWipListTitle($l, numCards, wipLimit, strippedTitle) {
     let $wipTitle;
     const $header = $l.find('.list-header');
@@ -1252,8 +1315,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   createWipTitle(title, numCards, wipLimit) {
     let $wipTitle;
 
@@ -1273,15 +1336,16 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   formatCards() {
     const $cards = tdom.getCardsByName('', false);
     if (this.config.debug) {
       console.groupCollapsed('Formatting cards');
     }
+    const self = this;
     $cards.each(function () {
-      this.formatCard(this);
+      self.formatCard(this);
     });
     if (this.config.debug) {
       console.groupEnd();
@@ -1289,8 +1353,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   formatCard(cardEl) {
     const $c = $(cardEl);
 
@@ -1316,8 +1380,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   formatAsSection($card) {
     if (this.debug) {
       console.log(`Formatting as section: ${tdom.getCardName($card)}`);
@@ -1330,7 +1394,7 @@ class tfolds {
     }
     const $icon = $('<span class="icon-expanded"/>');
     $icon.click(function () {
-      tfolds.toggleSection(this);
+      TFolds.toggleSection(this);
       return false;
     });
     const strippedTitle = this.getStrippedTitle(tdom.getCardName($card));
@@ -1342,32 +1406,45 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   collapseList($list) {
     $list.toggle().prev().toggle().parent().css('width', '40px');
     $list.prev().find('.list-header-name').text(tdom.getListName($list[0]));
     this.store(tdom.getListName($list), 'collapsed', true);
   }
 
-  getSubLists($list) {
-    let $firstList;
-    if (!this.isSubList($list)) {
-      $firstList = $list.siblings('.sub-list');
+  /**
+   * Returns all sub lists related to the passed element. This means
+   * either the passed list plus its sibling sub lists, or the sub lists with same ID as speciifed
+   * by the super list firstList attribute.
+   *
+   * @param {Element} list Either a sub list or a super list
+   * @returns {Array} Sub list elements
+   */
+  getSubLists(list) {
+    let firstSubList;
+
+    if (!this.isSubList(list)) {
+      firstSubList = list.parentNode.querySelector('.sub-list');
     } else {
-      $firstList = $list.data('firstList');
+      const idx = list.dataset.superListIndex;
+      const listEl = tdom.getListWrapperByIndex(idx);
+      firstSubList = listEl.querySelector(`[data-super-list-index="${idx}"]`);
     }
-    const id = $firstList.attr('data-id');
-    const $sls = $(`.sub-list[data-id="${id}"]`);
+
+    const { superListIndex } = firstSubList.dataset;
+    // const id = $firstList.attr('data-id');
+    const $sls = $(`.sub-list[data-super-list-index="${superListIndex}"]`);
     return $sls;
   }
 
   /**
-       * When collapsing a super list the first contained list's is hidden,
-       * and subsequent lists' wrappers are hidden.
-       *
-       * @param {jQuery} $superList The super list to collapse
-       */
+   * When collapsing a super list the first contained list's is hidden,
+   * and subsequent lists' wrappers are hidden.
+   *
+   * @param {jQuery} $superList The super list to collapse
+   */
   collapseSuperList($superList) {
     $superList.toggle().siblings('.super-list-collapsed').toggle().parent().css('width', '40px').next().hide();
     const $sls = this.getSubLists($superList);
@@ -1377,8 +1454,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   expandList($list) {
     $list.toggle().next().toggle().parent().css('width', `${this.listWidth}px`);
     // TODO Instead of storing "false" remove setting(?)
@@ -1386,8 +1463,8 @@ class tfolds {
   }
 
   /**
-       *
-       */
+   *
+   */
   expandSuperList($collapsedList) {
     const $superList = $collapsedList.toggle().siblings('.super-list');
     $superList.toggle().parent().css('width', `${this.listWidth}px`).next().show();
@@ -1396,12 +1473,12 @@ class tfolds {
     $sls.eq(0).show();
     $sls.not(':eq(0)').parent().show();
     this.store(tdom.getListName($superList.siblings('.js-list-content')), 'super-list-collapsed', false);
-    this.updateSuperList($sls.eq(0));
+    this.updateSuperList($sls[0]);
   }
 
   /**
-       *
-       */
+   *
+   */
   toggleSection(section, updateStorage = true) {
     let $l;
     const $s = $(section);
@@ -1438,9 +1515,7 @@ class tfolds {
 
 }
 
-tfolds.LEFTMOST_SUBLIST = 0;
-tfolds.DEFAULT_COMPACT_WIDTH = 200;
-tfolds.NORMAL_LIST_WIDTH = 272;
-tfolds.GLOBAL_BOARD_SETTING_STRING = 'trello-folds-board-settings';
-
-export default tfolds;
+TFolds.LEFTMOST_SUBLIST = 0;
+TFolds.DEFAULT_COMPACT_WIDTH = 200;
+TFolds.NORMAL_LIST_WIDTH = 272;
+TFolds.GLOBAL_BOARD_SETTING_STRING = 'trello-folds-board-settings';
