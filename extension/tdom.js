@@ -574,7 +574,8 @@ const tdom = (function (factory) {
      * @returns {Element} The containing list element
      */
     getContainingList(card) {
-      return card.closest('div.list')[0];
+      // NOTE Why [0] ... closest should not return array 🤔
+      return card.closest('div.list');
     },
 
     /**
