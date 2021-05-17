@@ -200,7 +200,7 @@ class TFolds {
       const $subs = this.getSubLists(list);
       const self = this;
       $subs.each(function () {
-        self.restoreSubList($(this));
+        self.restoreSubList(this);
       });
     }
     // const $list = $(listEl).find('.js-list-content');
@@ -223,7 +223,7 @@ class TFolds {
   cardAdded(cardEl) {
     setTimeout(() => {
       this.formatCard(cardEl);
-    }, 100);
+    }, TFolds.FORMAT_CARD_TIMEOUT);
   }
 
   /**
@@ -280,7 +280,7 @@ class TFolds {
       }
     }
 
-    this.showWipLimit(tdom.getContainingList(cardEl));
+    this.showWipLimit(tdom.getContainingList(cardEl)[0]);
   }
 
   /**
@@ -396,11 +396,11 @@ class TFolds {
        * Should not happen after changes to ``tdom.js`` but let's play it safe and
        * keep it - changing log level to warn.
        */
-      if (attemptCount < 3) {
+      if (attemptCount < TFolds.MAX_ATTEMPTS) {
         setTimeout(() => {
           console.warn(`Trying to find DIV.board-canvas again (attempt ${attemptCount + 1})`);
           this.setupBoard(attemptCount + 1);
-        }, 100);
+        }, TFolds.ATTEMPT_TIMEOUT);
         return;
       }
       throw ReferenceError(`DIV.board-canvas not found after ${attemptCount} attempts`);
@@ -422,7 +422,7 @@ class TFolds {
     if (this.settings.rememberViewStates) {
       setTimeout(() => {
         this.restoreSectionsViewState();
-      }, 200);
+      }, TFolds.RESTORE_VIEWSTATE_TIMEOUT);
     } else {
       this.clearViewState();
     }
@@ -620,14 +620,14 @@ class TFolds {
     const $lists = tdom.getLists();
     for (let i = 0; i < $lists.length; ++i) {
       if (tdom.getListName($lists[i]).indexOf('.') === -1 || i === $lists.length - 1) {
-        this.restoreSubList($lists.eq(i));
+        this.restoreSubList($lists[i]);
         continue;
       }
       if (this.areListsRelated($lists[i], $lists[i + 1])) {
         const numInSet = this.createCombinedList($lists.eq(i), i);
         i += numInSet - 1;
       } else {
-        this.restoreSubList($lists.eq(i));
+        this.restoreSubList($lists[i]);
       }
     }
   }
@@ -645,13 +645,9 @@ class TFolds {
    */
   createCombinedList($list, superListIndex) {
     const numOfSubLists = this.convertToSubList($list, superListIndex) + 1;
-    if (this.debug) {
-      console.log(`numOfSubLists=${numOfSubLists}`);
-    }
+    this.debug && console.log(`numOfSubLists=${numOfSubLists}`);
     if (numOfSubLists < 2) {
-      if (this.debug) {
-        console.warn('Expected number of lists to be combined to be at least two');
-      }
+      this.debug && console.error('Expected number of lists to be combined to be at least two');
       return null;
     }
     $list.data('numOfSubLists', numOfSubLists);
@@ -681,7 +677,7 @@ class TFolds {
     $list.addClass('sub-list');
     $list.data('sublistindex', idx);
     this.removeFoldingButton($list);
-    this.showWipLimit($list);
+    this.showWipLimit($list[0]);
 
     this.attachListResizeDetector($list);
 
@@ -776,15 +772,15 @@ class TFolds {
     let $subLists = $('.sub-list');
     let n = 0;
     const self = this;
-    while ($subLists.length > 0 && n < 100) {
-      const $sls = self.getSubLists($subLists[0]);
-      $sls.forEach(e => {
+    while ($subLists.length > 0 && n < TFolds.MAX_LISTS_IN_BOARD) {
+      const sublists = self.getSubLists($subLists[0]);
+      sublists.forEach(e => {
         this.restoreSubList(e);
       });
       $subLists = $('.sub-list');
       n++;
     }
-    if (n === 100) {
+    if (n === TFolds.MAX_LISTS_IN_BOARD) {
       console.error('Something went wrong splitting sub lists');
       console.trace();
       console.log($subLists);
@@ -861,8 +857,8 @@ class TFolds {
     }
     $list.removeData(['sublistindex']);
     $list.removeClass('sub-list');
-    this.addFoldingButton($list[0]);
-    this.showWipLimit($list[0]);
+    this.addFoldingButton(list);
+    this.showWipLimit(list);
   }
 
   /**
@@ -883,12 +879,9 @@ class TFolds {
     * @param {Element} listEl
     */
   addSuperList(listEl) {
-    const superList = document.createElement('div');
-    superList.className = 'super-list';
-    const title = document.createElement('span');
-    title.className = 'super-list-header';
-    const extras = document.createElement('div');
-    extras.className = 'list-header-extras';
+    const superList = this.createNode({ tag: 'div', classes: 'super-list' });
+    const title = this.createNode({ tag: 'span', classes: 'super-list-header' });
+    const extras = this.createNode({ tag: 'div', classes: 'list-header-extras' });
 
     title.appendChild(extras);
     superList.dataset.superList = true;
@@ -896,8 +889,7 @@ class TFolds {
 
     this.addFoldingButton(superList);
 
-    listEl.parentNode.insertBefore(superList, listEl.parentNode.firstChild);
-
+    listEl.parentNode.prepend(superList);
     this.addCollapsedSuperList(superList);
 
     this.updateSuperList(listEl);
@@ -916,7 +908,7 @@ class TFolds {
     try {
       const $collapsedList
         = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
-      $superList.parent().prepend($collapsedList);
+      superList.parentNode.prepend($collapsedList[0]);
       $collapsedList.click(() => {
         this.expandSuperList($collapsedList);
         return false;
@@ -972,7 +964,9 @@ class TFolds {
   getMySuperList($subList) {
     // let $l;
     const { superListIndex } = $subList[0].dataset;
-    return tdom.getListWrapperByIndex(superListIndex).querySelector('div.super-list');
+    const wrapper = tdom.getListWrapperByIndex(superListIndex);
+    const superList = wrapper.querySelector('div.super-list');
+    return superList;
     // if ($subList.data('sublistindex') === TFolds.LEFTMOST_SUBLIST) {
     //   $l = $subList;
     // } else {
@@ -988,14 +982,13 @@ class TFolds {
    */
   updateSuperList(subList) {
     const $subList = $(subList);
-    // let $sl;
-    // $sl = $subList.data('firstList');
     const listIndex = subList.dataset.superListIndex;
     const wrapper = tdom.getListWrapperByIndex(listIndex);
     const $sl = $(wrapper.querySelector(`[data-super-list-index="${listIndex}"]`));
     const $superList = $(this.getMySuperList($subList));
     const $title = $superList.find('span.super-list-header');
 
+    console.log({ $superList });
     $title.find('span.wip-limit-title').remove();
 
     /*
@@ -1008,7 +1001,7 @@ class TFolds {
      */
     const n = $sl.data('numOfSubLists');
     let totNumOfCards = 0;
-    let listEl = $sl[0];
+    let [listEl] = $sl;
     for (let i = 0; i < n; ++i) {
       totNumOfCards += this.countWorkCards(listEl);
       listEl = tdom.getNextList(listEl);
@@ -1016,12 +1009,11 @@ class TFolds {
 
     let title = tdom.getListName($sl);
     title = title.substr(0, title.indexOf('.'));
-    let $wipTitle;
-    $wipTitle = this.createWipTitle(title, totNumOfCards, wipLimit);
-    this.updateWipBars($superList, totNumOfCards, wipLimit);
-    $title.append($wipTitle);
+    const $wipTitle = this.createWipTitle(title, totNumOfCards, wipLimit);
+    this.updateWipBars($superList[0], totNumOfCards, wipLimit);
+    $title.append($($wipTitle));
     this.updateSuperListHeight($sl);
-    this.updateCollapsedSuperList($superList, $wipTitle.clone());
+    this.updateCollapsedSuperList($superList, $($wipTitle).clone());
 
     this.updateWidths();
 
@@ -1029,9 +1021,9 @@ class TFolds {
   }
 
   /**
-       * Updates the width of every list and super list. Ensures lists are drawn correctly in compact mode
-       * and that combined list backdrops are rendered correctly.
-       */
+   * Updates the width of every list and super list. Ensures lists are drawn correctly in
+   * compact mode and that combined list backdrops are rendered correctly.
+   */
   updateWidths() {
     $('div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))').css('width', `${this.listWidth}px`);
 
@@ -1039,7 +1031,7 @@ class TFolds {
     for (let i = 0; i < $supersets.length; ++i) {
       const $ss = $supersets.eq(i);
       const n = $ss.siblings('div.js-list-content').data('numOfSubLists');
-      const w = (this.listWidth + 8) * n - 8;
+      const w = ((this.listWidth + TFolds.LIST_PADDING) * n) - TFolds.LIST_PADDING;
       $ss.css('width', `${w}px`);
     }
   }
@@ -1092,7 +1084,6 @@ class TFolds {
         }
         self.collapseSuperList($(this).closest('.super-list')[0]);
       }
-      return false;
     });
     $header.append($foldIcon);
   }
@@ -1177,29 +1168,23 @@ class TFolds {
    *
    */
   showWipLimit(listEl) {
-    let $l;
-    let lEl;
-    if (listEl instanceof jQuery) {
-      $l = listEl;
-      lEl = listEl[0];
-    } else {
-      $l = $(listEl);
-      lEl = listEl;
-    }
-    const numCards = this.countWorkCards(lEl);
-    const wipLimit = this.extractWipLimit(lEl);
-    const subList = $l.data('sublistindex');
-    this.removeWipLimit($l);
+    console.log({ listEl });
+    const numCards = this.countWorkCards(listEl);
+    const wipLimit = this.extractWipLimit(listEl);
+    const subList = listEl?.dataset.sublistindex;
+    this.removeWipLimit(listEl);
     if (subList !== undefined) {
-      this.addWipLimit($l, numCards);
-      this.updateSuperList(lEl);
-      $l.removeClass('wip-limit-reached').removeClass('wip-limit-exceeded');
-      $l.prev().removeClass('collapsed-limit-reached').removeClass('collapsed-limit-exceeded');
+      this.addWipLimit(listEl, numCards);
+      this.updateSuperList(listEl);
+      console.log({ listEl });
+      listEl.classList.remove('wip-limit-reached', 'wip-limit-exceeded');
+      listEl.previousSibling?.classList.remove(
+          'collapsed-limit-reached', 'collapsed-limit-exceeded');
     } else if (wipLimit !== null) {
-      this.addWipLimit($l, numCards, wipLimit);
-      this.updateWipBars($l, numCards, wipLimit);
+      this.addWipLimit(listEl, numCards, wipLimit);
+      this.updateWipBars(listEl, numCards, wipLimit);
     } else if (this.settings.alwaysCount === true) {
-      this.addWipLimit($l, numCards);
+      this.addWipLimit(listEl, numCards);
     }
   }
 
@@ -1217,37 +1202,58 @@ class TFolds {
   /**
    *
    */
-  updateWipBars($l, numCards, wipLimit) {
+  updateWipBars(listEl, numCards, wipLimit) {
+    // debugger;
+    console.log({ listEl, numCards, wipLimit });
+    if (!listEl) {
+      return;
+    }
     if (typeof wipLimit === 'number' && this.settings.enableTopBars) {
+      const collapsed = listEl.parentNode.querySelectorAll(
+          '.list-collapsed,.super-list-collapsed');
       if (numCards === wipLimit) {
-        $l.addClass('wip-limit-reached').removeClass('wip-limit-exceeded');
-        $l.siblings('.list-collapsed,.super-list-collapsed').addClass('collapsed-limit-reached').removeClass('collapsed-limit-exceeded');
+        listEl.classList.add('wip-limit-reached');
+        listEl.classList.remove('wip-limit-exceeded');
+        collapsed.forEach(e => {
+          e.classList.add('collapsed-limit-reached');
+          e.classList.remove('collapsed-limit-exceeded');
+        });
         return;
-      } else if (numCards > wipLimit) {
-        $l.removeClass('wip-limit-reached').addClass('wip-limit-exceeded');
-        $l.siblings('.list-collapsed,.super-list-collapsed').removeClass('collapsed-limit-reached').addClass('collapsed-limit-exceeded');
+      }
+      if (numCards > wipLimit) {
+        listEl.classList.add('wip-limit-exceeded');
+        listEl.classList.remove('wip-limit-reached');
+        collapsed.forEach(e => {
+          e.classList.add('collapsed-limit-reached');
+          e.classList.remove('collapsed-limit-exceeded');
+        });
         return;
       }
     }
-    this.removeWipBar($l);
+    this.removeWipBar(listEl);
   }
 
   /**
    *
    */
-  removeWipLimit($l) {
-    $l.find('span.wip-limit-title').remove();
-    const $header = $l.find('.list-header');
-    $header.find('textarea').show();
-    this.removeWipBar($l);
+  removeWipLimit(listEl) {
+    const title = listEl.querySelector('span.wip-limit-title');
+    if (title) {
+      title.innerHTML = '';
+    }
+    const textarea = listEl.querySelector('.list-header > textarea');
+    this.toggleVisibility(textarea, true);
+    this.removeWipBar(listEl);
   }
 
   /**
    *
    */
-  removeWipBar($l) {
-    $l.removeClass('wip-limit-reached').removeClass('wip-limit-exceeded');
-    $l.prev().removeClass('collapsed-limit-reached').removeClass('collapsed-limit-exceeded');
+  removeWipBar(listEl) {
+    listEl.classList.remove('wip-limit-reached', 'wip-limit-exceeded');
+    listEl.previousSibling?.classList.remove(
+        'collapsed-limit-reached',
+        'collapsed-limit-exceeded');
   }
 
   /**
@@ -1271,11 +1277,14 @@ class TFolds {
    * @param {*} numCards
    * @param {*} wipLimit
    */
-  addWipLimit($l, numCards, wipLimit) {
+  addWipLimit(listEl, numCards, wipLimit = null) {
     let strippedTitle;
 
-    $l.find('span.wip-limit-title').remove();
-    const title = tdom.getListName($l[0]);
+    const wipLimitTitle = listEl.querySelector('span.wip-limit-title');
+    if (wipLimitTitle) {
+      wipLimitTitle.innerHTML = '';
+    }
+    const title = tdom.getListName(listEl);
 
     if (title.indexOf('[') !== -1) {
       strippedTitle = title.substr(0, title.indexOf('['));
@@ -1283,58 +1292,86 @@ class TFolds {
       strippedTitle = title;
     }
 
-    if (this.isSubList($l[0])) {
+    if (this.isSubList(listEl)) {
       strippedTitle = strippedTitle.substr(strippedTitle.indexOf('.') + 1);
     }
 
-    this.addWipListTitle($l, numCards, !this.isSubList($l[0]) ? wipLimit : null, strippedTitle);
+    this.addWipListTitle(listEl, numCards,
+        !this.isSubList(listEl) ? wipLimit : null, strippedTitle);
   }
 
   /**
    *
-   * @param {*} $l
+   * @param {*} listEl
    * @param {*} numCards
    * @param {*} wipLimit
    * @param {*} strippedTitle
    */
-  addWipListTitle($l, numCards, wipLimit, strippedTitle) {
-    let $wipTitle;
-    const $header = $l.find('.list-header');
+  addWipListTitle(listEl, numCards, wipLimit, strippedTitle) {
+    let wipTitle;
+    const header = listEl.querySelector('.list-header');
 
-    $wipTitle = this.createWipTitle(strippedTitle, numCards, wipLimit);
+    wipTitle = this.createWipTitle(strippedTitle, numCards, wipLimit);
 
-    $l.parent().find('div.list-collapsed').empty().append($wipTitle);
-    $wipTitle = $wipTitle.clone();
-    $header.off('click').click(function (e) {
-      $(this).find('.wip-limit-title').hide();
-      $(this).find('textarea').show().select();
-      return !$(e.target).hasClass('wip-limit-badge');
-    });
-    $header.find('textarea').hide().off('blur').blur(() => {
-      this.showWipLimit($l);
-    });
-    $header.append($wipTitle);
+    const collapsedList = listEl.parentNode.querySelector('div.list-collapsed');
+    if (collapsedList) {
+      collapsedList.innerHTML = '';
+      collapsedList.append(wipTitle);
+    }
+    wipTitle = wipTitle.cloneNode(true);
+    header.onclick = (event) => {
+      const textarea = event.currentTarget.querySelector('textarea');
+      this.toggleVisibility(event.currentTarget.querySelector('.wip-limit-title'), false);
+      if (textarea) {
+        this.toggleVisibility(textarea, true);
+        textarea.select();
+      }
+      if (event.currentTarget.classList.contains('wip-limit-badge')) {
+        event.stopPropagation();
+      }
+    };
+    this.toggleVisibility(header.querySelector('textarea'), false);
+    header.querySelector('textarea').onblur = () => {
+      this.showWipLimit(listEl);
+    };
+    header.appendChild(wipTitle);
   }
 
   /**
    *
    */
   createWipTitle(title, numCards, wipLimit) {
-    let $wipTitle;
+    // let $wipTitle;
+    let countBadge = null;
 
-    if (!(typeof wipLimit === 'number')) {
-      const countBadge = this.settings.alwaysCount ? `<span class="wip-limit-badge">${numCards}</span>` : '';
-      $wipTitle = $(`<span class="wip-limit-title">${title} ${countBadge}</span>`);
-    } else {
-      $wipTitle = $(`<span class="wip-limit-title">${title} <span class="wip-limit-badge">${numCards} / ${wipLimit}</span></span>`);
+    if (wipLimit === null && this.settings.alwaysCount) {
+      countBadge = this.createNode({
+        tag: 'span',
+        classes: 'wip-limit-badge',
+        content: numCards,
+      });
+    } else if (wipLimit !== null) {
+      countBadge = this.createNode({
+        tag: 'span',
+        classes: 'wip-limit-badge',
+        content: `${numCards} / ${wipLimit}`,
+      });
       if (numCards === wipLimit) {
-        $wipTitle.find('.wip-limit-badge').css('background-color', '#fb7928');
-      } else if (numCards > wipLimit) {
-        $wipTitle.find('.wip-limit-badge').css('background-color', '#b04632');
+        countBadge.style.backgroundColor = '#fb7928';
+      }
+      if (numCards > wipLimit) {
+        countBadge.style.backgroundColor = '#b04632';
       }
     }
 
-    return $wipTitle;
+    const wipTitle = this.createNode({
+      tag: 'span',
+      classes: 'wip-limit-title',
+      content: title,
+    });
+    wipTitle.appendChild(countBadge);
+
+    return wipTitle;
   }
 
   /**
@@ -1392,20 +1429,20 @@ class TFolds {
       this.debug && console.log('Section title already exists');
       return;
     }
-    const icon = document.createElement('span');
-    icon.className = 'icon-expanded';
+    const icon = this.createNode({ tag: 'span', classes: 'icon-expanded' });
     icon.onclick = (event) => {
-      console.log(event.target);
-      this.toggleSection(event.target);
+      this.toggleSection(event.currentTarget);
       event.stopPropagation();
       return false;
     };
 
     const strippedTitle = this.getStrippedTitle(tdom.getCardName($(card)));
 
-    const strippedTitleEl = document.createElement('span');
-    strippedTitleEl.id = 'section-title';
-    strippedTitleEl.textContent = strippedTitle;
+    const strippedTitleEl = this.createNode({
+      tag: 'span',
+      id: 'section-title',
+      content: strippedTitle,
+    });
 
     card.insertBefore(strippedTitleEl, card.firstChild);
     card.insertBefore(icon, card.firstChild);
@@ -1599,16 +1636,49 @@ class TFolds {
    * @returns {Boolean} True if visibility turned on, otherwise false
    */
   toggleVisibility(element, visible) {
+    if (!element) {
+      return undefined;
+    }
     if (visible === true || (element.style.display === 'none' && visible === undefined)) {
       element.style.display = element.dataset.displayState ?? '';
-      return;
+      return true;
     }
     element.dataset.displayState = element.style.display;
     element.style.display = 'none';
+    return false;
+  }
+
+  /**
+   * Helper function to create a node of the given type with optional
+   * CSS classes, ID and text content.
+   *
+   * @param {Object} node An object with node properties
+   * @returns The created element
+   */
+  createNode({ tag, classes = [], id = undefined, content = undefined }) {
+    const el = document.createElement(tag);
+    if (id) {
+      el.id = id;
+    }
+    if (typeof classes === 'string') {
+      el.classList.add(classes);
+    } else {
+      classes.forEach((c) => el.classList.add(c));
+    }
+    if (content) {
+      el.textContent = content;
+    }
+    return el;
   }
 
 }
 
+TFolds.LIST_PADDING = 8;
+TFolds.MAX_LISTS_IN_BOARD = 100;
+TFolds.RESTORE_VIEWSTATE_TIMEOUT = 200;
+TFolds.MAX_ATTEMPTS = 3;
+TFolds.ATTEMPT_TIMEOUT = 100;
+TFolds.FORMAT_CARD_TIMEOUT = 100;
 TFolds.LEFTMOST_SUBLIST = 0;
 TFolds.DEFAULT_COMPACT_WIDTH = 200;
 TFolds.NORMAL_LIST_WIDTH = 272;
