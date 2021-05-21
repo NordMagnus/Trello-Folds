@@ -30,6 +30,7 @@ I'm working on this extension because I use the features myself, because it's fu
 
 | Version | Description                                                             |
 | ------- | ----------------------------------------------------------------------- |
+| 0.9     | Combining multiple lists. Better list height adjustment.                |
 | 0.8     | Further improvements to board loading process, making it more reliable. |
 | 0.7     | Major improvements to moving sections, filtering and switching boards.  |
 | 0.6     | Bug fixes caused by Trello DOM changes.                                 |
