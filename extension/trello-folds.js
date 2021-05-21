@@ -2,6 +2,7 @@
 
 // import { tdom } from './tdom.js';
 // import { $, jQuery } from 'jquery';
+const tdom = new TDom();
 
 class TFolds {
 
@@ -190,22 +191,18 @@ class TFolds {
     }
     this.addFoldingButton(listEl);
     this.addCollapsedList(listEl);
-    this.showWipLimit($(listEl).find('.js-list-content')[0]);
+    this.showWipLimit(q$(listEl, '.js-list-content'));
     this.redrawCombinedLists();
   }
 
   listDragged(listEl) {
     const list = listEl.querySelector('.js-list-content');
     if (this.isSubList(list)) {
-      const $subs = this.getSubLists(list);
-      const self = this;
-      $subs.each(function () {
-        self.restoreSubList(this);
+      const subs = this.getSubLists(list);
+      subs.forEach(() => {
+        this.restoreSubList(this);
       });
     }
-    // const $list = $(listEl).find('.js-list-content');
-    // if (this.isSubList($list)) {
-    // }
   }
 
   listDropped() {
@@ -234,28 +231,30 @@ class TFolds {
    * @param {Element} cardEl
    */
   cardRemoved(cardEl) {
-    const $cardEl = $(cardEl);
-    if ($cardEl.hasClass('section-card')) {
-      $cardEl.find('div.list-card-details').css('opacity', '0.0');
-      // $cardEl.find("span#section-title").css("background-color", "#dfe3e6");
-      const $section = $cardEl.find('.icon-collapsed');
-      if ($section.length !== 0) {
-        this.toggleSection($section[0]);
+    console.log({ cardEl });
+    if (cardEl.classList.contains('section-card')) {
+      q$(cardEl, 'div.list-card-details').style.opacity = '0.0';
+      const section = q$(cardEl, '.icon-collapsed');
+      if (section) {
+        this.toggleSection(section);
       }
     }
   }
 
   cardBadgesModified(cardEl) {
-    const $c = $(cardEl);
-    if ($c.find(".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
-      $c.addClass('blocked-card');
-      $c.find('.list-card-title').addClass('blocked-title');
-      $c.find('div.badge').children().addClass('blocked-badges');
-    } else {
-      $c.removeClass('blocked-card');
-      $c.find('.list-card-title').removeClass('blocked-title');
-      $c.find('div.badge').children().removeClass('blocked-badges');
+    const badges = q$$(cardEl, '.badge-text');
+    const blocked = badges.some(b => {
+      return b.textContent.toLowerCase().includes('blocked');
+    });
+    if (blocked) {
+      cardEl.classList.add('blocked-card');
+      q$(cardEl, '.list-card-title').classList.add('blocked-title');
+      q$$(cardEl, 'div.badge > *').forEach(e => e.classList.add('blocked-badges'));
+      return;
     }
+    cardEl.classList.remove('blocked-card');
+    q$(cardEl, '.list-card-title').classList.remove('blocked-title');
+    q$$(cardEl, 'div.badge > *').forEach(e => e.classList.remove('blocked-badges'));
   }
 
   /**
@@ -268,19 +267,17 @@ class TFolds {
    * @param {String} oldTitle The title before it was modified
    */
   cardModified(cardEl, title, oldTitle) {
-    const $c = $(cardEl);
+    cardEl.classList.remove('comment-card');
 
-    $c.removeClass('comment-card');
-
-    this.checkSectionChange($c, title, oldTitle);
+    this.checkSectionChange(cardEl, title, oldTitle);
 
     if (!this.isSection(title)) {
       if (title.indexOf('//') === 0) {
-        $c.addClass('comment-card');
+        cardEl.classList.add('comment-card');
       }
     }
 
-    this.showWipLimit(tdom.getContainingList(cardEl)[0]);
+    this.showWipLimit(tdom.getContainingList(cardEl));
   }
 
   /**
@@ -291,7 +288,7 @@ class TFolds {
    * 3. A card was changed __from__ a section to a normal card
    * In addition for item 2 and 3 above the list WIP has to be updated
    */
-  checkSectionChange($c, title, oldTitle) {
+  checkSectionChange(card, title, oldTitle) {
     if (!this.isSection(title) && !this.isSection(oldTitle)) {
       return;
     }
@@ -300,7 +297,7 @@ class TFolds {
      * Case 1: Only title changed (was, and still is, a section)
      */
     if (this.isSection(title) && this.isSection(oldTitle)) {
-      $c.find('#section-title').text(this.getStrippedTitle(title));
+      card.querySelector('#section-title').text(this.getStrippedTitle(title));
       return;
     }
 
@@ -308,12 +305,12 @@ class TFolds {
      * Case 3: A card was changed from a section
      */
     if (!this.isSection(title)) {
-      this.removeSectionFormatting($c);
+      this.removeSectionFormatting(card);
     } else {
       /*
        * Case 2: Was a normal card now a section
        */
-      this.formatAsSection($c[0]);
+      this.formatAsSection(card);
     }
   }
 
@@ -322,12 +319,13 @@ class TFolds {
    *
    * @param {jQuery} $card The card to strip
    */
-  removeSectionFormatting($card) {
-    $card.find('span.icon-expanded,span.icon-collapsed').remove();
-    $card.find('span#section-title').remove();
-    $card.find('span.list-card-title').show();
-    $card.find('div.list-card-details').css('opacity', '1.0');
-    $card.removeClass('section-card');
+  removeSectionFormatting(card) {
+    card.querySelector('span.icon-expanded')?.remove();
+    card.querySelector('span.icon-collapsed')?.remove();
+    card.querySelector('span#section-title')?.remove();
+    card.querySelector('span.list-card-title')?.remove();
+    card.querySelector('div.list-card-details').style.opacity = '1.0';
+    card.classList.remove('section-card');
   }
 
   /**
@@ -389,8 +387,8 @@ class TFolds {
    * a new board is loaded.
    */
   setupBoard(attemptCount = 1) {
-    const $canvas = $('div.board-canvas');
-    if (!$canvas.length) {
+    const canvas = document.querySelector('div.board-canvas');
+    if (!canvas) {
       /*
        * Trying to find the board again in 100 ms if not found directly.
        * Should not happen after changes to ``tdom.js`` but let's play it safe and
@@ -432,28 +430,49 @@ class TFolds {
    * Adds board wide buttons to the top bar.
    */
   addBoardIcons() {
-    const $boardBtns = $('div.board-header-btns.mod-right');
+    const buttonContainer = q$('div.board-header-btns.mod-right');
+    // const $boardBtns = $('div.board-header-btns.mod-right');
 
-    $boardBtns.prepend('<span class="board-header-btn-divider"></span>');
+    const divider = this.createNode({ tag: 'span', classes: ['board-header-btn-divider'] });
+    buttonContainer.prepend(divider);
+    // $boardBtns.prepend('<span class="board-header-btn-divider"></span>');
 
     /*
-            * COMPACT MODE
-            */
-    $boardBtns.prepend(`<a id='toggle-compact-mode' class='board-header-btn board-header-btn-without-icon board-header-btn-text compact-mode-disabled'>
-                                              <span class=''>Compact Mode</span></a>`);
-    $('a#toggle-compact-mode').click(() => {
-      this.setCompactMode(!this.compactMode);
+     * COMPACT MODE
+     */
+    const compactModeButton = this.createNode({
+      tag: 'a',
+      id: 'toggle-compact-mode',
+      classes: ['board-header-btn', 'board-header-btn-without-icon', 'board-header-btn-text',
+        'compact-mode-disabled'],
     });
+    compactModeButton.append(this.createNode({
+      tag: 'span', content: 'Compact Mode',
+    }));
+    compactModeButton.onclick = () => {
+      this.setCompactMode(!this.compactMode);
+    };
+
+    buttonContainer.prepend(compactModeButton);
 
     /*
-            * REDRAW BOARD
-            */
-    $boardBtns.prepend(`<a id='redraw-board' class='board-header-btn board-header-btn-without-icon board-header-btn-textboard-header-btn board-header-btn-without-icon board-header-btn-text'>
-                                              <span class=''>Redraw</span></a>`);
-    $('a#redraw-board').click(() => {
+     * REDRAW BOARD
+     */
+    const redrawButton = this.createNode({
+      tag: 'a',
+      id: 'redraw-board',
+      classes: ['board-header-btn', 'board-header-btn-without-icon', 'board-header-btn-text',
+        'compact-mode-disabled'],
+    });
+    redrawButton.append(this.createNode({
+      tag: 'span', content: 'Redraw',
+    }));
+    redrawButton.onclick = () => {
       this.formatLists();
       this.formatCards();
-    });
+    };
+
+    buttonContainer.prepend(redrawButton);
   }
 
   /**
@@ -462,19 +481,20 @@ class TFolds {
    * @param {boolean} enabled `true` if compact mode should be enabled, otherwise `false`
    */
   setCompactMode(enabled) {
+    this.compactMode = enabled;
     this.updateCompactModeButtonState(enabled);
     this.updateWidths();
     this.storeGlobalBoardSetting('compactMode', enabled);
   }
 
   updateCompactModeButtonState(enabled) {
-    const $btn = $('a#toggle-compact-mode');
+    const btn = document.querySelector('a#toggle-compact-mode');
     if (enabled) {
-      $btn.addClass('compact-mode-enabled');
-      $btn.removeClass('compact-mode-disabled');
+      btn.classList.add('compact-mode-enabled');
+      btn.classList.remove('compact-mode-disabled');
     } else {
-      $btn.addClass('compact-mode-disabled');
-      $btn.removeClass('compact-mode-enabled');
+      btn.classList.add('compact-mode-disabled');
+      btn.classList.remove('compact-mode-enabled');
     }
   }
 
@@ -501,20 +521,21 @@ class TFolds {
    * Called at board setup.
    */
   restoreSectionsViewState() {
-    const $lists = tdom.getLists();
+    const lists = tdom.getLists();
     const self = this;
-    $lists.each(function () {
-      const $l = $(this);
-      const $sections = tdom.getCardsInList(this, self.sectionIdentifier);
-      const sectionStates = self.retrieve(tdom.getListName($l), 'sections');
+    lists.forEach(l => {
+      const sectionStates = self.retrieve(tdom.getListName(l), 'sections');
       if (!sectionStates) {
         return;
       }
-      $sections.each(function () {
-        const cardName = tdom.getCardName($(this));
+      const sections = tdom.getCardsInList(l, this.sectionIdentifier);
+      sections.forEach(() => {
+        const cardName = tdom.getCardName(l);
         if (sectionStates[self.getStrippedTitle(cardName)] === true) {
-          const $section = $(this).find('.icon-expanded');
-          self.toggleSection($section[0], false);
+          const section = l.querySelector('.icon-expanded');
+          // TODO Test that section is not null 😨
+          console.assert(section !== null, 'Section is null, oopsie');
+          self.toggleSection(section, false);
         }
       });
     });
@@ -617,17 +638,17 @@ class TFolds {
     if (this.settings.enableCombiningLists === false) {
       return;
     }
-    const $lists = tdom.getLists();
-    for (let i = 0; i < $lists.length; ++i) {
-      if (tdom.getListName($lists[i]).indexOf('.') === -1 || i === $lists.length - 1) {
-        this.restoreSubList($lists[i]);
+    const lists = tdom.getLists();
+    for (let i = 0; i < lists.length; ++i) {
+      if (tdom.getListName(lists[i]).indexOf('.') === -1 || i === lists.length - 1) {
+        this.restoreSubList(lists[i]);
         continue;
       }
-      if (this.areListsRelated($lists[i], $lists[i + 1])) {
-        const numInSet = this.createCombinedList($lists.eq(i), i);
+      if (this.areListsRelated(lists[i], lists[i + 1])) {
+        const numInSet = this.createCombinedList(lists[i], i);
         i += numInSet - 1;
       } else {
-        this.restoreSubList($lists[i]);
+        this.restoreSubList(lists[i]);
       }
     }
   }
@@ -643,15 +664,16 @@ class TFolds {
    * @param {jQuery} $list The leftmost list in the combined set to create
    * @returns {Number} The number of lists in the set
    */
-  createCombinedList($list, superListIndex) {
-    const numOfSubLists = this.convertToSubList($list, superListIndex) + 1;
+  createCombinedList(list, superListIndex) {
+    const numOfSubLists = this.convertToSubList(list, superListIndex) + 1;
     this.debug && console.log(`numOfSubLists=${numOfSubLists}`);
     if (numOfSubLists < 2) {
       this.debug && console.error('Expected number of lists to be combined to be at least two');
       return null;
     }
-    $list.data('numOfSubLists', numOfSubLists);
-    this.addSuperList($list[0]);
+    $(list).data('numOfSubLists', numOfSubLists); // TODO Remove this line ❌
+    list.dataset.numOfSubLists = numOfSubLists;
+    this.addSuperList(list);
     return numOfSubLists;
   }
 
@@ -664,30 +686,37 @@ class TFolds {
    * @param {Number} id Unique identifier (timestamp)
    * @param {jQuery} $firstList Reference to first list
    */
-  convertToSubList($list, superListIndex, idx = 0) {
-    console.log({ $list, superListIndex, idx });
-    if ($list.hasClass('sub-list')) {
-      if (this.debug) {
-        console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
-      }
+  convertToSubList(list, superListIndex, idx = 0) {
+    // if ($list.hasClass('sub-list')) {
+    //   if (this.debug) {
+    //     console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
+    //   }
+    //   throw new Error();
+    // }
+    if (list.classList.contains('sub-list')) {
+      this.debug && console.warn(
+          `List [${tdom.getListName(list)}] already combined with other list`);
       throw new Error();
     }
-    $list[0].setAttribute('data-sublistindex', idx);
-    $list[0].setAttribute('data-super-list-index', superListIndex);
-    $list.addClass('sub-list');
-    $list.data('sublistindex', idx);
-    this.removeFoldingButton($list);
-    this.showWipLimit($list[0]);
 
-    this.attachListResizeDetector($list);
+    list.setAttribute('data-sublistindex', idx);
+    list.setAttribute('data-super-list-index', superListIndex);
+    list.classList.add('sub-list');
+    $(list).data('sublistindex', idx); // TODO Remove ❌
+    this.removeFoldingButton(list);
+    this.showWipLimit(list);
 
-    const nextEl = tdom.getNextList($list);
-    if (nextEl) {
-      const $nextList = $(nextEl);
-      if ($nextList !== null && this.areListsRelated($list, $nextList)) {
-        console.log('Attaching to next list', idx);
-        return this.convertToSubList($nextList, superListIndex, idx + 1);
+    this.attachListResizeDetector(list);
+
+    const nextList = tdom.getNextList(list);
+    if (nextList) {
+      if (this.areListsRelated(list, nextList)) {
+        return this.convertToSubList(nextList, superListIndex, idx + 1);
       }
+      // const $nextList = $(nextList);
+      // if ($nextList !== null && this.areListsRelated($list[0], $nextList[0])) {
+      //   return this.convertToSubList($nextList, superListIndex, idx + 1);
+      // }
     }
     return idx;
   }
@@ -696,57 +725,72 @@ class TFolds {
    * Attaches a "height change detector" to the target list. It triggers
    * a `resized` event if a change is detected.
    *
-   * The detector detaches itthis when the list is no longer a sub list
+   * The detector detaches  when the list is no longer a sub list
    * and when the list is no longer in the DOM.
    *
    * If the method is called several times on same list no additional
    * detectors are added.
    *
+   * TODO Replace with resize observer? https://web.dev/resize-observer/
    * @param {jQuery} $list The target list
    */
-  attachListResizeDetector($list) {
-    if ($list.data('hasDetector') === true) {
-      console.log('Detector already exists: ', tdom.getListName($list[0]));
+  attachListResizeDetector(list) {
+    // const list = $list[0];
+
+    if (list.dataset.hasDetector === true) {
+      console.log('Detector already exists: ', tdom.getListName(list));
       return;
     }
-    if (this.debug) {
-      console.log('Attaching resize detector: ', tdom.getListName($list[0]));
-    }
-    $list.data('hasDetector', true);
+    // if ($list.data('hasDetector') === true) {
+    //   console.log('Detector already exists: ', tdom.getListName($list[0]));
+    //   return;
+    // }
+    this.debug && console.log('Attaching resize detector: ', tdom.getListName(list));
+
+    // $list.data('hasDetector', true);
+    list.dataset.hasDetector = true;
 
     const self = this;
-    function callback() {
+    const resizeDetector = () => {
       /*
        * If list not visible or not a sub list anymore, stop tracking
        * height changes
        */
-      if (!jQuery.contains(document, $list[0])) {
+
+      if (!list.isConnected) {
         if (self.debug) {
           console.log(
-              `Detaching resize detector (list no longer in DOM): [${tdom.getListName($list[0])}]`);
+              `Detaching resize detector (list no longer in DOM): [${tdom.getListName(list)}]`);
         }
-        $list.data('hasDetector', false);
+        delete list.dataset.hasDetector;
         return;
       }
-      if (!$list.is(':visible') || $list.data('sublistindex') === undefined) {
+
+      if (list.style.display === 'none' || list.dataset.sublistindex === undefined) {
         if (self.debug) {
           console.log(
-              `Detaching resize detector (no longer sub list): [${tdom.getListName($list[0])}]`);
+              `Detaching resize detector (no longer sub list): [${tdom.getListName(list)}]`);
         }
-        $list.data('hasDetector', false);
+        delete list.dataset.hasDetector;
         return;
       }
-      if ($list.height() !== $list.data('oldHeight')) {
-        console.log(`HEIGHT CHANGE:${tdom.getListName($list)}`);
-        $list.data('oldHeight', $list.height());
-        $(self.getMySuperList($list)).trigger('resized', $list[0]);
+      // if (!$list.is(':visible') || $list.data('sublistindex') === undefined) {
+      // }
+      if (list.style.height !== list.dataset.oldHeight) {
+        this.debug && console.log(`HEIGHT CHANGE: ${tdom.getListName(list)}`);
+        list.dataset.oldHeight = list.style.height;
+        const superList = this.getMySuperList(list);
+        if (superList) {
+          // TODO Add sublist parameter to this ...trigger('resized', $list[0]);
+          superList.dispatchEvent(new Event('resize'));
+        }
       }
-      requestAnimationFrame(callback);
-    }
+      requestAnimationFrame(resizeDetector);
+    };
 
-    $list.data('oldHeight', $list.height());
+    list.dataset.oldHeight = list.style.height;
 
-    requestAnimationFrame(callback);
+    requestAnimationFrame(resizeDetector);
   }
 
   /**
@@ -757,13 +801,12 @@ class TFolds {
    *
    * will return `true`.
    *
-   * @param {jQuery} $l1 The first list
-   * @param {jQuery} $l2 The second list
+   * @param {jQuery} l1 The first list
+   * @param {jQuery} l2 The second list
    */
-  areListsRelated($l1, $l2) {
-    const name1 = tdom.getListName($l1);
-    const name2 = tdom.getListName($l2);
-    console.log({ name1, name2 });
+  areListsRelated(l1, l2) {
+    const name1 = tdom.getListName(l1);
+    const name2 = tdom.getListName(l2);
     return name1.includes('.')
       && (name1.substr(0, name1.indexOf('.')) === name2.substr(0, name2.indexOf('.')));
   }
@@ -787,63 +830,6 @@ class TFolds {
     }
   }
 
-  // /**
-  //  * Splits the lists into two ordinary lists assuming they are combined
-  //  * and no longer matches.
-  //  *
-  //  * This would typically happen if a list is moved around or its title changed.
-  //  *
-  //  * @param {jQuery} $list The list object for the list being modified
-  //  * @return {boolean} `true` if lists split, otherwise `false`
-  //  */
-  // splitLists($list) {
-  //   if (!this.isSubList($list)) {
-  //     console.warn("Called splitLists() with a list that isn't a sublist", $list);
-  //     return false;
-  //   }
-
-  //   let $leftList;
-  //   let $rightList;
-
-  //   if (this.isFirstSubList($list)) {
-  //     $leftList = $list;
-  //     $rightList = $list.parent().next().find('.js-list-content');
-  //     console.info($rightList);
-  //     if (!this.isSubList($rightList)) {
-  //       console.warn('List to right not a sub list');
-  //       return false;
-  //     }
-  //   } else {
-  //     $rightList = $list;
-  //     $leftList = $list.parent().prev().find('.js-list-content');
-  //     console.info($leftList);
-  //     if (!this.isSubList($leftList)) {
-  //       console.warn('List to left not a sub list');
-  //       return false;
-  //     }
-  //   }
-
-  //   if (this.areListsRelated($leftList, $rightList)) {
-  //     return false;
-  //   }
-
-  //   this.restoreSubList($leftList);
-  //   this.restoreSubList($rightList);
-
-  //   return true;
-  // }
-
-  /**
-   * Checks if the specified list is the first sub list of a set of
-   * combined lists.
-   *
-   * @param {jQuery} $list The target list
-   * @returns `true` if first sub list of set otherwise `false`
-   */
-  isFirstSubList($list) {
-    return ($list.data('sublistindex') === TFolds.LEFTMOST_SUBLIST);
-  }
-
   /**
    * Restores the target list to a "normal" list by removing all sub list
    * related data and restoring the folding button and WiP limit stuff.
@@ -851,12 +837,12 @@ class TFolds {
    * @param {jQuery} $list The target list
    */
   restoreSubList(list) {
-    const $list = $(list);
-    if ($list.data('sublistindex') === 0) {
-      $list.parent().find('.super-list,.super-list-collapsed').remove();
+    if (list.dataset.sublistindex === 0) {
+      list.parentNode.querySelector('.super-list').remove();
+      list.parentNode.querySelector('.super-list').remove();
     }
-    $list.removeData(['sublistindex']);
-    $list.removeClass('sub-list');
+    delete list.dataset.sublistindex;
+    list.classList.remove('sub-list');
     this.addFoldingButton(list);
     this.showWipLimit(list);
   }
@@ -906,13 +892,20 @@ class TFolds {
   addCollapsedSuperList(superList) {
     const $superList = $(superList);
     try {
-      const $collapsedList
-        = $(`<div style="display: none" class="super-list-collapsed list"><span class="list-header-name">EMPTY</span></div>`);
-      superList.parentNode.prepend($collapsedList[0]);
-      $collapsedList.click(() => {
-        this.expandSuperList($collapsedList);
-        return false;
+      const collapsedList = this.createNode({
+        tag: 'div',
+        style: { display: 'none' },
+        classes: ['super-list-collapsed', 'list'],
       });
+      collapsedList.append(this.createNode(
+          { tag: 'span', classes: 'list-header-name', content: 'EMPTY' }));
+
+      collapsedList.onclick = (event) => {
+        this.expandSuperList(event.currentTarget);
+        event.stopPropagation();
+      };
+      superList.parentNode.prepend(collapsedList);
+
       if (this.settings.rememberViewStates) {
         const collapsed = this.retrieve(
             tdom.getListName($superList.siblings('.js-list-content')), 'super-list-collapsed');
@@ -929,20 +922,22 @@ class TFolds {
    *
    * @param {*} $subList
    */
-  updateSuperListHeight($list) {
-    if (!$list) {
+  updateSuperListHeight(list) {
+    if (!list) {
       throw new TypeError('Parameter [$l] undefined');
     }
-    if (!this.isSubList($list[0])) {
+    if (!this.isSubList(list)) {
       throw new TypeError('Parameter [$l] not sublist');
     }
-    const height = this.findSuperListHeight($list);
-    const $superList = $(this.getMySuperList($list));
-    $superList.css('height', height);
+    const superList = this.getMySuperList(list);
+    if (superList) {
+      const height = this.findSuperListHeight(list);
+      superList.style.height = `${height}px`;
+    }
   }
 
-  findSuperListHeight($list) {
-    const { superListIndex } = $list[0].dataset;
+  findSuperListHeight(list) {
+    const { superListIndex } = list.dataset;
     const listWrapper = tdom.getListWrapperByIndex(superListIndex);
     let listEl = listWrapper.querySelector(`[data-super-list-index="${superListIndex}"]`);
     let maxHeight = 0;
@@ -958,21 +953,14 @@ class TFolds {
   /**
        * Finds the super list DIV associated with the sub list.
        *
-       * @param {jQuery} $subList The sub list
+       * @param {jQuery} subList The sub list
        * @returns {jQuery} The super list DIV element jQuery object
        */
-  getMySuperList($subList) {
-    // let $l;
-    const { superListIndex } = $subList[0].dataset;
+  getMySuperList(subList) {
+    const { superListIndex } = subList.dataset;
     const wrapper = tdom.getListWrapperByIndex(superListIndex);
     const superList = wrapper.querySelector('div.super-list');
     return superList;
-    // if ($subList.data('sublistindex') === TFolds.LEFTMOST_SUBLIST) {
-    //   $l = $subList;
-    // } else {
-    //   $l = $subList.data('firstList');
-    // }
-    // return $l.siblings('div.super-list');
   }
 
   /**
@@ -985,10 +973,9 @@ class TFolds {
     const listIndex = subList.dataset.superListIndex;
     const wrapper = tdom.getListWrapperByIndex(listIndex);
     const $sl = $(wrapper.querySelector(`[data-super-list-index="${listIndex}"]`));
-    const $superList = $(this.getMySuperList($subList));
+    const $superList = $(this.getMySuperList($subList[0]));
     const $title = $superList.find('span.super-list-header');
 
-    console.log({ $superList });
     $title.find('span.wip-limit-title').remove();
 
     /*
@@ -1012,8 +999,8 @@ class TFolds {
     const $wipTitle = this.createWipTitle(title, totNumOfCards, wipLimit);
     this.updateWipBars($superList[0], totNumOfCards, wipLimit);
     $title.append($($wipTitle));
-    this.updateSuperListHeight($sl);
-    this.updateCollapsedSuperList($superList, $($wipTitle).clone());
+    this.updateSuperListHeight($sl[0]);
+    this.updateCollapsedSuperList($superList[0], $wipTitle.cloneNode(true));
 
     this.updateWidths();
 
@@ -1025,36 +1012,50 @@ class TFolds {
    * compact mode and that combined list backdrops are rendered correctly.
    */
   updateWidths() {
-    $('div.list-wrapper:not(:has(>div.list-collapsed:visible)):not(:has(>div.super-list-collapsed:visible))').css('width', `${this.listWidth}px`);
+    const lists = document.querySelectorAll('div.list-wrapper');
+    lists.forEach(l => {
+      const collapsedList = l.querySelector(
+          'div.list-collapsed:not([style*="none"]),div.super-list-collapsed:not([style*="none"])');
+      if (!collapsedList) {
+        l.style.width = `${this.listWidth}px`;
+      }
+    });
 
-    const $supersets = $('div.super-list');
-    for (let i = 0; i < $supersets.length; ++i) {
-      const $ss = $supersets.eq(i);
-      const n = $ss.siblings('div.js-list-content').data('numOfSubLists');
+    const supersets = document.querySelectorAll('div.super-list');
+    supersets.forEach(s => {
+      const n = s.parentNode.querySelector('div.js-list-content').dataset.numOfSubLists;
       const w = ((this.listWidth + TFolds.LIST_PADDING) * n) - TFolds.LIST_PADDING;
-      $ss.css('width', `${w}px`);
-    }
+      s.style.width = `${w}px`;
+    });
   }
+
+  // updateCollapsedSuperList($superList, $wipTitle) {
+  //   const $header = $superList.parent().find('.super-list-collapsed > span.list-header-name');
+  //   $header.empty().append($wipTitle);
+  // }
 
   /**
-       *
-       */
-  updateCollapsedSuperList($superList, $wipTitle) {
-    const $header = $superList.parent().find('.super-list-collapsed > span.list-header-name');
-    $header.empty().append($wipTitle);
+   *
+   */
+  updateCollapsedSuperList(superList, wipTitle) {
+    if (!superList) {
+      return;
+    }
+    const header = superList.parentNode.querySelector(
+        '.super-list-collapsed > span.list-header-name');
+    header.innerHTML = '';
+    header.append(wipTitle);
   }
-
   // #region COMBINED LISTS
 
   /**
-       *
-       */
+   *
+   */
   makeListsFoldable() {
-    const $lists = $('div.list-wrapper');
-    const self = this;
-    $lists.each(function () {
-      self.addFoldingButton(this);
-      self.addCollapsedList(this);
+    const lists = document.querySelectorAll('div.list-wrapper');
+    lists.forEach(e => {
+      this.addFoldingButton(e);
+      this.addCollapsedList(e);
     });
   }
 
@@ -1062,44 +1063,53 @@ class TFolds {
    *
    */
   addFoldingButton(listEl) {
-    const $l = $(listEl);
-
-    if ($l.find('.js-list-content').data('sublistindex') !== undefined) {
+    if (listEl.querySelector('.js-list-content')?.dataset.sublistindex !== undefined) {
       return;
     }
 
-    const $header = $l.find('div.list-header-extras');
-    $header.find('.icon-close').parent().remove();
-    const $foldIcon = this.createFoldIcon();
+    const header = listEl.querySelector('div.list-header-extras');
+    if (!header) {
+      return;
+    }
+    header.querySelector('.icon-close')?.parentNode.remove();
 
-    const self = this;
-    $foldIcon.click(function () {
-      const $l = $(this).closest('.list');
-      if ($l.length === 1) {
-        self.collapseList($l[0]);
+    const foldIcon = this.createFoldIcon();
+
+    foldIcon.onclick = (event) => {
+      const l = event.currentTarget.closest('.list');
+      if (l) {
+        this.collapseList(l);
       } else {
-        if ($l.length !== 0) {
-          console.error('Expected to find ONE list or super list');
+        const superList = event.currentTarget.closest('.super-list');
+        if (!superList) {
+          console.error('Expected to find a list or a super list');
           return;
         }
-        self.collapseSuperList($(this).closest('.super-list')[0]);
+        this.collapseSuperList(superList);
       }
-    });
-    $header.append($foldIcon);
+      event.stopPropagation();
+    };
+
+    header.append(foldIcon);
   }
 
   createFoldIcon() {
-    return $('<a class="list-header-extras-menu dark-hover" href="#"><span class="icon-sm icon-close dark-hover"/></a>');
+    const link = this.createNode({ tag: 'a', classes: ['list-header-extras-menu', 'dark-hover'] });
+    const icon = this.createNode({ tag: 'span', classes: ['icon-sm', 'icon-close', 'dark-hover'] });
+
+    link.href = '#';
+    link.append(icon);
+
+    return link;
   }
 
   /**
        *
        */
-  removeFoldingButton($list) {
-    const [listEl] = $list;
-    const foldingButton = listEl.querySelector('span.icon-close');
+  removeFoldingButton(list) {
+    const foldingButton = list.querySelector('span.icon-close');
     if (!foldingButton) {
-      this.debug && console.log(`Folding button not found for list: ${tdom.getListName(listEl)}`);
+      this.debug && console.log(`Folding button not found for list: ${tdom.getListName(list)}`);
       return;
     }
     foldingButton.parentNode.remove();
@@ -1109,38 +1119,41 @@ class TFolds {
    *
    */
   addCollapsedList(listEl) {
-    const $l = $(listEl);
-    if ($l.hasClass('js-add-list')) {
+    if (listEl.classList.contains('js-add-list')) {
       return;
     }
+
     /*
      * If list already contains an element with list-collapsed class
      * this method is called from "redraw"
      */
-    if ($l.find('.list-collapsed').length !== 0) {
-      if (this.debug) {
-        console.log("There's already a list-collapsed elementish");
-      }
+    if (listEl.querySelector('.list-collapsed')) {
+      this.debug && console.log("There's already a list-collapsed elementish");
       return;
     }
-    $l.css({
-      'position': 'relative',
-    });
+    listEl.style.position = 'relative';
     try {
       const name = tdom.getListName(listEl);
-      const $collapsedList = $(`<div style="display: none" class="list-collapsed list"><span class="list-header-name">${name}</span></div>`);
-      $collapsedList.click(() => {
-        /*
-                    * Call expandList with the list wrapper as argument
-                    */
-        this.expandList($collapsedList);
-        return false;
+      const collapsedList = this.createNode({
+        tag: 'div',
+        classes: ['list-collapsed', 'list'],
+        style: { display: 'none' },
       });
-      $l.prepend($collapsedList);
+      const nameSpan = this.createNode({
+        tag: 'span',
+        classes: 'list-header-name',
+        content: name,
+      });
+      collapsedList.append(nameSpan);
+      collapsedList.onclick = (event) => {
+        this.expandList(event.currentTarget);
+        event.stopPropagation();
+      };
+      listEl.prepend(collapsedList);
       if (this.settings.rememberViewStates) {
-        const collapsed = this.retrieve(tdom.getListName($l), 'collapsed');
+        const collapsed = this.retrieve(tdom.getListName(listEl), 'collapsed');
         if (collapsed === true) {
-          this.collapseList($l.find('.list').first().next()[0]);
+          this.collapseList(listEl.querySelector('.list > *').nextSibling);
         }
       }
     } catch (e) {
@@ -1152,15 +1165,14 @@ class TFolds {
    *
    */
   addWipLimits() {
-    let $wipLists;
+    let wipLists;
     if (this.settings.alwaysCount === true) {
-      $wipLists = tdom.getLists();
+      wipLists = tdom.getLists();
     } else {
-      $wipLists = tdom.getLists(/\[([0-9]*?)\]/);
+      wipLists = tdom.getLists(/\[([0-9]*?)\]/);
     }
-    const self = this;
-    $wipLists.each(function () {
-      self.showWipLimit(this);
+    wipLists.forEach(l => {
+      this.showWipLimit(l);
     });
   }
 
@@ -1168,7 +1180,6 @@ class TFolds {
    *
    */
   showWipLimit(listEl) {
-    console.log({ listEl });
     const numCards = this.countWorkCards(listEl);
     const wipLimit = this.extractWipLimit(listEl);
     const subList = listEl?.dataset.sublistindex;
@@ -1176,7 +1187,6 @@ class TFolds {
     if (subList !== undefined) {
       this.addWipLimit(listEl, numCards);
       this.updateSuperList(listEl);
-      console.log({ listEl });
       listEl.classList.remove('wip-limit-reached', 'wip-limit-exceeded');
       listEl.previousSibling?.classList.remove(
           'collapsed-limit-reached', 'collapsed-limit-exceeded');
@@ -1203,8 +1213,6 @@ class TFolds {
    *
    */
   updateWipBars(listEl, numCards, wipLimit) {
-    // debugger;
-    console.log({ listEl, numCards, wipLimit });
     if (!listEl) {
       return;
     }
@@ -1224,8 +1232,8 @@ class TFolds {
         listEl.classList.add('wip-limit-exceeded');
         listEl.classList.remove('wip-limit-reached');
         collapsed.forEach(e => {
-          e.classList.add('collapsed-limit-reached');
-          e.classList.remove('collapsed-limit-exceeded');
+          e.classList.add('collapsed-limit-exceeded');
+          e.classList.remove('collapsed-limit-reached');
         });
         return;
       }
@@ -1238,13 +1246,22 @@ class TFolds {
    */
   removeWipLimit(listEl) {
     const title = listEl.querySelector('span.wip-limit-title');
-    if (title) {
-      title.innerHTML = '';
-    }
+    title?.remove();
+    // if (title) {
+    //   title.remove();
+    // }
     const textarea = listEl.querySelector('.list-header > textarea');
     this.toggleVisibility(textarea, true);
     this.removeWipBar(listEl);
   }
+
+  // removeWipLimit(listEl) {
+  //   const $l = $(listEl);
+  //   $l.find('span.wip-limit-title').remove();
+  //   const $header = $l.find('.list-header');
+  //   $header.find('textarea').show();
+  //   this.removeWipBar($l[0]);
+  // }
 
   /**
    *
@@ -1281,9 +1298,7 @@ class TFolds {
     let strippedTitle;
 
     const wipLimitTitle = listEl.querySelector('span.wip-limit-title');
-    if (wipLimitTitle) {
-      wipLimitTitle.innerHTML = '';
-    }
+    wipLimitTitle?.remove();
     const title = tdom.getListName(listEl);
 
     if (title.indexOf('[') !== -1) {
@@ -1321,7 +1336,8 @@ class TFolds {
     wipTitle = wipTitle.cloneNode(true);
     header.onclick = (event) => {
       const textarea = event.currentTarget.querySelector('textarea');
-      this.toggleVisibility(event.currentTarget.querySelector('.wip-limit-title'), false);
+      const wipLimitTitle = event.currentTarget.querySelector('.wip-limit-title');
+      this.toggleVisibility(wipLimitTitle, false);
       if (textarea) {
         this.toggleVisibility(textarea, true);
         textarea.select();
@@ -1334,7 +1350,7 @@ class TFolds {
     header.querySelector('textarea').onblur = () => {
       this.showWipLimit(listEl);
     };
-    header.appendChild(wipTitle);
+    header.append(wipTitle);
   }
 
   /**
@@ -1369,7 +1385,7 @@ class TFolds {
       classes: 'wip-limit-title',
       content: title,
     });
-    wipTitle.appendChild(countBadge);
+    wipTitle.append(countBadge);
 
     return wipTitle;
   }
@@ -1378,24 +1394,17 @@ class TFolds {
    *
    */
   formatCards() {
-    const $cards = tdom.getCardsByName('', false);
-    if (this.config.debug) {
-      console.groupCollapsed('Formatting cards');
-    }
-    const self = this;
-    $cards.each(function () {
-      self.formatCard(this);
-    });
-    if (this.config.debug) {
-      console.groupEnd();
-    }
+    const cards = tdom.getCardsByName('', false);
+    this.debug && console.groupCollapsed('Formatting cards');
+    cards.forEach(c => this.formatCard(c));
+    this.debug && console.groupEnd();
   }
 
   /**
    *
    */
   formatCard(cardEl) {
-    const cardName = tdom.getCardName($(cardEl));
+    const cardName = tdom.getCardName(cardEl);
 
     if (cardName.indexOf(this.sectionIdentifier) === 0) {
       if (this.config.debug) {
@@ -1423,7 +1432,7 @@ class TFolds {
    */
   formatAsSection(card) {
     if (this.debug) {
-      console.log(`Formatting as section: ${tdom.getCardName($(card))}`);
+      console.log(`Formatting as section: ${tdom.getCardName(card)}`);
     }
     if (card.querySelector('#section-title')) {
       this.debug && console.log('Section title already exists');
@@ -1436,7 +1445,7 @@ class TFolds {
       return false;
     };
 
-    const strippedTitle = this.getStrippedTitle(tdom.getCardName($(card)));
+    const strippedTitle = this.getStrippedTitle(tdom.getCardName(card));
 
     const strippedTitleEl = this.createNode({
       tag: 'span',
@@ -1456,11 +1465,9 @@ class TFolds {
    * @param {Element} listEl List element to collapse
    */
   collapseList(listEl) {
-    console.log({ listEl });
     this.toggleVisibility(listEl);
     this.toggleVisibility(listEl.previousSibling);
     listEl.parentNode.style.width = '40px';
-    console.log(listEl.previousSibling);
     this.store(tdom.getListName(listEl), 'collapsed', true);
   }
 
@@ -1513,21 +1520,19 @@ class TFolds {
   /**
    *
    */
-  expandList($list) {
-    const [listEl] = $list;
-
+  expandList(listEl) {
     this.toggleVisibility(listEl);
-    this.toggleVisibility(listEl.nextElementSibling);
+    this.toggleVisibility(listEl.nextSibling);
     listEl.parentNode.style.width = `${this.listWidth}px`;
     // TODO Instead of storing "false" remove setting(?)
-    this.store(tdom.getListName($list.next()), 'collapsed', false);
+    this.store(tdom.getListName(listEl.nextSibling), 'collapsed', false);
   }
 
   /**
    *
    */
-  expandSuperList($collapsedList) {
-    const [collapsedList] = $collapsedList;
+  expandSuperList(collapsedList) {
+    // const [collapsedList] = $collapsedList;
     this.toggleVisibility(collapsedList);
     const superList = collapsedList.parentNode.querySelector('.super-list');
     this.toggleVisibility(superList);
@@ -1579,6 +1584,8 @@ class TFolds {
             return false;
           });
     } else {
+      // FIXME section is not connected here 💣
+      console.log({ section, connected: section.isConnected });
       listEl = tdom.getContainingList(section);
       cards = this.findSiblingsUntil(
           section.closest('a'),
@@ -1588,6 +1595,7 @@ class TFolds {
     cards.forEach(c => this.toggleVisibility(c));
 
     if (updateStorage === true) {
+      console.log({ listEl });
       const listName = tdom.getListName(listEl);
       let listSections = this.retrieve(listName, 'sections');
       if (!listSections) {
@@ -1655,7 +1663,7 @@ class TFolds {
    * @param {Object} node An object with node properties
    * @returns The created element
    */
-  createNode({ tag, classes = [], id = undefined, content = undefined }) {
+  createNode({ tag, classes = [], style = {}, id = undefined, content = undefined }) {
     const el = document.createElement(tag);
     if (id) {
       el.id = id;
@@ -1665,7 +1673,10 @@ class TFolds {
     } else {
       classes.forEach((c) => el.classList.add(c));
     }
-    if (content) {
+
+    Object.assign(el.style, style);
+    // el.style = style;
+    if (content !== undefined) {
       el.textContent = content;
     }
     return el;

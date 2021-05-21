@@ -1,4 +1,10 @@
+/* eslint-disable no-unused-vars */
 // import { TFolds } from 'trello-folds.js';
+
+const q$ = (a, b) => (typeof a === 'string' ? document.querySelector(a) : a.querySelector(b));
+const q$$ = (a, b) => {
+  return Array.from(typeof a === 'string' ? document.querySelectorAll(a) : a.querySelectorAll(b));
+};
 
 const tfolds = new TFolds();
 

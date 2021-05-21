@@ -11,10 +11,12 @@ module.exports = {
     'sourceType': 'module',
   },
   'globals': {
-    'tdom': 'readonly',
+    'TDom': 'readonly',
     'TFolds': 'readonly',
     '$': 'readonly',
     'jQuery': 'readonly',
+    'q$': 'readonly',
+    'q$$': 'readonly',
   },
   'rules': {
     'semi': ['warn', 'always', { 'omitLastInOneLineBlock': true }],
