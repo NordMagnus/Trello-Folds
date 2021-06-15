@@ -955,6 +955,11 @@ class TDOM {
   //   return labels;
   // }
 
+  /**
+   *
+   * @param {*} idx
+   * @returns {Element} Wrapper element
+   */
   getListWrapperByIndex(idx) {
     const boardEl = document.getElementById('board');
     const listEl = boardEl.children[idx];

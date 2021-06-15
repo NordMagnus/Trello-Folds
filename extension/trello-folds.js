@@ -1490,8 +1490,7 @@ class TFolds {
       firstSubList = list.parentNode.querySelector('.sub-list');
     } else {
       const idx = list.dataset.superListIndex;
-      const listEl = tdom.getListWrapperByIndex(idx);
-      firstSubList = listEl.querySelector(`[data-super-list-index="${idx}"]`);
+      firstSubList = $(`#board [data-super-list-index="${idx}"]`);
     }
 
     console.assert(firstSubList, 'firstSubList not defined');
