@@ -58,7 +58,7 @@ EventHandler.REDRAW_BOARD_HEADER = Symbol('redraw_board_header');
 Object.freeze(EventHandler);
 
 // eslint-disable-next-line no-unused-vars
-class TDom {
+class TDOM {
 
   constructor() {
     this.handler = new EventHandler();
@@ -137,9 +137,10 @@ class TDom {
    * Also disconnects other observers used to track changes within the board.
    */
   initialize(attemptCount = 0) {
-    const $content = $('DIV#content');
+    // const $content = $('DIV#content');
+    const content = $('div#content');
 
-    if (!$content.length) {
+    if (!content) {
       if (attemptCount < 3) {
         setTimeout(() => {
           console.warn(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
@@ -155,7 +156,8 @@ class TDom {
         console.log('Init observer invoked');
       }
 
-      if (mutations.length !== 0 && $(mutations[mutations.length - 1].addedNodes)) {
+      // NOTE
+      if (mutations.length !== 0 && mutations[mutations.length - 1].addedNodes) {
         const boardId = this.getBoardIdFromUrl();
 
         if (this.currentBoardId !== boardId) {
@@ -197,7 +199,7 @@ class TDom {
 
     this.boardChanged(this.getBoardIdFromUrl());
 
-    initObserver.observe($content[0], conf);
+    initObserver.observe(content, conf);
   }
 
   /**
@@ -219,20 +221,20 @@ class TDom {
    * watching for mutations to the board.
    */
   watchForMutations(boardId, attemptCount = 1) {
-    const $content = $('DIV#board');
+    const content = $('div#board');
 
-    if (!$content.length) {
-      if (attemptCount < 3) {
+    if (!content) {
+      if (attemptCount < TDOM.MAX_LOAD_ATTEMPTS) {
         setTimeout(() => {
           console.log(`Trying to find DIV#board again (attempt ${attemptCount + 1})`);
           this.watchForMutations(boardId, attemptCount + 1);
-        }, 100);
+        }, TDOM.LOAD_RETRY_TIMEOUT);
         return;
       }
       throw ReferenceError(`DIV#board not found after ${attemptCount} attempts`);
     }
 
-    this.connectLoadObserver($content);
+    this.connectLoadObserver(content);
 
     /*
             * Setting newMutations to true to force at least one 100 ms delay before completing.
@@ -258,7 +260,7 @@ class TDom {
         console.log(`Connecting observers - NO NEW MUTATIONS (after ${numCalls} calls)`);
       }
       this.loadObserver.disconnect();
-      this.connectBoardObserver($('DIV#board'));
+      this.connectBoardObserver($('div#board'));
       this.connectHeaderObserver();
       this.connectListObserver();
 
@@ -272,13 +274,14 @@ class TDom {
     this.newMutations = false;
     setTimeout(() => {
       if (this.debug) {
-        console.log(`%cWaiting for board to load... (newMutations=${this.newMutations},boardCompletelyLoaded=${this.boardCompletelyLoaded})`, 'font-style: italic; color: #808080;');
+        console.log(`%cWaiting for board to load... (newMutations=${this.newMutations},boardCompletelyLoaded=${this.boardCompletelyLoaded})`,
+            'font-style: italic; color: #808080;');
       }
       this.connectObservers(numCalls+1);
-    }, 100);
+    }, TDOM.DEFAULT_TIMEOUT);
   }
 
-  connectLoadObserver($content) {
+  connectLoadObserver(content) {
     if (this.debug) {
       console.log('%c  Looking for DOM mutations during board change  ',
           'font-weight: bold; color: #40a022; background-color: #f0f0f0;');
@@ -291,8 +294,8 @@ class TDom {
       }
       for (const m of mutations) {
         if (m.addedNodes.length === 1 && m.target.className === 'js-plugin-badges'
-                  && $(m.target).closest('a').next().length === 0) {
-          const theList = $(this.getContainingList(m.target));
+                  && m.target.closest('a').nextSibling === null) {
+          const theList = this.getContainingList(m.target);
           let nextList = this.getNextList(theList);
           let done = true;
           while (nextList !== null) {
@@ -318,36 +321,36 @@ class TDom {
       subtree: true,
     };
 
-    this.loadObserver.observe($content[0], conf);
+    this.loadObserver.observe(content, conf);
   }
 
   /**
    * Setting up the observer to check for added and removed lists by looking for
    * added and removed children to `DIV#board` having the CSS class `list-wrapper`.
    */
-  connectBoardObserver($content) {
+  connectBoardObserver(content) {
     this.boardObserver = new MutationObserver(((mutations) => {
       let isDropped = false;
       let addedList;
 
       for (const m of mutations) {
         if (m.addedNodes.length === 1
-                      && m.addedNodes[0].localName === 'div'
-                      && $(m.addedNodes).hasClass('placeholder')) {
-          const $draggedList = $('body').find('.ui-sortable-helper');
-          console.log($draggedList);
-          this.handler.emit(EventHandler.LIST_DRAGGED, $draggedList[0]);
+            && m.addedNodes[0].localName === 'div'
+            && m.addedNodes[0].classList.contains('placeholder')) {
+          const draggedList = $('body .ui-sortable-helper');
+          console.log({ draggedList });
+          this.handler.emit(EventHandler.LIST_DRAGGED, draggedList);
         } else if (m.removedNodes.length === 1
                       && m.removedNodes[0].localName === 'div'
-                      && $(m.removedNodes[0]).hasClass('placeholder')) {
+                      && m.removedNodes[0].classList.contains('placeholder')) {
           isDropped = true;
         } else if (m.addedNodes.length === 1
-                      && $(m.addedNodes[0]).hasClass('list-wrapper')) {
-          addedList = m.addedNodes[0];
+                      && m.addedNodes[0].classList.contains('list-wrapper')) {
+          [addedList] = m.addedNodes;
         } else if (m.removedNodes.length === 1
-                      && $(m.removedNodes[0]).hasClass('list-wrapper')) {
-          const $l = $(m.removedNodes[0]).find('div.js-list-content');
-          this.handler.emit(EventHandler.LIST_REMOVED, $l[0]);
+                      && m.removedNodes[0].classList.contains('list-wrapper')) {
+          const l = $(m.removedNodes[0], 'div.js-list-content');
+          this.handler.emit(EventHandler.LIST_REMOVED, l);
         }
       }
       if (addedList) {
@@ -366,12 +369,12 @@ class TDom {
       subtree: false,
     };
 
-    this.boardObserver.observe($content[0], conf);
+    this.boardObserver.observe(content, conf);
   }
 
   connectHeaderObserver() {
-    const $header = $('div.board-header');
-    if ($header.length === 0) {
+    const header = $('div.board-header');
+    if (!header) {
       console.error('Board header not found');
       return;
     }
@@ -379,8 +382,7 @@ class TDom {
     this.headerObserver = new MutationObserver(((mutations) => {
       mutations.forEach((m) => {
         if (m.addedNodes.length === 1) {
-          if ($(m.addedNodes[0]).hasClass('board-header-plugin-btns')) {
-            // console.log(m.addedNodes);
+          if (m.addedNodes[0].classList.contains('board-header-plugin-btns')) {
             this.handler.emit(EventHandler.REDRAW_BOARD_HEADER);
           }
         }
@@ -394,20 +396,20 @@ class TDom {
       subtree: true,
     };
 
-    this.headerObserver.observe($header[0], conf);
+    this.headerObserver.observe(header, conf);
   }
 
   /**
    *
    */
   connectListObserver() {
-    const $lists = $('div.list');
+    const lists = $$('div.list');
 
     if (this.debug) {
-      console.log('connectListObserver()', `# of lists: ${$lists.length}`);
+      console.log('connectListObserver()', `# of lists: ${lists.length}`);
     }
 
-    if ($lists.length === 0) {
+    if (lists.length === 0) {
       return;
     }
 
@@ -415,42 +417,34 @@ class TDom {
       mutations.forEach((m) => {
         // console.dir(m);
         if (m.addedNodes.length === 1
-                      && $(m.target).hasClass('custom-field-front-badges')) {
-          this.handler.emit(EventHandler.BADGES_MODIFIED, $(m.target).closest('a')[0]);
+                      && m.target.classList.contains('custom-field-front-badges')) {
+          this.handler.emit(EventHandler.BADGES_MODIFIED, m.target.closest('a'));
         } else if (m.addedNodes.length > 0
                       && m.addedNodes[0].localName === 'a'
-                      && $(m.addedNodes[0]).hasClass('list-card')) {
-          if (!$(m.addedNodes[0]).hasClass('placeholder')) {
+                      && m.addedNodes[0].classList.contains('list-card')) {
+          if (!m.addedNodes[0].classList.contains('placeholder')) {
             this.handler.emit(EventHandler.CARD_ADDED, m.addedNodes[0]);
           }
-          this.handler.emit(EventHandler.LIST_MODIFIED, $(m.target).parent()[0]);
+          this.handler.emit(EventHandler.LIST_MODIFIED, m.target.parentNode);
         } else if (m.removedNodes.length > 0
                       && m.removedNodes[0].localName === 'a'
-                      && $(m.removedNodes[0]).hasClass('list-card')) {
+                      && m.removedNodes[0].classList.contains('list-card')) {
           this.handler.emit(EventHandler.CARD_REMOVED, m.removedNodes[0]);
-          const $target = $(m.target);
-          if ($target.parent().length !== 0) {
-            this.handler.emit(EventHandler.LIST_MODIFIED, $target.closest('div.list')[0]);
+          const { target } = m;
+          if (target.parentNode) {
+            this.handler.emit(EventHandler.LIST_MODIFIED, target.closest('div.list'));
           }
         } else if (m.addedNodes.length === 2
                       && m.removedNodes.length === 2
-                      && m.addedNodes[1].parentElement.localName === 'span'
-                      && $(m.addedNodes[1].parentElement).hasClass('list-card-title')) {
-          this.handler.emit(EventHandler.CARD_MODIFIED, $(m.target).closest('a')[0],
+                      && m.addedNodes[1].parentNode.localName === 'span'
+                      && m.addedNodes[1].parentNode.classList.contains('list-card-title')) {
+          this.handler.emit(EventHandler.CARD_MODIFIED, m.target.closest('a'),
               m.addedNodes[1].textContent, m.removedNodes[1].textContent);
-        } else if ($(m.target).hasClass('list-header-name-assist') && m.addedNodes.length === 1) {
-          this.handler.emit(EventHandler.LIST_TITLE_MODIFIED, $(m.target).closest('div.list'),
+        } else if (m.target.classList.contains('list-header-name-assist')
+          && m.addedNodes.length === 1) {
+          this.handler.emit(EventHandler.LIST_TITLE_MODIFIED, m.target.closest('div.list'),
               m.addedNodes[0].textContent);
         }
-
-        // if (m.addedNodes.length === 1 && m.target.className === "js-plugin-badges") {
-        //     console.info(`List name: ${this.getListName(this.getContainingList(m.target))}`);
-        //     console.info("%cHallelujah!", "font-weight: bold; color: red;");
-        // }
-
-        // } else if (m.removedNodes.length !== 0) {
-        //     console.dir(m);
-        // }
       });
     }));
 
@@ -461,9 +455,8 @@ class TDom {
       subtree: true,
     };
 
-    const self = this;
-    $lists.each(function () {
-      self.listObserver.observe(this, conf);
+    lists.forEach(l => {
+      this.listObserver.observe(l, conf);
     });
   }
   // #region EVENT MANAGEMENT
@@ -579,7 +572,6 @@ class TDom {
    * @returns {Element} The containing list element
    */
   getContainingList(card) {
-    // NOTE Why [0] ... closest should not return array 🤔
     return card.closest('div.list');
   }
 
@@ -593,15 +585,12 @@ class TDom {
     if (!el) {
       throw new TypeError('Parameter [el] undefined');
     }
-    const nameElement = $(el).find('h2.list-header-name-assist');
-    if (nameElement.length === 0) {
+    const nameElement = $(el, 'h2.list-header-name-assist');
+    if (!nameElement) {
       console.error('No [H2.list-header-name-assist] found', el);
       throw new ReferenceError('No [H2.list-header-name-assist] tag found');
     }
-    if (nameElement.length !== 1) {
-      throw new RangeError('More than one [H2.list-header-name-assist] tag found');
-    }
-    return nameElement.text().trim();
+    return nameElement.textContent.trim();
   }
 
   /**
@@ -613,9 +602,9 @@ class TDom {
    */
   getLists(name, filter) {
     let jLists;
-    jLists = document.querySelectorAll('#board div.js-list-content');
+    jLists = $$('#board div.js-list-content');
     jLists = [...jLists].filter(l => {
-      const title = l.querySelector('h2').textContent;
+      const title = $(l, 'h2').textContent;
       if (name instanceof RegExp) {
         return name.test(title);
       }
@@ -624,7 +613,7 @@ class TDom {
 
     if (filter !== undefined) {
       jLists = jLists.filter(l => {
-        const title = l.querySelector('h2').textContent;
+        const title = $(l, 'h2').textContent;
         for (let i = 0; i < filter.length; ++i) {
           if (title.search(filter[i]) !== -1) {
             return false;
@@ -644,8 +633,9 @@ class TDom {
    * @returns {Element} List element or ``null`` if not found
    */
   getPrevList(listEl) {
-    const $prev = $(listEl).parent().prev().find('div.js-list-content');
-    return $prev.length ? $prev[0]: null;
+    // const $prev = $(listEl).parent().prev().find('div.js-list-content');
+    return $(listEl.parentNode.previousElementSibling, 'div.js-list-content');
+    // return prev.length ? $prev[0]: null;
   }
 
   /**
@@ -655,8 +645,9 @@ class TDom {
    * @returns {Element} List element or ``null`` if not found
    */
   getNextList(listEl) {
-    const $next = $(listEl).parent().next().find('div.js-list-content');
-    return $next.length === 1 ? $next[0] : null;
+    return $(listEl.parentNode.nextElementSibling, 'div.js-list-content');
+    // const $next = $(listEl).parent().next().find('div.js-list-content');
+    // return $next.length === 1 ? $next[0] : null;
   }
 
   /**
@@ -683,7 +674,7 @@ class TDom {
 
   extractTextContent(element) {
     for (let i = 0; i < element.childNodes.length; ++i) {
-      if (element.childNodes[i].nodeType === 3) {
+      if (element.childNodes[i].nodeType === TDOM.TEXT_NODE) {
         return element.childNodes[i].textContent;
       }
     }
@@ -691,15 +682,19 @@ class TDom {
   }
 
   getCardsInList(list, name) {
-    if (!name) {
-      throw new TypeError();
-    }
+    // if (!name) {
+    //   throw new TypeError();
+    // }
 
-    const cards = list.querySelectorAll('a.list-card');
-    return [...cards].filter(c => {
-      const title = this.getCardName(c);
-      return title.includes(name);
-    });
+    // const cards = list.querySelectorAll('a.list-card');
+    const cards = $$(list, 'a.list-card');
+    if (name) {
+      return [...cards].filter(c => {
+        const title = this.getCardName(c);
+        return title.includes(name);
+      });
+    }
+    return cards;
     // return cards;
     // const jCards = $(list).find('a.list-card').filter(function () {
     //   const title = this.getCardName(this);
@@ -727,6 +722,7 @@ class TDom {
       }
       return title.includes(name);
     });
+    console.log({ filteredCards });
     return filteredCards;
   }
 
@@ -738,18 +734,19 @@ class TDom {
    * @returns {Number} Number of cards found
    */
   countCards(list, filter, pos) {
-    const self = this;
-    const $cards = $(list).find('a.list-card').filter(function () {
-      const title = self.getCardName(this);
+    // const self = this;
+    const cards = $$(list, 'a.list-card').filter(c => {
+    // const $cards = $(list).find('a.list-card').filter(function () {
+      const title = this.getCardName(c);
       if (filter && title) {
         if (pos !== undefined) {
-          return !self.beginsWith(title, filter, pos);
+          return !this.beginsWith(title, filter, pos);
         }
-        return !self.containsAny(title, filter);
+        return !this.containsAny(title, filter);
       }
       return true;
     });
-    return $cards.length;
+    return cards.length;
   }
 
   /**
@@ -763,7 +760,7 @@ class TDom {
     if (typeof filter === 'string') {
       return string.includes(filter);
     }
-    if (typeof filter !== 'object') {
+    if (!Array.isArray(filter)) {
       throw new TypeError();
     }
     for (const f of filter) {
@@ -783,7 +780,7 @@ class TDom {
   beginsWith(string, filter, pos) {
     let needle;
     if (typeof filter === 'string') {
-      needle = [].push(filter);
+      needle = [filter];
     } else {
       needle = filter;
     }
@@ -795,41 +792,41 @@ class TDom {
     return false;
   }
 
-  /**
-   * Get a count for all labels used in a list.
-   *
-   * @param {jQuery} jLists Lists to count labels in
-   * @param {Array} filter Array with strings. Labels will be excluded if they contain any
-   *      of the strings
-   * @returns {Array} An associative array with labels and their respective count
-   */
-  countListLabels(jLists, filter) {
-    if (!jLists) {
-      throw new TypeError('Parameter [jLists] not defined');
-    }
-    if (filter && !(filter instanceof Array)) {
-      throw new TypeError('Parameter [filter] undefined or not of type Array');
-    }
+  // /**
+  //  * Get a count for all labels used in a list.
+  //  *
+  //  * @param {jQuery} jLists Lists to count labels in
+  //  * @param {Array} filter Array with strings. Labels will be excluded if they contain any
+  //  *      of the strings
+  //  * @returns {Array} An associative array with labels and their respective count
+  //  */
+  // countListLabels(jLists, filter) {
+  //   if (!jLists) {
+  //     throw new TypeError('Parameter [jLists] not defined');
+  //   }
+  //   if (filter && !(filter instanceof Array)) {
+  //     throw new TypeError('Parameter [filter] undefined or not of type Array');
+  //   }
 
-    const cardLabels = [];
+  //   const cardLabels = [];
 
-    jLists.find('span.card-label').each(function () {
-      const title = $(this).attr('title');
-      if (filter) {
-        for (let i = 0; i < filter.length; ++i) {
-          if (title.indexOf(filter[i]) > -1) {
-            return;
-          }
-        }
-      }
-      if (cardLabels[title] === undefined) {
-        cardLabels[title] = 0;
-      }
-      cardLabels[title]++;
-    });
+  //   jLists.find('span.card-label').each(function () {
+  //     const title = $(this).attr('title');
+  //     if (filter) {
+  //       for (let i = 0; i < filter.length; ++i) {
+  //         if (title.indexOf(filter[i]) > -1) {
+  //           return;
+  //         }
+  //       }
+  //     }
+  //     if (cardLabels[title] === undefined) {
+  //       cardLabels[title] = 0;
+  //     }
+  //     cardLabels[title]++;
+  //   });
 
-    return cardLabels;
-  }
+  //   return cardLabels;
+  // }
 
   /**
    * Get the labels for a specific card.
@@ -843,12 +840,12 @@ class TDom {
     if (!el) {
       throw new TypeError('Parameter [el] not defined');
     }
-    if (filter && !(filter instanceof Array)) {
-      throw new TypeError('Parameter [filter] undefined or not of type Array');
+    if (filter && !Array.isArray(filter)) {
+      throw new TypeError('Parameter [filter] not an array');
     }
     const labels = [];
-    $(el).find('span.card-label').each(function () {
-      const title = $(this).attr('title');
+    $$(el, 'span.card-label').forEach(lbl => {
+      const title = lbl.getAttribute('title');
       if (filter) {
         for (let i = 0; i < filter.length; ++i) {
           if (title.indexOf(filter[i]) > -1) {
@@ -858,78 +855,119 @@ class TDom {
       }
       labels.push(title);
     });
+    // $(el).find('span.card-label').each(function () {
+    //   const title = $(this).attr('title');
+    //   if (filter) {
+    //     for (let i = 0; i < filter.length; ++i) {
+    //       if (title.indexOf(filter[i]) > -1) {
+    //         return;
+    //       }
+    //     }
+    //   }
+    //   labels.push(title);
+    // });
     return labels;
   }
 
-  /**
-   * Gets an associative array with the fields for a given card, e.g.
-   * `{"fieldName": "fieldValue", ...}`
-   *
-   * @param {Element} cardEl The *DIV.list-card-details* element for the card
-   * @returns {Object} Associative array with field names and values
-   */
-  getCardFields(cardEl) {
-    if (!cardEl) {
-      throw new TypeError('Parameter [cardEl] not defined');
-    }
+  // /**
+  //  * Gets an associative array with the fields for a given card, e.g.
+  //  * `{"fieldName": "fieldValue", ...}`
+  //  *
+  //  * @param {Element} cardEl The *DIV.list-card-details* element for the card
+  //  * @returns {Object} Associative array with field names and values
+  //  */
+  // getCardFields(cardEl) {
+  //   if (!cardEl) {
+  //     throw new TypeError('Parameter [cardEl] not defined');
+  //   }
 
-    const fields = [];
+  //   const fields = [];
 
-    $(cardEl).find('span.badge-text').each(function () {
-      const title = $(this).text().trim();
-      const f = title.split(':');
-      if (f.length === 2) {
-        const fName = f[0].trim();
-        const fVal = f[1].trim();
-        fields[fName] = fVal;
-      } else {
-        fields[title] = 'true';
-      }
-    });
-    return fields;
-  }
+  //   $$(cardEl, 'span.badge-text').forEach(badge => {
+  //     const title = badge.textContent.trim();
+  //     const f = title.split(':');
+  //     if (f.length === 2) {
+  //       const fName = f[0].trim();
+  //       const fVal = f[1].trim();
+  //       fields[fName] = fVal;
+  //     } else {
+  //       fields[title] = 'true';
+  //     }
+  //   });
+  //   // $(cardEl).find('span.badge-text').each(function () {
+  //   //   const title = $(this).text().trim();
+  //   //   const f = title.split(':');
+  //   //   if (f.length === 2) {
+  //   //     const fName = f[0].trim();
+  //   //     const fVal = f[1].trim();
+  //   //     fields[fName] = fVal;
+  //   //   } else {
+  //   //     fields[title] = 'true';
+  //   //   }
+  //   // });
+  //   return fields;
+  // }
 
-  /**
-   * Returns an associative array with the count for each label in that list, e.g.
-   * ```
-   * {
-   *     "Label 1": 3,
-   *     "Label 2": 2
-   * }
-   * ```
-   *
-   * @param {Element} listEl The list to check
-   * @param {Array} filter An optional filter with labels to exclude
-   * @returns {Object} Label count for the given list
-   */
-  countLabelsInList(listEl, filter) {
-    if (!listEl) {
-      throw new TypeError('Parameter [listEl] not defined');
-    }
-    if (filter && !(filter instanceof Array)) {
-      throw new TypeError('Parameter [filter] undefined or not of type Array');
-    }
+  // /**
+  //  * Returns an associative array with the count for each label in that list, e.g.
+  //  * ```
+  //  * {
+  //  *     "Label 1": 3,
+  //  *     "Label 2": 2
+  //  * }
+  //  * ```
+  //  *
+  //  * @param {Element} listEl The list to check
+  //  * @param {Array} filter An optional filter with labels to exclude
+  //  * @returns {Object} Label count for the given list
+  //  */
+  // countLabelsInList(listEl, filter) {
+  //   if (!listEl) {
+  //     throw new TypeError('Parameter [listEl] not defined');
+  //   }
+  //   if (filter && !(filter instanceof Array)) {
+  //     throw new TypeError('Parameter [filter] undefined or not of type Array');
+  //   }
 
-    const labels = {};
+  //   const labels = {};
 
-    $(listEl).find('span.card-label').each(function () {
-      const title = $(this).attr('title');
-      // FIXME Implement filter
-      // if (mainRolesOnly && (title === "concern" || title.indexOf("*") !== -1)) {
-      //     return;
-      // }
-      if (labels[title] === undefined) {
-        labels[title] = 0;
-      }
-      labels[title]++;
-    });
-    return labels;
-  }
+  //   $$(listEl, 'span.card-label').forEach(lbl => {
+  //     const title = lbl.getAttribute('title');
+  //     // FIXME Implement filter
+  //     // if (mainRolesOnly && (title === "concern" || title.indexOf("*") !== -1)) {
+  //     //     return;
+  //     // }
+  //     if (labels[title] === undefined) {
+  //       labels[title] = 0;
+  //     }
+  //     labels[title]++;
+  //   });
+  //   // $(listEl).find('span.card-label').each(function () {
+  //   //   const title = $(this).attr('title');
+  //   //   // if (mainRolesOnly && (title === "concern" || title.indexOf("*") !== -1)) {
+  //   //   //     return;
+  //   //   // }
+  //   //   if (labels[title] === undefined) {
+  //   //     labels[title] = 0;
+  //   //   }
+  //   //   labels[title]++;
+  //   // });
+  //   return labels;
+  // }
 
   getListWrapperByIndex(idx) {
     const boardEl = document.getElementById('board');
-    const listEl = boardEl.childNodes[idx];
+    const listEl = boardEl.children[idx];
     return listEl;
   }
 
 }
+
+TDOM.MAX_LOAD_ATTEMPTS = 3;
+TDOM.LOAD_RETRY_TIMEOUT = 100;
+TDOM.DEFAULT_TIMEOUT = 100;
+TDOM.TEXT_NODE = 3;
+
+// module.exports = TDOM;
+
+if (module) module.exports = TDOM;

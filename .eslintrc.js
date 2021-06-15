@@ -1,24 +1,31 @@
 /* eslint-disable no-magic-numbers */
 module.exports = {
+  'plugins': ['jest', 'jest-formatting'],
   'env': {
     'browser': true,
     'es6': true,
     'node': true,
+    'jest/globals': true,
   },
-  'extends': 'eslint:recommended',
+  'extends': ['eslint:recommended', 'plugin:jest/recommended',
+    'plugin:jest-formatting/recommended'],
   'parserOptions': {
     'ecmaVersion': 2020,
     'sourceType': 'module',
   },
   'globals': {
-    'TDom': 'readonly',
+    'tdom': 'readonly',
+    'TDOM': 'readonly',
     'TFolds': 'readonly',
     '$': 'readonly',
-    'jQuery': 'readonly',
-    'q$': 'readonly',
-    'q$$': 'readonly',
+    '$$': 'readonly',
+    '_$': 'readonly',
   },
   'rules': {
+    'jest/no-standalone-expect': [
+      'error',
+      { 'additionalTestBlockFunctions': ['each.test'] },
+    ],
     'semi': ['warn', 'always', { 'omitLastInOneLineBlock': true }],
     'no-const-assign': 'warn',
     'no-this-before-super': 'warn',

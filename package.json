@@ -1,18 +1,33 @@
 {
   "name": "trello-folds",
   "version": "0.9.6",
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-jquery": "^2.1.0",
-    "chai-sinon": "^2.8.1",
+    "@testing-library/jest-dom": "^5.12.0",
+    "@types/jest": "^26.0.23",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jest-formatting": "^3.0.0",
     "grunt": "^1.0.4",
-    "grunt-contrib-compress": "^1.4.3",
-    "grunt-mocha-test": "^0.13.3",
-    "jquery": "^3.4.1",
-    "jsdom": "^13.2.0",
-    "mocha": "^5.0.4",
+    "grunt-contrib-compress": "^2.0.0",
+    "grunt-jest": "^0.4.0",
+    "jest": "^26.6.3",
+    "jest-chain": "^1.1.5",
+    "jest-each": "^26.6.2",
+    "jest-extended": "^0.11.5",
     "mutation-observer": "^1.0.3",
-    "requirejs": "^2.3.5",
-    "sinon": "^7.2.3"
+    "requirejs": "^2.3.5"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testURL": "https://trello.com/b/aBcdEfGH/trello-folds-test-board",
+    "verbose": true,
+    "setupFilesAfterEnv": [
+      "jest-chain",
+      "jest-extended",
+      "jest-each",
+      "@testing-library/jest-dom"
+    ]
   }
 }

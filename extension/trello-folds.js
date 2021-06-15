@@ -2,8 +2,6 @@
 
 // import { tdom } from './tdom.js';
 // import { $, jQuery } from 'jquery';
-const tdom = new TDom();
-
 class TFolds {
 
   constructor() {
@@ -146,8 +144,8 @@ class TFolds {
     tdom.init();
 
     /*
-            * Get icon URLs
-            */
+     * Get icon URLs
+     */
     this.config.expandedIconUrl = chrome.runtime.getURL('img/icons8-sort-down-16.png');
     this.config.collapsedIconUrl = chrome.runtime.getURL('img/icons8-sort-right-16.png');
   }
@@ -191,21 +189,24 @@ class TFolds {
     }
     this.addFoldingButton(listEl);
     this.addCollapsedList(listEl);
-    this.showWipLimit(q$(listEl, '.js-list-content'));
+    this.showWipLimit($(listEl, '.js-list-content'));
     this.redrawCombinedLists();
   }
 
   listDragged(listEl) {
+    this.debug && console.log('List dragged');
     const list = listEl.querySelector('.js-list-content');
-    if (this.isSubList(list)) {
+    const isSubList = this.isSubList(list);
+    if (isSubList) {
       const subs = this.getSubLists(list);
-      subs.forEach(() => {
-        this.restoreSubList(this);
+      subs.forEach((e) => {
+        this.restoreSubList(e);
       });
     }
   }
 
   listDropped() {
+    this.debug && console.log('List dropped');
     this.redrawCombinedLists();
   }
 
@@ -231,30 +232,29 @@ class TFolds {
    * @param {Element} cardEl
    */
   cardRemoved(cardEl) {
-    console.log({ cardEl });
     if (cardEl.classList.contains('section-card')) {
-      q$(cardEl, 'div.list-card-details').style.opacity = '0.0';
-      const section = q$(cardEl, '.icon-collapsed');
-      if (section) {
-        this.toggleSection(section);
+      $(cardEl, 'div.list-card-details').style.opacity = '0.0';
+      const collapsed = $(cardEl, '.icon-collapsed');
+      if (collapsed) {
+        this.toggleSection(collapsed);
       }
     }
   }
 
   cardBadgesModified(cardEl) {
-    const badges = q$$(cardEl, '.badge-text');
+    const badges = $$(cardEl, '.badge-text');
     const blocked = badges.some(b => {
       return b.textContent.toLowerCase().includes('blocked');
     });
     if (blocked) {
       cardEl.classList.add('blocked-card');
-      q$(cardEl, '.list-card-title').classList.add('blocked-title');
-      q$$(cardEl, 'div.badge > *').forEach(e => e.classList.add('blocked-badges'));
+      $(cardEl, '.list-card-title').classList.add('blocked-title');
+      $$(cardEl, 'div.badge > *').forEach(e => e.classList.add('blocked-badges'));
       return;
     }
     cardEl.classList.remove('blocked-card');
-    q$(cardEl, '.list-card-title').classList.remove('blocked-title');
-    q$$(cardEl, 'div.badge > *').forEach(e => e.classList.remove('blocked-badges'));
+    $(cardEl, '.list-card-title').classList.remove('blocked-title');
+    $$(cardEl, 'div.badge > *').forEach(e => e.classList.remove('blocked-badges'));
   }
 
   /**
@@ -297,7 +297,8 @@ class TFolds {
      * Case 1: Only title changed (was, and still is, a section)
      */
     if (this.isSection(title) && this.isSection(oldTitle)) {
-      card.querySelector('#section-title').text(this.getStrippedTitle(title));
+      $(card, '#section-title').textContent = this.getStrippedTitle(title);
+      // card.querySelector('#section-title').text(this.getStrippedTitle(title));
       return;
     }
 
@@ -430,7 +431,7 @@ class TFolds {
    * Adds board wide buttons to the top bar.
    */
   addBoardIcons() {
-    const buttonContainer = q$('div.board-header-btns.mod-right');
+    const buttonContainer = $('div.board-header-btns.mod-right');
     // const $boardBtns = $('div.board-header-btns.mod-right');
 
     const divider = this.createNode({ tag: 'span', classes: ['board-header-btn-divider'] });
@@ -618,8 +619,7 @@ class TFolds {
    * Applies extension specific formatting to all lists in the board.
    */
   formatLists() {
-    this.splitAllCombined();
-    this.combineLists();
+    this.redrawCombinedLists();
     this.makeListsFoldable();
     this.addWipLimits();
   }
@@ -671,7 +671,6 @@ class TFolds {
       this.debug && console.error('Expected number of lists to be combined to be at least two');
       return null;
     }
-    $(list).data('numOfSubLists', numOfSubLists); // TODO Remove this line ❌
     list.dataset.numOfSubLists = numOfSubLists;
     this.addSuperList(list);
     return numOfSubLists;
@@ -687,22 +686,15 @@ class TFolds {
    * @param {jQuery} $firstList Reference to first list
    */
   convertToSubList(list, superListIndex, idx = 0) {
-    // if ($list.hasClass('sub-list')) {
-    //   if (this.debug) {
-    //     console.warn(`List [${tdom.getListName($list[0])}] already combined with other list`);
-    //   }
-    //   throw new Error();
-    // }
     if (list.classList.contains('sub-list')) {
       this.debug && console.warn(
           `List [${tdom.getListName(list)}] already combined with other list`);
-      throw new Error();
+      return null;
     }
 
     list.setAttribute('data-sublistindex', idx);
     list.setAttribute('data-super-list-index', superListIndex);
     list.classList.add('sub-list');
-    $(list).data('sublistindex', idx); // TODO Remove ❌
     this.removeFoldingButton(list);
     this.showWipLimit(list);
 
@@ -713,10 +705,6 @@ class TFolds {
       if (this.areListsRelated(list, nextList)) {
         return this.convertToSubList(nextList, superListIndex, idx + 1);
       }
-      // const $nextList = $(nextList);
-      // if ($nextList !== null && this.areListsRelated($list[0], $nextList[0])) {
-      //   return this.convertToSubList($nextList, superListIndex, idx + 1);
-      // }
     }
     return idx;
   }
@@ -737,7 +725,7 @@ class TFolds {
   attachListResizeDetector(list) {
     // const list = $list[0];
 
-    if (list.dataset.hasDetector === true) {
+    if (list.dataset.hasDetector === 'true') {
       console.log('Detector already exists: ', tdom.getListName(list));
       return;
     }
@@ -812,21 +800,21 @@ class TFolds {
   }
 
   splitAllCombined() {
-    let $subLists = $('.sub-list');
+    let subLists = $$('.sub-list');
     let n = 0;
-    const self = this;
-    while ($subLists.length > 0 && n < TFolds.MAX_LISTS_IN_BOARD) {
-      const sublists = self.getSubLists($subLists[0]);
+    console.log(subLists);
+    while (subLists.length > 0 && n < TFolds.MAX_LISTS_IN_BOARD) {
+      const sublists = this.getSubLists(subLists[0]);
       sublists.forEach(e => {
         this.restoreSubList(e);
       });
-      $subLists = $('.sub-list');
+      subLists = $$('.sub-list');
       n++;
     }
     if (n === TFolds.MAX_LISTS_IN_BOARD) {
       console.error('Something went wrong splitting sub lists');
       console.trace();
-      console.log($subLists);
+      console.log(subLists);
     }
   }
 
@@ -837,9 +825,15 @@ class TFolds {
    * @param {jQuery} $list The target list
    */
   restoreSubList(list) {
-    if (list.dataset.sublistindex === 0) {
-      list.parentNode.querySelector('.super-list').remove();
-      list.parentNode.querySelector('.super-list').remove();
+    console.log({
+      subListIndex: list.dataset.sublistindex,
+      superListIndex: list.dataset.superListIndex,
+    });
+    if (list.dataset.sublistindex === '0') {
+      const superLists = list.parentNode.querySelectorAll('.super-list');
+      console.log({ superLists });
+      superLists.forEach(e => e.remove());
+      list.parentNode.querySelectorAll('.super-list-collapsed').forEach(e => e.remove());
     }
     delete list.dataset.sublistindex;
     list.classList.remove('sub-list');
@@ -890,7 +884,6 @@ class TFolds {
        *
        */
   addCollapsedSuperList(superList) {
-    const $superList = $(superList);
     try {
       const collapsedList = this.createNode({
         tag: 'div',
@@ -908,9 +901,10 @@ class TFolds {
 
       if (this.settings.rememberViewStates) {
         const collapsed = this.retrieve(
-            tdom.getListName($superList.siblings('.js-list-content')), 'super-list-collapsed');
+            tdom.getListName(
+                superList.parentNode.querySelector('.js-list-content')), 'super-list-collapsed');
         if (collapsed === true) {
-          this.collapseSuperList($superList[0]);
+          this.collapseSuperList(superList);
         }
       }
     } catch (e) {
@@ -969,42 +963,48 @@ class TFolds {
    * @returns
    */
   updateSuperList(subList) {
-    const $subList = $(subList);
     const listIndex = subList.dataset.superListIndex;
     const wrapper = tdom.getListWrapperByIndex(listIndex);
-    const $sl = $(wrapper.querySelector(`[data-super-list-index="${listIndex}"]`));
-    const $superList = $(this.getMySuperList($subList[0]));
-    const $title = $superList.find('span.super-list-header');
-
-    $title.find('span.wip-limit-title').remove();
+    const sl = $(wrapper, `[data-super-list-index="${listIndex}"]`);
+    // const $superList = $(this.getMySuperList(subList));
+    // console.assert($superList.length !== 0, 'Nada superlisto !!!');
+    const superList = this.getMySuperList(subList);
+    let $title;
+    if (superList) {
+      $title = $(superList, 'span.super-list-header');
+      $($title, 'span.wip-limit-title')?.remove();
+    }
+    console.log({ $title });
 
     /*
      * Get the WiP limit from the left list
      */
-    const wipLimit = this.extractWipLimit($sl);
+    const wipLimit = this.extractWipLimit(sl);
 
     /*
      * Calculate tot # of cards
      */
-    const n = $sl.data('numOfSubLists');
+    // const n = $sl.data('numOfSubLists');
+    const n = sl.dataset.numOfSubLists;
     let totNumOfCards = 0;
-    let [listEl] = $sl;
+    // let [listEl] = $sl;
+    let listEl = sl;
     for (let i = 0; i < n; ++i) {
       totNumOfCards += this.countWorkCards(listEl);
       listEl = tdom.getNextList(listEl);
     }
 
-    let title = tdom.getListName($sl);
+    let title = tdom.getListName(sl);
     title = title.substr(0, title.indexOf('.'));
-    const $wipTitle = this.createWipTitle(title, totNumOfCards, wipLimit);
-    this.updateWipBars($superList[0], totNumOfCards, wipLimit);
-    $title.append($($wipTitle));
-    this.updateSuperListHeight($sl[0]);
-    this.updateCollapsedSuperList($superList[0], $wipTitle.cloneNode(true));
+    const wipTitle = this.createWipTitle(title, totNumOfCards, wipLimit);
+    this.updateWipBars(superList, totNumOfCards, wipLimit);
+    $title?.append(wipTitle);
+    this.updateSuperListHeight(sl);
+    this.updateCollapsedSuperList(superList, wipTitle.cloneNode(true));
 
     this.updateWidths();
 
-    return $wipTitle;
+    return wipTitle;
   }
 
   /**
@@ -1188,7 +1188,7 @@ class TFolds {
       this.addWipLimit(listEl, numCards);
       this.updateSuperList(listEl);
       listEl.classList.remove('wip-limit-reached', 'wip-limit-exceeded');
-      listEl.previousSibling?.classList.remove(
+      listEl.previousElementSibling?.classList.remove(
           'collapsed-limit-reached', 'collapsed-limit-exceeded');
     } else if (wipLimit !== null) {
       this.addWipLimit(listEl, numCards, wipLimit);
@@ -1268,7 +1268,7 @@ class TFolds {
    */
   removeWipBar(listEl) {
     listEl.classList.remove('wip-limit-reached', 'wip-limit-exceeded');
-    listEl.previousSibling?.classList.remove(
+    listEl.previousElementSibling?.classList.remove(
         'collapsed-limit-reached',
         'collapsed-limit-exceeded');
   }
@@ -1411,13 +1411,17 @@ class TFolds {
         console.info(`Card [${cardName}] is a section`);
       }
       this.formatAsSection(cardEl);
-    } else if (cardName.indexOf('//') === 0) {
+      return;
+    }
+    if (cardName.indexOf('//') === 0) {
       if (this.config.debug) {
         console.info(`Card [${cardName}] is a comment`);
       }
       cardEl.classList.add('comment-card');
-    } else if ($(cardEl).find(
-        ".badge-text:contains('Blocked'),.badge-text:contains('blocked')").length !== 0) {
+      return;
+    }
+    const badgeLabels = $$(cardEl, '.badge-text');
+    if (badgeLabels.some(l => l.textContent.includes('blocked'))) {
       if (this.config.debug) {
         console.info(`Card [${cardName}] is blocked`);
       }
@@ -1489,6 +1493,8 @@ class TFolds {
       const listEl = tdom.getListWrapperByIndex(idx);
       firstSubList = listEl.querySelector(`[data-super-list-index="${idx}"]`);
     }
+
+    console.assert(firstSubList, 'firstSubList not defined');
 
     const { superListIndex } = firstSubList.dataset;
     const subLists = document.querySelectorAll(
@@ -1694,3 +1700,5 @@ TFolds.LEFTMOST_SUBLIST = 0;
 TFolds.DEFAULT_COMPACT_WIDTH = 200;
 TFolds.NORMAL_LIST_WIDTH = 272;
 TFolds.GLOBAL_BOARD_SETTING_STRING = 'trello-folds-board-settings';
+
+if (module) module.exports = TFolds;
