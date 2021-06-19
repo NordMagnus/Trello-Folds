@@ -1,7 +1,7 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Trello Folds (Kanban for Trello)",
-    "version": "0.9.6",
+    "version": "0.9.12",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
@@ -12,7 +12,7 @@
         "storage",
         "activeTab"
     ],
-    "browser_action": {
+    "action": {
         "default_icon": "icons/icon48.png",
         "default_popup": "popup.html"
     },
@@ -22,5 +22,8 @@
         "js": ["tdom.js", "trello-folds.js", "content.js"],
         "matches": ["https://trello.com/*"]
     }],
-    "web_accessible_resources": ["img/*.png"]
+    "web_accessible_resources": [{
+      "resources": ["img/*.png"],
+      "matches": ["https://trello.com/*"]
+      }]
 }
