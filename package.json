@@ -1,6 +1,6 @@
 {
   "name": "trello-folds",
-  "version": "0.9.6",
+  "version": "0.9.12",
   "scripts": {
     "test": "jest"
   },
@@ -11,6 +11,7 @@
     "eslint-plugin-jest-formatting": "^3.0.0",
     "grunt": "^1.0.4",
     "grunt-contrib-compress": "^2.0.0",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-jest": "^0.4.0",
     "jest": "^26.6.3",
     "jest-chain": "^1.1.5",
