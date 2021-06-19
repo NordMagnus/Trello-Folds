@@ -1,12 +1,15 @@
 {
     "typeAcquisition": {
         "include": [
-            "jest"
+            "jest",
+            "chrome",
         ]
     },
     "compilerOptions": {
+        "module": "commonjs",
         "target": "es2020",
         "allowSyntheticDefaultImports": true,
-        "module": "commonJS"
-    }
+        "checkJs": true,
+    },
+    "exclude": ["node_modules"],
 }
