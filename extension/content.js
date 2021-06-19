@@ -6,6 +6,7 @@ const $$ = (a, b) => {
   return Array.from(typeof a === 'string' ? document.querySelectorAll(a) : a.querySelectorAll(b));
 };
 
+/* @type TDOM */
 const tdom = new TDOM();
 const tfolds = new TFolds();
 

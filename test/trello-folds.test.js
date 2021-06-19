@@ -1054,9 +1054,9 @@ describe('tFolds', () => {
       /* Assign */
       const [bravo] = tdom.getLists('Bravo');
       const [sectionCard] = tdom.getCardsInList(bravo, 'Beta Section 1');
-      const sectionIcon = $(sectionCard, '.icon-expanded');
+      // const sectionIcon = $(sectionCard, '.icon-expanded');
       /* Act */
-      tfolds.toggleSection(sectionIcon, false);
+      tfolds.toggleSection(sectionCard, false);
       jest.spyOn(tfolds, 'toggleSection').mockReturnValue(undefined);
       tfolds.cardRemoved(sectionCard);
       /* Assert */
@@ -1099,6 +1099,24 @@ describe('tFolds', () => {
       expect(tfolds.makeListsFoldable).toHaveBeenCalledTimes(1);
       expect(tfolds.addWipLimits).toHaveBeenCalledTimes(1);
     });
+  });
+
+  describe('should*AddWip()', () => {
+    each([
+      [true, null, true],
+      [true, 0, true],
+      [true, 1, true],
+      [true, 2, true],
+      [false, null, false],
+      [true, 0, false],
+      [true, 1, false],
+      [true, 2, false],
+    ]).test(
+        'should return %s when "display: %s" and visible == %s',
+        (expected, wipLimit, alwaysCount) => {
+          tfolds.settings.alwaysCount = alwaysCount;
+          expect(tfolds.shouldAddWip(wipLimit)).toBe(expected);
+        });
   });
 });
 

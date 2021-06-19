@@ -975,4 +975,7 @@ TDOM.TEXT_NODE = 3;
 
 // module.exports = TDOM;
 
-if (module) module.exports = TDOM;
+try {
+  module.exports = TDOM;
+} catch (e) { /* Delib empty */ }
+

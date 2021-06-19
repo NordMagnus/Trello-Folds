@@ -1,5 +1,4 @@
 /* global chrome */
-
 // import { tdom } from './tdom.js';
 // import { $, jQuery } from 'jquery';
 class TFolds {
@@ -104,7 +103,7 @@ class TFolds {
 
   // TODO Replace ...args with actual arguments?
   initialize() {
-    tdom.debug = this.config.debug;
+    tdom.debug = this.debug;
     tdom.onBoardChanged((...args) => {
       this.boardChanged(...args);
     });
@@ -153,17 +152,18 @@ class TFolds {
   // #region EVENT HANDLERS
 
   /**
+   * Called when the board changes.
    *
+   * @param {String} boardId
+   * @param {String} oldBoardId
    */
-  boardChanged(boardId, oldId) {
-    if (this.debug) {
-      console.log(`boardId=${boardId},oldId=${oldId}`);
-    }
+  boardChanged(boardId, oldBoardId) {
+    this.debug && console.log(`boardId=${boardId},oldId=${oldBoardId}`);
     this.initStorage();
   }
 
   /**
-   *
+   * @param {Element} listEl
    */
   listModified(listEl) {
     if (!listEl) {
@@ -173,6 +173,9 @@ class TFolds {
     this.showWipLimit(listEl);
   }
 
+  /**
+   * @param {Element} listEl
+   */
   listRemoved(listEl) {
     if (this.isSubList(listEl)) {
       this.redrawCombinedLists();
@@ -180,7 +183,7 @@ class TFolds {
   }
 
   /**
-   *
+   * @param {Element} listEl
    */
   listAdded(listEl) {
     if (!listEl) {
@@ -193,6 +196,9 @@ class TFolds {
     this.redrawCombinedLists();
   }
 
+  /**
+   * @param {Element} listEl
+   */
   listDragged(listEl) {
     this.debug && console.log('List dragged');
     const list = listEl.querySelector('.js-list-content');
@@ -234,19 +240,14 @@ class TFolds {
   cardRemoved(cardEl) {
     if (cardEl.classList.contains('section-card')) {
       $(cardEl, 'div.list-card-details').style.opacity = '0.0';
-      const collapsed = $(cardEl, '.icon-collapsed');
-      if (collapsed) {
-        this.toggleSection(collapsed);
+      if (this.isSectionCollapsed(cardEl)) {
+        this.toggleSection(cardEl);
       }
     }
   }
 
   cardBadgesModified(cardEl) {
-    const badges = $$(cardEl, '.badge-text');
-    const blocked = badges.some(b => {
-      return b.textContent.toLowerCase().includes('blocked');
-    });
-    if (blocked) {
+    if (this.isBlocked(cardEl)) {
       cardEl.classList.add('blocked-card');
       $(cardEl, '.list-card-title').classList.add('blocked-title');
       $$(cardEl, 'div.badge > *').forEach(e => e.classList.add('blocked-badges'));
@@ -255,6 +256,13 @@ class TFolds {
     cardEl.classList.remove('blocked-card');
     $(cardEl, '.list-card-title').classList.remove('blocked-title');
     $$(cardEl, 'div.badge > *').forEach(e => e.classList.remove('blocked-badges'));
+  }
+
+  isBlocked(card) {
+    const badges = $$(card, '.badge-text');
+    return badges.some(b => {
+      return b.textContent.toLowerCase().includes('blocked');
+    });
   }
 
   /**
@@ -283,9 +291,9 @@ class TFolds {
   /**
    * Checks if section state changed. There are basically
    * three changes that we need to handle:
-   * 1. A section card's title changed
-   * 2. A card was changed __into__ a section
-   * 3. A card was changed __from__ a section to a normal card
+   *   1. A section card's title changed
+   *   2. A card was changed __from__ a section to a normal card
+   *   3. A card was changed __into__ a section
    * In addition for item 2 and 3 above the list WIP has to be updated
    */
   checkSectionChange(card, title, oldTitle) {
@@ -303,16 +311,16 @@ class TFolds {
     }
 
     /*
-     * Case 3: A card was changed from a section
+     * Case 2: A card was changed from a section
      */
     if (!this.isSection(title)) {
       this.removeSectionFormatting(card);
-    } else {
-      /*
-       * Case 2: Was a normal card now a section
-       */
-      this.formatAsSection(card);
+      return;
     }
+    /*
+      * Case 3: Was a normal card now a section
+      */
+    this.formatAsSection(card);
   }
 
   /**
@@ -321,8 +329,7 @@ class TFolds {
    * @param {jQuery} $card The card to strip
    */
   removeSectionFormatting(card) {
-    card.querySelector('span.icon-expanded')?.remove();
-    card.querySelector('span.icon-collapsed')?.remove();
+    card.querySelector('span.section-icon')?.remove();
     card.querySelector('span#section-title')?.remove();
     card.querySelector('span.list-card-title')?.remove();
     card.querySelector('div.list-card-details').style.opacity = '1.0';
@@ -362,27 +369,44 @@ class TFolds {
     return title.replace(re, '').trim();
   }
 
+  // HACK This is dirty as he11. Change to promise or refactor other way
   /**
    *
    */
-  initStorage() {
+  async initStorage() {
     this.boardId = tdom.getBoardIdFromUrl();
 
-    chrome.storage.sync.get(['settings', this.boardId], result => {
-      if (this.config.debug) {
-        console.table(result.settings);
-        if (result.settings['rememberViewStates'] === true) {
-          console.table(result[this.boardId]);
-        }
+    const result = await chrome.storage.sync.get(['settings', this.boardId]);
+
+    this.storage = {};
+
+    if (result) {
+      this.debug && console.table(result.settings);
+      if (result.settings['rememberViewStates'] === true) {
+        console.table(result[this.boardId]);
       }
+
+      // chrome.storage.sync.get(['settings', this.boardId], result => {
+      //   if (this.config.debug) {
+      //     console.table(result.settings);
+      //     if (result.settings['rememberViewStates'] === true) {
+      //       console.table(result[this.boardId]);
+      //     }
+      //   }
       if (result['settings']) {
         this.settings = result['settings'];
       }
-      this.storage = result[this.boardId] || {};
-      this.setupBoard();
-    });
+      this.storage = result[this.boardId];
+    }
+
+    this.setupBoard();
   }
 
+  /**
+   *
+   * @param { } attemptCount
+   * @returns
+   */
   /**
    * This method is called when the extension is first loaded and when
    * a new board is loaded.
@@ -405,9 +429,7 @@ class TFolds {
       throw ReferenceError(`DIV.board-canvas not found after ${attemptCount} attempts`);
     }
 
-    if (this.config.debug) {
-      console.info('%cSetting up board', 'font-weight: bold;');
-    }
+    this.debug && console.info('%cSetting up board', 'font-weight: bold;');
 
     this.cleanupStorage();
     this.formatCards();
@@ -533,6 +555,7 @@ class TFolds {
       sections.forEach(() => {
         const cardName = tdom.getCardName(l);
         if (sectionStates[self.getStrippedTitle(cardName)] === true) {
+          // FIXME Change to dataset etc. etc. 💣
           const section = l.querySelector('.icon-expanded');
           // TODO Test that section is not null 😨
           console.assert(section !== null, 'Section is null, oopsie');
@@ -725,6 +748,7 @@ class TFolds {
   attachListResizeDetector(list) {
     // const list = $list[0];
 
+    // FIXME Fix resizing when section expanded/collapsed
     if (list.dataset.hasDetector === 'true') {
       console.log('Detector already exists: ', tdom.getListName(list));
       return;
@@ -738,7 +762,6 @@ class TFolds {
     // $list.data('hasDetector', true);
     list.dataset.hasDetector = true;
 
-    const self = this;
     const resizeDetector = () => {
       /*
        * If list not visible or not a sub list anymore, stop tracking
@@ -746,7 +769,7 @@ class TFolds {
        */
 
       if (!list.isConnected) {
-        if (self.debug) {
+        if (this.debug) {
           console.log(
               `Detaching resize detector (list no longer in DOM): [${tdom.getListName(list)}]`);
         }
@@ -755,7 +778,7 @@ class TFolds {
       }
 
       if (list.style.display === 'none' || list.dataset.sublistindex === undefined) {
-        if (self.debug) {
+        if (this.debug) {
           console.log(
               `Detaching resize detector (no longer sub list): [${tdom.getListName(list)}]`);
         }
@@ -764,19 +787,21 @@ class TFolds {
       }
       // if (!$list.is(':visible') || $list.data('sublistindex') === undefined) {
       // }
-      if (list.style.height !== list.dataset.oldHeight) {
-        this.debug && console.log(`HEIGHT CHANGE: ${tdom.getListName(list)}`);
-        list.dataset.oldHeight = list.style.height;
+      const height = String(list.getBoundingClientRect().height);
+      if (height !== list.dataset.oldHeight) {
+        list.dataset.oldHeight = height;
         const superList = this.getMySuperList(list);
         if (superList) {
           // TODO Add sublist parameter to this ...trigger('resized', $list[0]);
-          superList.dispatchEvent(new Event('resize'));
+          this.updateSuperListHeight(list);
+          // superList.dispatchEvent(new Event('resize'));
         }
       }
       requestAnimationFrame(resizeDetector);
     };
 
-    list.dataset.oldHeight = list.style.height;
+    const height = String(list.getBoundingClientRect().height);
+    list.dataset.oldHeight = height;
 
     requestAnimationFrame(resizeDetector);
   }
@@ -974,7 +999,6 @@ class TFolds {
       $title = $(superList, 'span.super-list-header');
       $($title, 'span.wip-limit-title')?.remove();
     }
-    console.log({ $title });
 
     /*
      * Get the WiP limit from the left list
@@ -1302,7 +1326,7 @@ class TFolds {
     const title = tdom.getListName(listEl);
 
     if (title.indexOf('[') !== -1) {
-      strippedTitle = title.substr(0, title.indexOf('['));
+      strippedTitle = title.substr(0, title.indexOf('[')).trim();
     } else {
       strippedTitle = title;
     }
@@ -1311,8 +1335,12 @@ class TFolds {
       strippedTitle = strippedTitle.substr(strippedTitle.indexOf('.') + 1);
     }
 
-    this.addWipListTitle(listEl, numCards,
-        !this.isSubList(listEl) ? wipLimit : null, strippedTitle);
+    this.addWipListTitle({
+      listEl,
+      numCards,
+      wipLimit: !this.isSubList(listEl) ? wipLimit : null,
+      strippedTitle,
+    });
   }
 
   /**
@@ -1322,7 +1350,7 @@ class TFolds {
    * @param {*} wipLimit
    * @param {*} strippedTitle
    */
-  addWipListTitle(listEl, numCards, wipLimit, strippedTitle) {
+  addWipListTitle({ listEl, numCards, wipLimit, strippedTitle }) {
     let wipTitle;
     const header = listEl.querySelector('.list-header');
 
@@ -1357,7 +1385,6 @@ class TFolds {
    *
    */
   createWipTitle(title, numCards, wipLimit) {
-    // let $wipTitle;
     let countBadge = null;
 
     if (wipLimit === null && this.settings.alwaysCount) {
@@ -1385,9 +1412,14 @@ class TFolds {
       classes: 'wip-limit-title',
       content: title,
     });
-    wipTitle.append(countBadge);
-
+    if (this.shouldAddWip(wipLimit)) {
+      wipTitle.append(countBadge);
+    }
     return wipTitle;
+  }
+
+  shouldAddWip(wipLimit) {
+    return this.settings.alwaysCount || wipLimit !== null;
   }
 
   /**
@@ -1407,14 +1439,14 @@ class TFolds {
     const cardName = tdom.getCardName(cardEl);
 
     if (cardName.indexOf(this.sectionIdentifier) === 0) {
-      if (this.config.debug) {
+      if (this.debug) {
         console.info(`Card [${cardName}] is a section`);
       }
       this.formatAsSection(cardEl);
       return;
     }
     if (cardName.indexOf('//') === 0) {
-      if (this.config.debug) {
+      if (this.debug) {
         console.info(`Card [${cardName}] is a comment`);
       }
       cardEl.classList.add('comment-card');
@@ -1422,7 +1454,7 @@ class TFolds {
     }
     const badgeLabels = $$(cardEl, '.badge-text');
     if (badgeLabels.some(l => l.textContent.includes('blocked'))) {
-      if (this.config.debug) {
+      if (this.debug) {
         console.info(`Card [${cardName}] is blocked`);
       }
       cardEl.classList.add('blocked-card');
@@ -1442,7 +1474,8 @@ class TFolds {
       this.debug && console.log('Section title already exists');
       return;
     }
-    const icon = this.createNode({ tag: 'span', classes: 'icon-expanded' });
+    const icon = this.createNode({ tag: 'span', classes: 'section-icon' });
+    icon.style.backgroundImage = `url(${this.config.expandedIconUrl})`;
     icon.onclick = (event) => {
       this.toggleSection(event.currentTarget);
       event.stopPropagation();
@@ -1559,15 +1592,14 @@ class TFolds {
    * clicked or when a section is dragged, in which case it is expanded so that
    * contained cards don't mystically disappear.
    *
-   * @param {Element} section The card element
+   * @param {Element} icon The clicked element (i.e. the icon span)
    * @param {Boolean} updateStorage Whether or not to store state in extension storage
    */
   toggleSection(section, updateStorage = true) {
     let listEl;
     let cards;
 
-    section.classList.toggle('icon-collapsed');
-    section.classList.toggle('icon-expanded');
+    this.toggleSectionIcon(section);
 
     const placeholderEl = document.querySelector('a.list-card.placeholder');
     const ident = this.sectionIdentifier;
@@ -1599,6 +1631,7 @@ class TFolds {
 
     cards.forEach(c => this.toggleVisibility(c));
 
+    // FIXME This might be broken 🔥
     if (updateStorage === true) {
       console.log({ listEl });
       const listName = tdom.getListName(listEl);
@@ -1610,6 +1643,22 @@ class TFolds {
       listSections[title] = section.classList.contains('icon-collapsed');
       this.store(listName, 'sections', listSections);
     }
+  }
+
+  toggleSectionIcon(section) {
+    const icon = $(section.parentNode, '.section-icon');
+    if (this.isSectionCollapsed(section)) {
+      icon.dataset.collapsed = false;
+      icon.style.backgroundImage = `url(${this.config.expandedIconUrl})`;
+      return;
+    }
+    icon.dataset.collapsed = true;
+    icon.style.backgroundImage = `url(${this.config.collapsedIconUrl})`;
+  }
+
+  isSectionCollapsed(section) {
+    const icon = $(section.parentNode, '.section-icon');
+    return icon.dataset.collapsed === 'true';
   }
 
   /**
@@ -1700,4 +1749,6 @@ TFolds.DEFAULT_COMPACT_WIDTH = 200;
 TFolds.NORMAL_LIST_WIDTH = 272;
 TFolds.GLOBAL_BOARD_SETTING_STRING = 'trello-folds-board-settings';
 
-if (module) module.exports = TFolds;
+try {
+  module.exports = TFolds;
+} catch (e) { /* Delib empty */ }

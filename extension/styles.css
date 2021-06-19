@@ -76,17 +76,8 @@
     padding-left: 10px;
 }
 
-.icon-expanded {
-    background-image:url('chrome-extension://__MSG_@@extension_id__/img/icons8-sort-down-16.png');
-    width: 16px;
-    height: 16px;
-    display: inline-block;
-    position: relative;
-    top: 7px;
-}
-
-.icon-collapsed {
-    background-image:url('chrome-extension://__MSG_@@extension_id__/img/icons8-sort-right-16.png');
+.section-icon {
+    /* background-image:url('chrome-extension://__MSG_@@extension_id__/img/icons8-sort-down-16.png'); */
     width: 16px;
     height: 16px;
     display: inline-block;
