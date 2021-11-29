@@ -76,22 +76,6 @@ class TDOM {
     this.boardCompletelyLoaded = false;
   }
 
-  // const tdom = (function (factory) {
-  //   'use strict';
-  //   if (typeof define === 'function' && define.amd) {
-  //     define(['jquery'], factory);
-  //   } else {
-  //     return factory(jQuery);
-  //   }
-  // }(($) => {
-  //   'use strict';
-
-
-  // #region PRIVATE MEMBERS
-
-
-  // #endregion PRIVATE MEMBERS
-
   get debug() {
     return this._debug;
   }
@@ -122,13 +106,11 @@ class TDOM {
           ================================================================================= */
 
   /**
-       * Called by client/consumer to init library.
-       */
+   * Called by client/consumer to init library.
+   */
   init() {
-    document.addEventListener('readystatechange', event => {
-      if (event.target.readyState === 'complete') {
-        this.initialize();
-      }
+    window.addEventListener('pageshow', () => {
+      this.initialize();
     });
   }
 
@@ -139,13 +121,15 @@ class TDOM {
   initialize(attemptCount = 0) {
     // const $content = $('DIV#content');
     const content = $('div#content');
-
+    this.debug && console.log(`initialize, attempt=${attemptCount}`);
     if (!content) {
-      if (attemptCount < 3) {
+      if (attemptCount < TDOM.MAX_LOAD_ATTEMPTS) {
+        const delay = TDOM.RETRY_BASE_TIME * (TDOM.RETRY_TIME_FACTOR ** (attemptCount+1));
         setTimeout(() => {
           console.warn(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
           this.initialize(attemptCount + 1);
-        }, 100);
+          console.log(`Trying again in ${delay}ms`);
+        }, delay);
         return;
       }
       throw ReferenceError(`DIV#content not found after ${attemptCount} attempts`);
@@ -210,7 +194,8 @@ class TDOM {
     this.oldBoardId = this.currentBoardId;
 
     console.info(
-        `%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${this.oldBoardId})`, 'font-weight: bold;');
+        `%cINITIALIZING NEW BOARD: ${boardId} (old board ID: ${this.oldBoardId})`,
+        'font-weight: bold;');
     this.watchForMutations(boardId);
 
     this.currentBoardId = boardId;
@@ -221,14 +206,16 @@ class TDOM {
    * watching for mutations to the board.
    */
   watchForMutations(boardId, attemptCount = 1) {
+    this.debug && console.log(`watchForMutations, attemptCount=${attemptCount}`);
     const content = $('div#board');
 
     if (!content) {
       if (attemptCount < TDOM.MAX_LOAD_ATTEMPTS) {
+        const delay = TDOM.LOAD_RETRY_TIMEOUT * (TDOM.RETRY_TIME_FACTOR ** attemptCount);
         setTimeout(() => {
-          console.log(`Trying to find DIV#board again (attempt ${attemptCount + 1})`);
+          console.log(`Trying to find DIV#board again in ${delay}ms (attempt ${attemptCount + 1})`);
           this.watchForMutations(boardId, attemptCount + 1);
-        }, TDOM.LOAD_RETRY_TIMEOUT);
+        }, delay);
         return;
       }
       throw ReferenceError(`DIV#board not found after ${attemptCount} attempts`);
@@ -274,6 +261,7 @@ class TDOM {
     this.newMutations = false;
     setTimeout(() => {
       if (this.debug) {
+        // eslint-disable-next-line max-len
         console.log(`%cWaiting for board to load... (newMutations=${this.newMutations},boardCompletelyLoaded=${this.boardCompletelyLoaded})`,
             'font-style: italic; color: #808080;');
       }
@@ -596,9 +584,9 @@ class TDOM {
   /**
    * Gets all **DIV.js-list-content** elements matching the given parameters.
    *
-   * @param {String} name String that name of list should contain
+   * @param {String|RegExp} name String that name of list should contain
    * @param {Array} filter Array of strings that name of list should *not* contain
-   * @returns {jQuery} A jQuery object with the elements
+   * @returns {Array} A jQuery object with the elements
    */
   getLists(name, filter) {
     let jLists;
@@ -634,6 +622,7 @@ class TDOM {
    */
   getPrevList(listEl) {
     // const $prev = $(listEl).parent().prev().find('div.js-list-content');
+    // @ts-ignore
     return $(listEl.parentNode.previousElementSibling, 'div.js-list-content');
     // return prev.length ? $prev[0]: null;
   }
@@ -645,6 +634,7 @@ class TDOM {
    * @returns {Element} List element or ``null`` if not found
    */
   getNextList(listEl) {
+    // @ts-ignore
     return $(listEl.parentNode.nextElementSibling, 'div.js-list-content');
     // const $next = $(listEl).parent().next().find('div.js-list-content');
     // return $next.length === 1 ? $next[0] : null;
@@ -654,7 +644,7 @@ class TDOM {
    * Gets the title of a card by stripping all children
    * and returning the text inside the `span.list-card-title` element.
    *
-   * @param {jQuery} $card A jQuery object containing a Trello card
+   * @param {Element} card A jQuery object containing a Trello card
    * @returns {String} The card title
    */
   getCardName(card) {
@@ -706,7 +696,7 @@ class TDOM {
   /**
    * Gets all cards with a specific string in the title.
    *
-   * @returns {jQuery} jQuery object with card DOM elements or <code>null</code> if no cards found
+   * @returns {Array} jQuery object with card DOM elements or <code>null</code> if no cards found
    * @throws {TypeError} when missing parameter
    */
   getCardsByName(name, exactMatch = false) {
@@ -855,105 +845,8 @@ class TDOM {
       }
       labels.push(title);
     });
-    // $(el).find('span.card-label').each(function () {
-    //   const title = $(this).attr('title');
-    //   if (filter) {
-    //     for (let i = 0; i < filter.length; ++i) {
-    //       if (title.indexOf(filter[i]) > -1) {
-    //         return;
-    //       }
-    //     }
-    //   }
-    //   labels.push(title);
-    // });
     return labels;
   }
-
-  // /**
-  //  * Gets an associative array with the fields for a given card, e.g.
-  //  * `{"fieldName": "fieldValue", ...}`
-  //  *
-  //  * @param {Element} cardEl The *DIV.list-card-details* element for the card
-  //  * @returns {Object} Associative array with field names and values
-  //  */
-  // getCardFields(cardEl) {
-  //   if (!cardEl) {
-  //     throw new TypeError('Parameter [cardEl] not defined');
-  //   }
-
-  //   const fields = [];
-
-  //   $$(cardEl, 'span.badge-text').forEach(badge => {
-  //     const title = badge.textContent.trim();
-  //     const f = title.split(':');
-  //     if (f.length === 2) {
-  //       const fName = f[0].trim();
-  //       const fVal = f[1].trim();
-  //       fields[fName] = fVal;
-  //     } else {
-  //       fields[title] = 'true';
-  //     }
-  //   });
-  //   // $(cardEl).find('span.badge-text').each(function () {
-  //   //   const title = $(this).text().trim();
-  //   //   const f = title.split(':');
-  //   //   if (f.length === 2) {
-  //   //     const fName = f[0].trim();
-  //   //     const fVal = f[1].trim();
-  //   //     fields[fName] = fVal;
-  //   //   } else {
-  //   //     fields[title] = 'true';
-  //   //   }
-  //   // });
-  //   return fields;
-  // }
-
-  // /**
-  //  * Returns an associative array with the count for each label in that list, e.g.
-  //  * ```
-  //  * {
-  //  *     "Label 1": 3,
-  //  *     "Label 2": 2
-  //  * }
-  //  * ```
-  //  *
-  //  * @param {Element} listEl The list to check
-  //  * @param {Array} filter An optional filter with labels to exclude
-  //  * @returns {Object} Label count for the given list
-  //  */
-  // countLabelsInList(listEl, filter) {
-  //   if (!listEl) {
-  //     throw new TypeError('Parameter [listEl] not defined');
-  //   }
-  //   if (filter && !(filter instanceof Array)) {
-  //     throw new TypeError('Parameter [filter] undefined or not of type Array');
-  //   }
-
-  //   const labels = {};
-
-  //   $$(listEl, 'span.card-label').forEach(lbl => {
-  //     const title = lbl.getAttribute('title');
-  //     // FIXME Implement filter
-  //     // if (mainRolesOnly && (title === "concern" || title.indexOf("*") !== -1)) {
-  //     //     return;
-  //     // }
-  //     if (labels[title] === undefined) {
-  //       labels[title] = 0;
-  //     }
-  //     labels[title]++;
-  //   });
-  //   // $(listEl).find('span.card-label').each(function () {
-  //   //   const title = $(this).attr('title');
-  //   //   // if (mainRolesOnly && (title === "concern" || title.indexOf("*") !== -1)) {
-  //   //   //     return;
-  //   //   // }
-  //   //   if (labels[title] === undefined) {
-  //   //     labels[title] = 0;
-  //   //   }
-  //   //   labels[title]++;
-  //   // });
-  //   return labels;
-  // }
 
   /**
    *
@@ -968,12 +861,12 @@ class TDOM {
 
 }
 
-TDOM.MAX_LOAD_ATTEMPTS = 3;
+TDOM.MAX_LOAD_ATTEMPTS = 5;
 TDOM.LOAD_RETRY_TIMEOUT = 100;
 TDOM.DEFAULT_TIMEOUT = 100;
 TDOM.TEXT_NODE = 3;
-
-// module.exports = TDOM;
+TDOM.RETRY_TIME_FACTOR = 2;
+TDOM.RETRY_BASE_TIME = 100;
 
 try {
   module.exports = TDOM;

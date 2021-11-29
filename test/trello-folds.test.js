@@ -513,11 +513,11 @@ describe('tFolds', () => {
 
       it('should not add comment-card class when title does not start with //', () => {
         /* Assign */
-        const card1 = _$(normalCard);
-        const card2 = _$(normalCard);
-        const card3 = _$(normalCard);
-        const card4 = _$(normalCard);
-        const card5 = _$(normalCard);
+        const card1 = $(normalCard);
+        const card2 = $(normalCard);
+        const card3 = $(normalCard);
+        const card4 = $(normalCard);
+        const card5 = $(normalCard);
         /* Act */
         tfolds.cardModified(card1, 'No comment', '// Comment');
         tfolds.cardModified(card2, '/No comment/', '// Comment');
@@ -534,9 +534,9 @@ describe('tFolds', () => {
 
       it('should add comment-card class if title starts with //', () => {
         /* Assign */
-        const card1 = _$(normalCard);
-        const card2 = _$(normalCard);
-        const card3 = _$(normalCard);
+        const card1 = $(normalCard);
+        const card2 = $(normalCard);
+        const card3 = $(normalCard);
         /* Act */
         tfolds.cardModified(card1, '// comment', 'Comment');
         tfolds.cardModified(card2, '// Comment //', '// Comment');
@@ -549,7 +549,7 @@ describe('tFolds', () => {
 
       it('should remove comment-card class if title does not start with //', () => {
         /* Assign */
-        const card = _$(commentCard);
+        const card = $(commentCard);
         /* Act */
         tfolds.cardModified(card, 'comment', '// Comment');
         /* Assert */
@@ -580,7 +580,7 @@ describe('tFolds', () => {
 
       it('should not call anything', () => {
         /* Assign */
-        const card = _$(normalCard);
+        const card = $(normalCard);
         /* Act */
         tfolds.checkSectionChange(card, 'new', 'old');
         /* Assert */
@@ -592,7 +592,7 @@ describe('tFolds', () => {
     describe('[section --> section]', () => {
       it('should contain section-title with stripped title', () => {
         /* Assign */
-        const card = _$(sectionCard);
+        const card = $(sectionCard);
         const newTitle = '## New Title';
         const oldTitle = '## Beta Section 1';
         /* Act */
@@ -608,7 +608,7 @@ describe('tFolds', () => {
       const oldTitle = '## Beta Section 1';
 
       beforeEach(() => {
-        card = _$(sectionCard);
+        card = $(sectionCard);
       });
 
       it('should call removeSectionFormatting()', () => {
@@ -634,7 +634,7 @@ describe('tFolds', () => {
       const oldTitle = 'Old title';
 
       beforeAll(() => {
-        card = _$(normalCard);
+        card = $(normalCard);
       });
 
       it('should call formatAsSection()', () => {

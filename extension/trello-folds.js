@@ -20,6 +20,7 @@ class TFolds {
       debug: true,
       collapsedIconUrl: null,
       expandedIconUrl: null,
+      verbose: true,
     };
   }
 
@@ -39,6 +40,10 @@ class TFolds {
    */
   set debug(debug) {
     this._config.debug = debug;
+  }
+
+  get verbose() {
+    return this._config.verbose;
   }
 
   get boardId() {
@@ -275,6 +280,7 @@ class TFolds {
    * @param {String} oldTitle The title before it was modified
    */
   cardModified(cardEl, title, oldTitle) {
+    this.verbose && console.debug('cardModified()');
     cardEl.classList.remove('comment-card');
 
     this.checkSectionChange(cardEl, title, oldTitle);
@@ -329,6 +335,7 @@ class TFolds {
    * @param {jQuery} $card The card to strip
    */
   removeSectionFormatting(card) {
+    this.verbose && console.debug('removeSectionFormatting()');
     card.querySelector('span.section-icon')?.remove();
     card.querySelector('span#section-title')?.remove();
     card.querySelector('span.list-card-title')?.remove();
@@ -785,18 +792,20 @@ class TFolds {
         delete list.dataset.hasDetector;
         return;
       }
-      // if (!$list.is(':visible') || $list.data('sublistindex') === undefined) {
-      // }
-      const height = String(list.getBoundingClientRect().height);
-      if (height !== list.dataset.oldHeight) {
-        list.dataset.oldHeight = height;
-        const superList = this.getMySuperList(list);
-        if (superList) {
-          // TODO Add sublist parameter to this ...trigger('resized', $list[0]);
-          this.updateSuperListHeight(list);
-          // superList.dispatchEvent(new Event('resize'));
+
+      Promise.resolve(1).then(() => {
+        const height = String(list.getBoundingClientRect().height);
+        if (height !== list.dataset.oldHeight) {
+          list.dataset.oldHeight = height;
+          const superList = this.getMySuperList(list);
+          if (superList) {
+            // TODO Add sublist parameter to this ...trigger('resized', $list[0]);
+            this.updateSuperListHeight(list);
+            // superList.dispatchEvent(new Event('resize'));
+          }
         }
-      }
+      });
+
       requestAnimationFrame(resizeDetector);
     };
 
@@ -1189,6 +1198,7 @@ class TFolds {
    *
    */
   addWipLimits() {
+    this.verbose && console.debug('addWipLimits()');
     let wipLists;
     if (this.settings.alwaysCount === true) {
       wipLists = tdom.getLists();
@@ -1204,6 +1214,7 @@ class TFolds {
    *
    */
   showWipLimit(listEl) {
+    this.verbose && console.debug('showWipLimits()');
     const numCards = this.countWorkCards(listEl);
     const wipLimit = this.extractWipLimit(listEl);
     const subList = listEl?.dataset.sublistindex;
@@ -1490,6 +1501,7 @@ class TFolds {
       content: strippedTitle,
     });
 
+    console.log({ strippedTitleEl, icon });
     card.insertBefore(strippedTitleEl, card.firstChild);
     card.insertBefore(icon, card.firstChild);
     this.toggleVisibility(card.querySelector('span.list-card-title'), false);
@@ -1598,6 +1610,8 @@ class TFolds {
   toggleSection(section, updateStorage = true) {
     let listEl;
     let cards;
+
+    console.log({ section });
 
     this.toggleSectionIcon(section);
 

@@ -212,7 +212,7 @@ describe('tdom', () => {
   describe('extractTextContent()', () => {
     it('should get the content of containing text node', () => {
       /* Assign */
-      const html = _$('<div><span>not this</span>But this<p></p></div>');
+      const html = $('<div><span>not this</span>But this<p></p></div>');
       /* Act */
       const text = tdom.extractTextContent(html);
       /* Assert */
@@ -221,7 +221,7 @@ describe('tdom', () => {
 
     it('should return empty string if no text node found', () => {
       /* Assign */
-      const html = _$('<div><span>not this</span><p></p></div>');
+      const html = $('<div><span>not this</span><p></p></div>');
       /* Act */
       const text = tdom.extractTextContent(html);
       /* Assert */
@@ -239,7 +239,7 @@ describe('tdom', () => {
 
     it('should return empty array when no cards found', () => {
       /* Assign */
-      const html = _$('<div></div>');
+      const html = $('<div></div>');
       /* Act */
       const cards = tdom.getCardsInList(html);
       /* Assert */
@@ -285,11 +285,11 @@ describe('tdom', () => {
 
   describe('countCards()', () => {
     const html
-        = _$("<div><a class='list-card'><span class='list-card-title'>foo bar</span></a></div>");
+        = $("<div><a class='list-card'><span class='list-card-title'>foo bar</span></a></div>");
 
     it('should return zero (0) for empty element', () => {
       /* Assign */
-      const emptyDiv = _$('<div></div>');
+      const emptyDiv = $('<div></div>');
       /* Act */
       const count = tdom.countCards(emptyDiv);
       /* Assert */
