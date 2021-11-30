@@ -251,11 +251,13 @@ class TDOM {
       this.connectHeaderObserver();
       this.connectListObserver();
 
-      if (this.debug) {
-        console.info('Emitting BOARD_CHANGED event');
-      }
-      this.handler.emit(EventHandler.BOARD_CHANGED, this.currentBoardId, this.oldBoardId);
-
+      console.warn('ABOUT TO CHANGE BOARD');
+      setTimeout(() => {
+        if (this.debug) {
+          console.info('Emitting BOARD_CHANGED event');
+        }
+        this.handler.emit(EventHandler.BOARD_CHANGED, this.currentBoardId, this.oldBoardId);
+      }, 1500);
       return;
     }
     this.newMutations = false;
@@ -656,7 +658,7 @@ class TDOM {
     }
     const span = card.querySelector('span.list-card-title');
     if (!span) {
-      return undefined;
+      return '';
     }
     const title = this.extractTextContent(span);
     return title;
@@ -712,7 +714,6 @@ class TDOM {
       }
       return title.includes(name);
     });
-    console.log({ filteredCards });
     return filteredCards;
   }
 
@@ -861,12 +862,12 @@ class TDOM {
 
 }
 
-TDOM.MAX_LOAD_ATTEMPTS = 5;
-TDOM.LOAD_RETRY_TIMEOUT = 100;
+TDOM.MAX_LOAD_ATTEMPTS = 7;
+TDOM.LOAD_RETRY_TIMEOUT = 50;
 TDOM.DEFAULT_TIMEOUT = 100;
 TDOM.TEXT_NODE = 3;
 TDOM.RETRY_TIME_FACTOR = 2;
-TDOM.RETRY_BASE_TIME = 100;
+TDOM.RETRY_BASE_TIME = 50;
 
 try {
   module.exports = TDOM;

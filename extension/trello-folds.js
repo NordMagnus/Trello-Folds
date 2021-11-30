@@ -20,7 +20,7 @@ class TFolds {
       debug: true,
       collapsedIconUrl: null,
       expandedIconUrl: null,
-      verbose: true,
+      verbose: false,
     };
   }
 
@@ -106,44 +106,46 @@ class TFolds {
     return Number(width);
   }
 
-  // TODO Replace ...args with actual arguments?
   initialize() {
     tdom.debug = this.debug;
-    tdom.onBoardChanged((...args) => {
-      this.boardChanged(...args);
+
+    // Load from storage here
+
+    tdom.onBoardChanged((oldId, newId) => {
+      this.boardChanged(oldId, newId);
     });
-    tdom.onListModified((...args) => {
-      this.listModified(...args);
+    tdom.onListModified((listEl) => {
+      this.listModified(listEl);
     });
-    tdom.onListAdded((...args) => {
-      this.listAdded(...args);
+    tdom.onListAdded((listEl) => {
+      this.listAdded(listEl);
     });
-    tdom.onListRemoved((...args) => {
-      this.listRemoved(...args);
+    tdom.onListRemoved((listEl) => {
+      this.listRemoved(listEl);
     });
-    tdom.onCardAdded((...args) => {
-      this.cardAdded(...args);
+    tdom.onCardAdded((cardEl) => {
+      this.cardAdded(cardEl);
     });
-    tdom.onCardRemoved((...args) => {
-      this.cardRemoved(...args);
+    tdom.onCardRemoved((cardEl) => {
+      this.cardRemoved(cardEl);
     });
-    tdom.onCardModified((...args) => {
-      this.cardModified(...args);
+    tdom.onCardModified((cardEl, title, oldTitle) => {
+      this.cardModified(cardEl, title, oldTitle);
     });
-    tdom.onListTitleModified((...args) => {
-      this.listTitleModified(...args);
+    tdom.onListTitleModified(() => {
+      this.listTitleModified();
     });
-    tdom.onListDragged((...args) => {
-      this.listDragged(...args);
+    tdom.onListDragged((listEl) => {
+      this.listDragged(listEl);
     });
-    tdom.onListDropped((...args) => {
-      this.listDropped(...args);
+    tdom.onListDropped(() => {
+      this.listDropped();
     });
-    tdom.onBadgesModified((...args) => {
-      this.cardBadgesModified(...args);
+    tdom.onBadgesModified((cardEl) => {
+      this.cardBadgesModified(cardEl);
     });
-    tdom.onRedrawBoardHeader((...args) => {
-      this.redrawHeader(...args);
+    tdom.onRedrawBoardHeader(() => {
+      this.redrawHeader();
     });
     tdom.init();
 
@@ -332,7 +334,7 @@ class TFolds {
   /**
    * Removes any section formatting for the specified card.
    *
-   * @param {jQuery} $card The card to strip
+   * @param {Element} card The card to strip
    */
   removeSectionFormatting(card) {
     this.verbose && console.debug('removeSectionFormatting()');
@@ -392,14 +394,6 @@ class TFolds {
       if (result.settings['rememberViewStates'] === true) {
         console.table(result[this.boardId]);
       }
-
-      // chrome.storage.sync.get(['settings', this.boardId], result => {
-      //   if (this.config.debug) {
-      //     console.table(result.settings);
-      //     if (result.settings['rememberViewStates'] === true) {
-      //       console.table(result[this.boardId]);
-      //     }
-      //   }
       if (result['settings']) {
         this.settings = result['settings'];
       }
@@ -439,10 +433,8 @@ class TFolds {
     this.debug && console.info('%cSetting up board', 'font-weight: bold;');
 
     this.cleanupStorage();
-    this.formatCards();
-
     this.formatLists();
-
+    this.formatCards();
     this.addBoardIcons();
 
     this.compactMode = this.retrieveGlobalBoardSetting('compactMode');
@@ -461,11 +453,8 @@ class TFolds {
    */
   addBoardIcons() {
     const buttonContainer = $('div.board-header-btns.mod-right');
-    // const $boardBtns = $('div.board-header-btns.mod-right');
-
     const divider = this.createNode({ tag: 'span', classes: ['board-header-btn-divider'] });
     buttonContainer.prepend(divider);
-    // $boardBtns.prepend('<span class="board-header-btn-divider"></span>');
 
     /*
      * COMPACT MODE
@@ -760,13 +749,8 @@ class TFolds {
       console.log('Detector already exists: ', tdom.getListName(list));
       return;
     }
-    // if ($list.data('hasDetector') === true) {
-    //   console.log('Detector already exists: ', tdom.getListName($list[0]));
-    //   return;
-    // }
     this.debug && console.log('Attaching resize detector: ', tdom.getListName(list));
 
-    // $list.data('hasDetector', true);
     list.dataset.hasDetector = true;
 
     const resizeDetector = () => {
@@ -836,7 +820,6 @@ class TFolds {
   splitAllCombined() {
     let subLists = $$('.sub-list');
     let n = 0;
-    console.log(subLists);
     while (subLists.length > 0 && n < TFolds.MAX_LISTS_IN_BOARD) {
       const sublists = this.getSubLists(subLists[0]);
       sublists.forEach(e => {
@@ -859,13 +842,8 @@ class TFolds {
    * @param {jQuery} $list The target list
    */
   restoreSubList(list) {
-    console.log({
-      subListIndex: list.dataset.sublistindex,
-      superListIndex: list.dataset.superListIndex,
-    });
     if (list.dataset.sublistindex === '0') {
       const superLists = list.parentNode.querySelectorAll('.super-list');
-      console.log({ superLists });
       superLists.forEach(e => e.remove());
       list.parentNode.querySelectorAll('.super-list-collapsed').forEach(e => e.remove());
     }
@@ -1495,17 +1473,20 @@ class TFolds {
 
     const strippedTitle = this.getStrippedTitle(tdom.getCardName(card));
 
+    console.log(strippedTitle);
+
     const strippedTitleEl = this.createNode({
       tag: 'span',
       id: 'section-title',
       content: strippedTitle,
     });
 
-    console.log({ strippedTitleEl, icon });
     card.insertBefore(strippedTitleEl, card.firstChild);
     card.insertBefore(icon, card.firstChild);
     this.toggleVisibility(card.querySelector('span.list-card-title'), false);
     card.classList.add('section-card');
+
+    console.log(card);
   }
 
   /**
@@ -1610,8 +1591,6 @@ class TFolds {
   toggleSection(section, updateStorage = true) {
     let listEl;
     let cards;
-
-    console.log({ section });
 
     this.toggleSectionIcon(section);
 
