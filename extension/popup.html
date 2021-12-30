@@ -103,9 +103,21 @@
         </div>
 
         <!--
+        -->
+        <div class="dark-panel">
+          <h2>Load Timeout</h2>
+          <span>Wait for <input type="text" id="load-timeout" value="1500" class="medium-field" />
+            milliseconds before initiating board setup.</span>
+            <div class="example-area">
+              If boards d not load properly try to increase this value. If you have no
+              issues and want to initialize boards faster, decrease the number. The default
+              value is 1500 milliseconds, chosen by trial and error without any exact science involved whatsoever.
+          </div>
+        </div>
+        <!--
             VIEW STATE SETTINGS
         -->
-        <div class="dark-panel panel-last">
+        <div class="light-panel panel-last">
             <h2>View State</h2>
             <input id="remember-view-states" type="checkbox" name="store-viewstate" checked="true" />
             <span>

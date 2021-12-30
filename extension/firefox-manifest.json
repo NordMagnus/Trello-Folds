@@ -1,35 +1,47 @@
 {
-    "manifest_version": 2,
-    "browser_specific_settings": {
-      "gecko": {
-        "id": "trello@folds.com",
-        "strict_min_version": "88.0"
-      }
-    },
-    "name": "Trello Folds (Kanban for Trello)",
-    "version": "0.9.13",
-    "icons": {
-        "16": "icons/icon16.png",
-        "48": "icons/icon48.png",
-        "64": "icons/icon64.png",
-        "128": "icons/icon128-96.png"
-    },
-    "permissions": [
-        "storage",
-        "activeTab",
-        "https://trello.com/*",
-        "*://trellocdn.com/*",
-        "<all_urls>"
-    ],
-    "browser_action": {
-        "default_icon": "icons/icon48.png",
-        "default_popup": "popup.html"
-    },
-    "description": "Turn your Trello board into a Kanban system with WiP limits, combining lists, card count and collapsible lists",
-    "content_scripts": [{
-        "css": ["styles.css"],
-        "js": ["tdom.js", "trello-folds.js", "content.js"],
-        "matches": ["https://trello.com/*"]
-    }],
-    "web_accessible_resources": ["img/*.png"]
+  "manifest_version": 2,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "trello@folds.com",
+      "strict_min_version": "88.0"
+    }
+  },
+  "name": "Trello Folds (Kanban for Trello)",
+  "version": "0.10.1",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "64": "icons/icon64.png",
+    "128": "icons/icon128-96.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "https://trello.com/*",
+    "*://trellocdn.com/*",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_icon": "icons/icon48.png",
+    "default_popup": "popup.html"
+  },
+  "description": "Turn your Trello board into a Kanban system with WiP limits, combining lists, card count and collapsible lists",
+  "content_scripts": [
+    {
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "tdom.js",
+        "trello-folds.js",
+        "content.js"
+      ],
+      "matches": [
+        "https://trello.com/*"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "img/*.png"
+  ]
 }

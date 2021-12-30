@@ -66,6 +66,7 @@ class TDOM {
     this.oldBoardId = undefined;
     this._debug = false;
     this.newMutations = false;
+    this.loadTimeout = 100;
 
     // Mutation Observers
     this.loadObserver = undefined;
@@ -108,7 +109,8 @@ class TDOM {
   /**
    * Called by client/consumer to init library.
    */
-  init() {
+  init({ loadTimeout = 1500 }) {
+    this.loadTimeout = loadTimeout;
     window.addEventListener('pageshow', () => {
       this.initialize();
     });
@@ -224,14 +226,15 @@ class TDOM {
     this.connectLoadObserver(content);
 
     /*
-            * Setting newMutations to true to force at least one 100 ms delay before completing.
-            */
+     * Setting newMutations to true to force at least one 100 ms delay before completing.
+     */
     this.newMutations = true;
     /*
-            * Setting boardCompletelyLoaded to false when changing board (opposite to loading
-            * the first board)
-            */
-    this.boardCompletelyLoaded = (this.oldBoardId === undefined);
+     * Setting boardCompletelyLoaded to false when changing board (opposite to loading
+     * the first board)
+     */
+    // this.boardCompletelyLoaded = (this.oldBoardId === undefined);
+    this.boardCompletelyLoaded = false;
     this.connectObservers();
   }
 
@@ -251,13 +254,12 @@ class TDOM {
       this.connectHeaderObserver();
       this.connectListObserver();
 
-      console.warn('ABOUT TO CHANGE BOARD');
       setTimeout(() => {
         if (this.debug) {
-          console.info('Emitting BOARD_CHANGED event');
+          console.log('Emitting BOARD_CHANGED event');
         }
         this.handler.emit(EventHandler.BOARD_CHANGED, this.currentBoardId, this.oldBoardId);
-      }, 1500);
+      }, this.loadTimeout);
       return;
     }
     this.newMutations = false;
@@ -721,7 +723,8 @@ class TDOM {
    * Count cards in list.
    *
    * @param {Element} list The containing list
-   * @param {String} filter Cards containing filter will be excluded
+   * @param {String} [filter] Cards containing filter will be excluded
+   * @param {Number} [pos] Start position
    * @returns {Number} Number of cards found
    */
   countCards(list, filter, pos) {

@@ -12,6 +12,7 @@ class TFolds {
       alwaysCount: false,
       enableCombiningLists: true,
       compactListWidth: 200,
+      loadTimeout: 100,
     };
     this._compactMode = false;
     this.storage = {};
@@ -106,10 +107,16 @@ class TFolds {
     return Number(width);
   }
 
-  initialize() {
+  async initialize() {
     tdom.debug = this.debug;
 
-    // Load from storage here
+    /*
+     * Get icon URLs
+     */
+    this.config.expandedIconUrl = chrome.runtime.getURL('img/icons8-sort-down-16.png');
+    this.config.collapsedIconUrl = chrome.runtime.getURL('img/icons8-sort-right-16.png');
+
+    await this.loadSettings();
 
     tdom.onBoardChanged((oldId, newId) => {
       this.boardChanged(oldId, newId);
@@ -147,13 +154,18 @@ class TFolds {
     tdom.onRedrawBoardHeader(() => {
       this.redrawHeader();
     });
-    tdom.init();
+    tdom.init({ loadTimeout: this.settings.loadTimeout });
+  }
 
-    /*
-     * Get icon URLs
-     */
-    this.config.expandedIconUrl = chrome.runtime.getURL('img/icons8-sort-down-16.png');
-    this.config.collapsedIconUrl = chrome.runtime.getURL('img/icons8-sort-right-16.png');
+  async loadSettings() {
+    this.debug && console.log('Loading extension settings');
+    const result = await chrome.storage.sync.get('settings');
+    if (result) {
+      this.debug && console.table(result.settings);
+      if (result.settings) {
+        this.settings = result.settings;
+      }
+    }
   }
 
   // #region EVENT HANDLERS
@@ -164,9 +176,10 @@ class TFolds {
    * @param {String} boardId
    * @param {String} oldBoardId
    */
-  boardChanged(boardId, oldBoardId) {
+  async boardChanged(boardId, oldBoardId) {
     this.debug && console.log(`boardId=${boardId},oldId=${oldBoardId}`);
-    this.initStorage();
+    await this.getViewstate();
+    this.setupBoard();
   }
 
   /**
@@ -382,25 +395,19 @@ class TFolds {
   /**
    *
    */
-  async initStorage() {
+  async getViewstate() {
+    this.debug && console.log('Loading board settings');
+
     this.boardId = tdom.getBoardIdFromUrl();
-
-    const result = await chrome.storage.sync.get(['settings', this.boardId]);
-
     this.storage = {};
+    const result = await chrome.storage.sync.get([this.boardId]);
 
     if (result) {
-      this.debug && console.table(result.settings);
-      if (result.settings['rememberViewStates'] === true) {
+      if (this.settings['rememberViewStates'] === true) {
         console.table(result[this.boardId]);
-      }
-      if (result['settings']) {
-        this.settings = result['settings'];
       }
       this.storage = result[this.boardId];
     }
-
-    this.setupBoard();
   }
 
   /**
