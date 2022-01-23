@@ -128,7 +128,7 @@ class TDOM {
       if (attemptCount < TDOM.MAX_LOAD_ATTEMPTS) {
         const delay = TDOM.RETRY_BASE_TIME * (TDOM.RETRY_TIME_FACTOR ** (attemptCount+1));
         setTimeout(() => {
-          console.warn(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
+          console.log(`Trying to find DIV#content (attempt ${attemptCount + 1})`);
           this.initialize(attemptCount + 1);
           console.log(`Trying again in ${delay}ms`);
         }, delay);
@@ -875,4 +875,3 @@ TDOM.RETRY_BASE_TIME = 50;
 try {
   module.exports = TDOM;
 } catch (e) { /* Delib empty */ }
-

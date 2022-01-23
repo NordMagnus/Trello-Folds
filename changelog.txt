@@ -14,6 +14,23 @@ FEEDBACK AND SUGGESTIONS ARE APPRECIATED.
 
 ** CHANGELOG **
 
+New in 0.10.2
+====================
+- Fixed collapsed board rendering offset issue due to changes in Trello's DOM/styles.
+- Fixed bug with not remembering board collapsed state
+- Minor fixes for board button hovering
+
+New in 0.10.1
+====================
+- Further tweaks with board initialization/loading to make it more reliable. Hopefully it worked :-/
+- Changed the default "load timeout" to 100 ms. Try increasing this value if boards do not load properly.
+
+New in 0.10
+====================
+- Removed dependency on jQuery
+- Improvements/tweaks to board initialization
+- New "load timeout" setting (defaults to 1500 ms). Try to increase this value if boards do not load properly.
+
 New in 0.9
 ====================
 - Support for combining multiple (more than two) lists(!!)

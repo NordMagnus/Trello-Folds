@@ -439,12 +439,12 @@ class TFolds {
 
     this.debug && console.info('%cSetting up board', 'font-weight: bold;');
 
+    this.compactMode = this.retrieveGlobalBoardSetting('compactMode');
+
     this.cleanupStorage();
     this.formatLists();
     this.formatCards();
     this.addBoardIcons();
-
-    this.compactMode = this.retrieveGlobalBoardSetting('compactMode');
 
     if (this.settings.rememberViewStates) {
       setTimeout(() => {
@@ -466,11 +466,18 @@ class TFolds {
     /*
      * COMPACT MODE
      */
+    const btnClasses = [
+      'board-header-btn',
+      'board-header-btn-without-icon',
+      'board-header-btn-text',
+    ];
+    if (this.compactMode) {
+      btnClasses.push('compact-mode-enabled');
+    }
     const compactModeButton = this.createNode({
       tag: 'a',
       id: 'toggle-compact-mode',
-      classes: ['board-header-btn', 'board-header-btn-without-icon', 'board-header-btn-text',
-        'compact-mode-disabled'],
+      classes: btnClasses,
     });
     compactModeButton.append(this.createNode({
       tag: 'span', content: 'Compact Mode',
@@ -487,8 +494,7 @@ class TFolds {
     const redrawButton = this.createNode({
       tag: 'a',
       id: 'redraw-board',
-      classes: ['board-header-btn', 'board-header-btn-without-icon', 'board-header-btn-text',
-        'compact-mode-disabled'],
+      classes: ['board-header-btn', 'board-header-btn-without-icon', 'board-header-btn-text'],
     });
     redrawButton.append(this.createNode({
       tag: 'span', content: 'Redraw',
@@ -517,9 +523,7 @@ class TFolds {
     const btn = document.querySelector('a#toggle-compact-mode');
     if (enabled) {
       btn.classList.add('compact-mode-enabled');
-      btn.classList.remove('compact-mode-disabled');
     } else {
-      btn.classList.add('compact-mode-disabled');
       btn.classList.remove('compact-mode-enabled');
     }
   }
@@ -907,7 +911,7 @@ class TFolds {
       const collapsedList = this.createNode({
         tag: 'div',
         style: { display: 'none' },
-        classes: ['super-list-collapsed', 'list'],
+        classes: ['super-list-collapsed'],
       });
       collapsedList.append(this.createNode(
           { tag: 'span', classes: 'list-header-name', content: 'EMPTY' }));
@@ -1146,7 +1150,7 @@ class TFolds {
      * this method is called from "redraw"
      */
     if (listEl.querySelector('.list-collapsed')) {
-      this.debug && console.log("There's already a list-collapsed elementish");
+      this.debug && console.warn("There's already a list-collapsed elementish");
       return;
     }
     listEl.style.position = 'relative';
@@ -1154,7 +1158,7 @@ class TFolds {
       const name = tdom.getListName(listEl);
       const collapsedList = this.createNode({
         tag: 'div',
-        classes: ['list-collapsed', 'list'],
+        classes: ['list-collapsed'],
         style: { display: 'none' },
       });
       const nameSpan = this.createNode({
@@ -1171,7 +1175,8 @@ class TFolds {
       if (this.settings.rememberViewStates) {
         const collapsed = this.retrieve(tdom.getListName(listEl), 'collapsed');
         if (collapsed === true) {
-          this.collapseList(listEl.querySelector('.list > *').nextSibling);
+          this.debug && console.log(`List ${name} is collapsed`);
+          this.collapseList(listEl.querySelector('.list'));
         }
       }
     } catch (e) {
@@ -1499,11 +1504,12 @@ class TFolds {
   /**
    * Collapse one list.
    *
-   * @param {Element} listEl List element to collapse
+   * @param {HTMLElement} listEl List element to collapse
    */
   collapseList(listEl) {
-    this.toggleVisibility(listEl);
-    this.toggleVisibility(listEl.previousSibling);
+    this.debug && console.log('Collapsing list', listEl);
+    this.toggleVisibility(listEl, false);
+    this.toggleVisibility(listEl.previousElementSibling, 'flex');
     listEl.parentNode.style.width = '40px';
     this.store(tdom.getListName(listEl), 'collapsed', true);
   }
@@ -1542,7 +1548,7 @@ class TFolds {
    */
   collapseSuperList(superList) {
     this.toggleVisibility(superList);
-    this.toggleVisibility(superList.parentNode.querySelector('.super-list-collapsed'));
+    this.toggleVisibility(superList.parentNode.querySelector('.super-list-collapsed'), 'flex');
     superList.parentNode.style.width = '40px';
     superList.parentNode.nextSibling.style.display = 'none';
 
@@ -1693,16 +1699,20 @@ class TFolds {
   /**
    * Toggles visibility of an element, indicating the end state with a boolean.
    *
-   * @param {Element} element An element to toggle
-   * @param {Boolean} visible Force state to be visible or hidden
+   * @param {HTMLElement} element An element to toggle
+   * @param {Boolean} [visible] Force state to be visible or hidden
    * @returns {Boolean} True if visibility turned on, otherwise false
    */
   toggleVisibility(element, visible) {
     if (!element) {
       return undefined;
     }
-    if (visible === true || (element.style.display === 'none' && visible === undefined)) {
-      element.style.display = element.dataset.displayState ?? '';
+    if (!!visible || (element.style.display === 'none' && visible === undefined)) {
+      if (typeof visible === 'string') {
+        element.style.display = visible;
+      } else {
+        element.style.display = element.dataset.displayState ?? '';
+      }
       return true;
     }
     element.dataset.displayState = element.style.display;
