@@ -406,7 +406,7 @@ class TFolds {
       if (this.settings['rememberViewStates'] === true) {
         console.table(result[this.boardId]);
       }
-      this.storage = result[this.boardId];
+      this.storage = result[this.boardId] || {};
     }
   }
 
@@ -610,11 +610,20 @@ class TFolds {
    * @param {Object} value The preference new value
    */
   store(listName, key, value) {
+    let setting;
+
     if (!this.boardId) {
       throw new ReferenceError('Board ID not set');
     }
 
-    const setting = this.storage[listName] || {};
+    try {
+      setting = this.storage[listName];
+    } catch (e) {
+      this.debug && console.log(`Adding new state setting for list: ${listName}`);
+    }
+    if (!setting) {
+      setting = {};
+    }
     setting[key] = value;
     this.storage[listName] = setting;
     const boardStorage = {};

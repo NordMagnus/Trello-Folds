@@ -264,7 +264,7 @@ class TDOM {
     }
     this.newMutations = false;
     setTimeout(() => {
-      if (this.debug) {
+      if (false && this.debug) {
         // eslint-disable-next-line max-len
         console.log(`%cWaiting for board to load... (newMutations=${this.newMutations},boardCompletelyLoaded=${this.boardCompletelyLoaded})`,
             'font-style: italic; color: #808080;');
@@ -284,24 +284,29 @@ class TDOM {
       if (this.boardCompletelyLoaded) {
         return;
       }
+      console.log('here');
       for (const m of mutations) {
-        if (m.addedNodes.length === 1 && m.target.className === 'js-plugin-badges'
-                  && m.target.closest('a').nextSibling === null) {
-          const theList = this.getContainingList(m.target);
-          let nextList = this.getNextList(theList);
-          let done = true;
-          while (nextList !== null) {
-            if (this.countCards(nextList) !== 0) {
-              done = false;
-              break;
-            }
-            nextList = this.getNextList(nextList);
-          }
-          this.boardCompletelyLoaded = done;
-          if (done) {
-            console.info('%c  BOARD COMPLETELY LOADED!  ',
-                'font-weight: bold; color: #40a022; background-color: #f0f0f0;');
-          }
+        if (m.addedNodes.length === 1) {
+          console.log(m.target.className);
+        }
+        if (m.addedNodes.length === 1 && (
+          m.target.className === 'loader-wrapper' || m.target.className === 'js-plugin-badges')) {
+          console.log('here');
+          // const theList = this.getContainingList(m.target);
+          // let nextList = this.getNextList(theList);
+          // let done = true;
+          // while (nextList !== null) {
+          //   if (this.countCards(nextList) !== 0) {
+          //     done = false;
+          //     break;
+          //   }
+          //   nextList = this.getNextList(nextList);
+          // }
+          this.boardCompletelyLoaded = true;
+          // if (done) {
+          console.info('%c  BOARD COMPLETELY LOADED!  ',
+              'font-weight: bold; color: #40a022; background-color: #f0f0f0;');
+          // }
         }
       }
     }));
